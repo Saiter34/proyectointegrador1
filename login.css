@@ -141,6 +141,23 @@ button[type="submit"]:hover {
   background-color: #4c0000;
   box-shadow: 0 0 10px #ff0000;
 }
+a.btn-ingresar {
+  display: block;
+  text-align: center;
+  background-color: #610000;
+  color: white;
+  font-weight: bold;
+  border-radius: 10px;
+  padding: 0.75rem;
+  margin-top: 1.5rem;
+  text-decoration: none;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+a.btn-ingresar:hover {
+  background-color: #4c0000;
+  box-shadow: 0 0 10px #ff0000;
+}
 
 .imagen-lateral {
   position: relative;

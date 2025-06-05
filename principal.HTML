@@ -5,30 +5,29 @@
     <title>Teycketan</title>
     <link rel="stylesheet" href="principal.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
 </head>
 <body>
     <div class="overlay"></div>
     <main>
-        <header>
-            <div class="header-contenido">
-                <div class="logo"><img src="img/logo.png" alt="Logo"></div>
-                <nav>
-                    <div class="nav-box"><input type="text" placeholder="Buscar"></div>
-                    <div class="nav-box dropdown">
-                        <button>Categorías</button>
-                        <div class="dropdown-content">
-                            <a href="concierto.html">Conciertos</a>
-                            <a href="teatro.html">Teatro</a>
-                            <a href="deportes.html">Deportes</a>
-                        </div>
+        <header class="encabezado">
+            <div class="logo"><img src="img/logo.png" alt="Logo"></div>
+            <nav>
+                <div class="nav-box dropdown">
+                    <button>Categorías</button>
+                    <div class="dropdown-content">
+                        <a href="concierto.html">Conciertos</a>
+                        <a href="teatro.html">Teatro</a>
+                        <a href="deportes.html">Deportes</a>
                     </div>
-                    <div class="nav-box"><a href="login.html">Mi cuenta</a></div>
-                </nav>
-            </div>
+                </div>
+                <div class="nav-box"><a href="login.html">Mi cuenta</a></div>
+            </nav>
         </header>
 
         <div class="contenido-principal">
-            <section class="damiano">
+            <section class="damiano contenedor-estilo">
                 <div class="info">
                     <h2>Your Damiano David</h2>
                     <p><strong>Música</strong> / Presencial</p>
@@ -39,52 +38,56 @@
                 <img src="img/damiano.jpg" alt="Damiano David">
             </section>
 
-            <aside class="destacados">
+            <aside class="destacados contenedor-estilo">
                 <h3>Destacados</h3>
                 <div class="circulos">
-                    <div class="circulo">
-                        <img src="img/sanmarcos.png" alt="San Marcos" href="Sanmarcos.html">
+                    <a href="sanmarcos.html" class="circulo">
+                        <img src="img/sanmarcos.png" alt="San Marcos">
                         <span>San Marcos</span>
-                    </div>
-                    <div class="circulo">
-                        <img src="img/teatrocanout.jpg" alt="Canut" href="teatrocanut.html">
+                    </a>
+                    <a href="teatrocanout.html" class="circulo">
+                        <img src="img/teatrocanout.jpg" alt="Canut">
                         <span>Teatro Canut</span>
-                    </div>
-                    <div class="circulo">
-                        <img src="img/teatronacional.jpg" alt="Nacional" href="teatronacional.html">
+                    </a>
+                    <a href="teatronacional.html" class="circulo">
+                        <img src="img/teatronacional.jpg" alt="Nacional">
                         <span>Teatro Nacional</span>
-                    </div>
+                    </a>
                 </div>
             </aside>
         </div>
 
-        <section class="eventos">
-            <h3>Próximos eventos</h3>
-            <div class="eventos-grid">
-                <div class="evento">
-                    <img src="img/grupo5.jpg" alt="Grupo 5">
-                    <div class="evento-info">
-                        <h4>Gran Combo de Puerto Rico</h4>
-                        <p>Gran Teatro Nacional - Lima</p>
-                        <p>16 agosto 2025</p>
-                    </div>
-                </div>
-                <div class="evento">
-                    <img src="img/ballet.jpg" alt="Ballet Cascanueces">
-                    <div class="evento-info">
-                        <h4>Ballet Cascanueces</h4>
-                        <p>San Borja - Lima</p>
-                        <p>17 agosto 2025</p>
-                    </div>
+       <section class="eventos contenedor-estilo">
+    <h3>Próximos eventos</h3>
+    <div class="eventos-grid">
+        <a href="grupo5.html" target="_blank" class="evento-link">
+            <div class="evento">
+                <img src="img/grupo5.jpg" alt="Gran Combo de Puerto Rico">
+                <div class="evento-info">
+                    <h4>Gran Combo de Puerto Rico</h4>
+                    <p>Gran Teatro Nacional - Lima</p>
+                    <p>16 agosto 2025</p>
                 </div>
             </div>
-        </section>
+        </a>
+
+        <a href="ballet.html" target="_blank" class="evento-link">
+            <div class="evento">
+                <img src="img/ballet.jpg" alt="Ballet Cascanueces">
+                <div class="evento-info">
+                    <h4>Ballet Cascanueces</h4>
+                    <p>San Borja - Lima</p>
+                    <p>17 agosto 2025</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</section>
+
     </main>
 
-    <footer>
-        <p>© Teycketan 2025</p>
-    </footer>
+      <footer>
+    <img src="img/logo.png" alt="Logo Footer" class="logo-footer"/>
+  </footer>
 </body>
 </html>
-
-

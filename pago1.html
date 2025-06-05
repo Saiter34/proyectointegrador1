@@ -83,11 +83,36 @@
       </table>
 
       <button class="btn-agregar">AGREGAR</button>
+      <a href="pago2.html" class="btn-siguiente">SIGUIENTE</a>
+
+
     </section>
   </main>
 
   <footer>
     <img src="img/logo.png" alt="Logo Footer" class="logo-footer"/>
   </footer>
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const botonesCantidad = document.querySelectorAll('.cantidad');
+
+    botonesCantidad.forEach((contenedor) => {
+      const input = contenedor.querySelector('input');
+      const btnMenos = contenedor.querySelectorAll('button')[0];
+      const btnMas = contenedor.querySelectorAll('button')[1];
+
+      btnMas.addEventListener('click', () => {
+        input.value = parseInt(input.value) + 1;
+      });
+
+      btnMenos.addEventListener('click', () => {
+        if (parseInt(input.value) > 0) {
+          input.value = parseInt(input.value) - 1;
+        }
+      });
+    });
+  });
+</script>
+
 </body>
 </html>

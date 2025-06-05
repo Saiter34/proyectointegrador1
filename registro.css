@@ -51,7 +51,7 @@ body::after {
 label {
   display: block;
   margin-top: 1rem;
-  color: #ff7f00;
+  color: white;
   font-weight: 500;
 }
 
@@ -107,18 +107,11 @@ button[type="submit"]:hover {
   box-shadow: 0 0 10px #ff0000;
 }
 
-.footer {
-  margin-top: 2rem;
+footer {
   text-align: center;
+  padding: 20px;
 }
 
-.footer img {
+.logo-footer {
   height: 50px;
-}
-
-.footer p {
-  font-family: 'Orbitron', sans-serif;
-  color: #fff;
-  margin-top: 0.5rem;
-  font-size: 1.1rem;
 }

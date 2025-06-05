@@ -11,6 +11,54 @@ body {
   overflow-x: hidden;
 }
 
+.encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #7c0000;
+  border-bottom: 4px solid #b30000;
+  padding: 10px 30px;
+  position: relative;
+  z-index: 2;
+}
+
+.barra-logo .logo {
+  height: 45px;
+}
+
+.barra-pasos {
+  display: flex;
+  gap: 40px;
+}
+
+.paso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+  opacity: 0.5;
+}
+
+.paso.activo {
+  opacity: 1;
+  color: #ff3b3b;
+}
+
+.circulo {
+  width: 30px;
+  height: 30px;
+  background-color: #400000;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-bottom: 5px;
+  border: 2px solid #ff0000;
+}
+
 .hero {
   position: relative;
   height: 200vh;
@@ -132,7 +180,7 @@ button.general {
   max-width: 250px;
 }
 .historia {
-  background: none; /* Quitamos el fondo general */
+  background: none; 
   padding: 6rem 2rem 3rem 2rem;
   display: flex;
   justify-content: center;
@@ -140,7 +188,6 @@ button.general {
 
 .historia-contenido {
   position: relative;
-  background: url("img/historia.jpg") center center no-repeat;
   background-size: cover;
   border-radius: 30px;
   padding: 3rem 2rem;
@@ -164,6 +211,38 @@ button.general {
   border-radius: 10px;
   flex-shrink: 0;
 }
+
+.historia-contenido {
+  position: relative;
+  background: none;
+  overflow: hidden;
+}
+
+.historia-fondo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 110%;
+  height: 110%;
+  object-fit: cover;
+  z-index: 0;
+  filter: brightness(40%) blur(1px); 
+}
+
+.damiano-mini {
+  position: relative;
+  z-index: 1;
+}
+
+.historia-texto {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 
 .historia-texto {
   flex: 1;
@@ -190,6 +269,43 @@ button.general {
     margin: 0 auto;
     line-height: 1.6;
 }
+.botones-precio {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.btn-precio {
+  display: inline-block;
+  text-decoration: none;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 250px;
+  text-align: center;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-precio.regular {
+  background-color: #990000;
+  color: white;
+}
+
+.btn-precio.conadis {
+  background-color: white;
+  color: #990000;
+  border: 2px solid #990000;
+}
+
+.btn-precio:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
 footer{
     margin-top: 3rem;
     text-align: center;
