@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Selecciona tu ubicación - TEYCKETAN</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="pago1.css" />
+</head>
+<body>
+  <<header class="encabezado">
+  <div class="barra-logo">
+    <img src="img/logo.png" alt="Logo Teycketan" class="logo" />
+  </div>
+  <div class="barra-pasos">
+    <div class="paso activo">
+      <div class="circulo">1</div>
+      <span>TIK</span>
+    </div>
+    <div class="paso">
+      <div class="circulo">2</div>
+      <span>DATOS DE COMPRA</span>
+    </div>
+    <div class="paso">
+      <div class="circulo">3</div>
+      <span>CONFIRMACIÓN</span>
+    </div>
+  </div>
+</header>
+
+
+  <main class="contenedor">
+    <h1><span class="evento">Your Damiano David</span><br><span class="en-vivo">EN VIVO</span></h1>
+
+    <section class="zonas">
+      <div class="zona vip">
+        <h2>VIP</h2>
+      </div>
+      <div class="zona general">
+        <h2>GENERAL</h2>
+      </div>
+    </section>
+
+    <section class="detalles">
+      <div class="precios">
+        <label><input type="radio" name="zona" value="vip" required /> ZONA VIP - S/ 120.00</label><br>
+        <label><input type="radio" name="zona" value="comodis" /> ZONA VIP - COMODIS S/ 105.00</label><br>
+        <label><input type="radio" name="zona" value="general" /> ZONA GENERAL - S/ 84.00</label>
+      </div>
+
+      <table class="tabla-compra">
+        <thead>
+          <tr>
+            <th>TICKET</th>
+            <th>PRECIO</th>
+            <th>SELECCIONA CANTIDAD</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ZONA VIP</td>
+            <td>S/ 120.00</td>
+            <td>
+              <div class="cantidad">
+                <button>-</button>
+                <input type="text" value="0" />
+                <button>+</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>ZONA GENERAL</td>
+            <td>S/ 84.00</td>
+            <td>
+              <div class="cantidad">
+                <button>-</button>
+                <input type="text" value="0" />
+                <button>+</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <button class="btn-agregar">AGREGAR</button>
+    </section>
+  </main>
+
+  <footer>
+    <img src="img/logo.png" alt="Logo Footer" class="logo-footer"/>
+  </footer>
+</body>
+</html>

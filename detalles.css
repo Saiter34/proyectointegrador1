@@ -1,0 +1,200 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: black;
+  color: white;
+  overflow-x: hidden;
+}
+
+.hero {
+  position: relative;
+  height: 200vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+}
+
+.fondo-mapa {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("img/fondodetalles.jpg") center center no-repeat;
+  background-size: cover;
+  z-index: 0;
+}
+
+/* Imagen de Damiano semi-transparente */
+.damiano-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.85;
+  z-index: 1;
+}
+
+/* Contenido encima */
+.contenido {
+  position: relative;
+  z-index: 2;
+  padding: 2rem;
+  background-color: rgba(0, 0, 0, 0.65);
+  border-radius: 1rem;
+  max-width: 500px;
+  margin: auto;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.subtitulo {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+.botones-zonas{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.botones-zonas button {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  border-radius: 10px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  max-width: 300px;
+}
+
+button.vip {
+  background-color: #4c0000;
+  color: white;
+}
+
+button.general {
+  background-color: white;
+  color: #4c0000;
+}
+
+.tabla-precios {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.tabla-precios .fila {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.3rem 0;
+  border-bottom: 1px dotted #aaa;
+}
+
+.precio,
+.precio-conadis {
+  width: 100px;
+  text-align: right;
+}
+
+.botones-precio {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.botones-precio button {
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  background-color: #990000;
+  color: white;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  max-width: 250px;
+}
+.historia {
+  background: none; /* Quitamos el fondo general */
+  padding: 6rem 2rem 3rem 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.historia-contenido {
+  position: relative;
+  background: url("img/historia.jpg") center center no-repeat;
+  background-size: cover;
+  border-radius: 30px;
+  padding: 3rem 2rem;
+  max-width: 900px;
+  width: 100%;
+  color: white;
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  text-align: left;
+}
+
+.historia-overlay {
+  display: none; 
+}
+
+.damiano-mini {
+  width: 300px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.historia-texto {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.historia-texto p {
+  line-height: 1.6;
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+.info-detalles{
+    background-color: #2e0000;
+    padding: 4rem 2rem;
+    color: #fdd;
+    font-size: 1rem;
+    text-align: center;
+}
+.info-contenido{
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+footer{
+    margin-top: 3rem;
+    text-align: center;
+}
+.logo-footer{
+    width: 100px;
+    opacity: 0.9;
+}

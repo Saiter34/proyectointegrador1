@@ -1,0 +1,124 @@
+body {
+    background: url('img/fondometal.jpg') repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    font-family: 'Poppins', sans-serif;
+    color: white;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+body::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('img/fondodetalles.jpg') no-repeat center center;
+    background-size: cover;
+    opacity: 0.4; 
+    z-index: 0;
+}
+
+.container-registro {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  backdrop-filter: blur(2px);
+  position: relative;
+  z-index: 1; 
+}
+
+.form-box {
+  background-color: rgba(90, 0, 0, 0.8);
+  padding: 2rem;
+  border-radius: 15px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+}
+
+.form-box h3 {
+  text-align: center;
+  font-family: 'Orbitron', sans-serif;
+  margin-bottom: 1.5rem;
+  color: #fff;
+}
+
+label {
+  display: block;
+  margin-top: 1rem;
+  color: #ff7f00;
+  font-weight: 500;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"] {
+  width: 100%;
+  padding: 0.6rem;
+  margin-top: 0.3rem;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background-color: #2a2a2a;
+  color: white;
+}
+
+input::placeholder {
+  color: #bbb;
+}
+
+.sexo-options {
+  display: flex;
+  gap: 2rem;
+  margin-top: 0.5rem;
+  padding-left: 0.5rem;
+}
+
+.fecha-nac {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.fecha-nac input {
+  width: 33%;
+}
+
+button[type="submit"] {
+  background-color: #610000;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem;
+  margin-top: 1.5rem;
+  width: 100%;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background-color: #4c0000;
+  box-shadow: 0 0 10px #ff0000;
+}
+
+.footer {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.footer img {
+  height: 50px;
+}
+
+.footer p {
+  font-family: 'Orbitron', sans-serif;
+  color: #fff;
+  margin-top: 0.5rem;
+  font-size: 1.1rem;
+}

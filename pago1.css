@@ -1,0 +1,215 @@
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: url('img/fondometal.jpg') repeat;
+  background-size: cover;
+  position: relative;
+  color: white;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url('img/fondodetalles.jpg') no-repeat center;
+  background-size: cover;
+  opacity: 0.5;
+  z-index: 0;
+}
+
+.encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #333;
+  border-bottom: 4px solid #b30000;
+  padding: 5px 20px; /* Menos padding vertical */
+  height: 60px;
+  position: relative;
+  z-index: 3;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+
+}
+
+.barra-logo .logo {
+  height: 40px;
+}
+
+.barra-pasos {
+  display: flex;
+  gap: 30px;
+  margin-right: 20px;
+}
+
+.paso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  color: #fff;
+  opacity: 0.5;
+  transition: 0.3s ease;
+}
+
+.paso.activo {
+  opacity: 1;
+  color: #ff3b3b;
+}
+
+.circulo {
+  width: 24px;
+  height: 24px;
+  background-color: #400000;
+  border-radius: 50%;
+  color: white;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-bottom: 4px;
+  border: 2px solid #ff0000;
+}
+
+main.contenedor {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 40px auto 0 auto; 
+  padding: 30px;
+  background-color: rgba(50, 0, 0, 0.7);
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+  margin-top: 80px;
+}
+
+h1 {
+  text-align: center;
+  font-family: 'Orbitron', sans-serif;
+  margin-bottom: 20px;
+}
+
+h1 .evento {
+  color: #cccccc;
+  letter-spacing: 1px;
+}
+
+h1 .en-vivo {
+  font-size: 1.2rem;
+  color: #ff0000;
+}
+
+.zonas {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.zona {
+  width: 180px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+.zona.vip {
+  background-color: #4d0000;
+  color: white;
+}
+
+.zona.general {
+  background-color: #ddd;
+  color: #222;
+}
+
+.detalles {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.precios {
+  margin-bottom: 20px;
+  line-height: 1.8;
+  color: #f7f7f7;
+}
+
+.precios input[type="radio"] {
+  margin-right: 8px;
+}
+
+.tabla-compra {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.tabla-compra th, .tabla-compra td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+}
+
+.cantidad {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.cantidad button {
+  width: 30px;
+  height: 30px;
+  background-color: #610000;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cantidad input {
+  width: 40px;
+  text-align: center;
+  border-radius: 5px;
+  border: 1px solid #444;
+  background-color: #2a2a2a;
+  color: white;
+}
+
+.btn-agregar {
+  background-color: #4c0000;
+  color: white;
+  font-weight: bold;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  display: block;
+  margin: auto;
+  transition: 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-agregar:hover {
+  background-color: #610000;
+  box-shadow: 0 0 10px red;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+}
+
+.logo-footer {
+  height: 50px;
+}
