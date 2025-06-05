@@ -38,7 +38,8 @@ h1, h2, h3, h4 {
 
 
 header.encabezado {
-    background: #1a1a1a;
+     background-color: #7c0000;
+  border-bottom: 4px solid #b30000;
     padding: 10px 30px;
     display: flex;
     justify-content: space-between;
@@ -280,6 +281,16 @@ main {
 }
 
 /* --- EVENTOS --- */
+main h2 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: #400000;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
 .eventos {
     background-color: transparent;
     padding: 20px;
@@ -293,34 +304,39 @@ main {
 .eventos-grid {
     display: flex;
     gap: 20px;
-    flex-wrap: wrap;
+    flex-direction: column;
 }
 
 .evento {
     background-color: #1a1a1a;
     border: 2px solid #5c0d0d;
-    padding: 15px;
-    border-radius: 10px;
+    padding: 20px;
+    border-radius: 12px;
     display: flex;
-    gap: 15px;
-    width: calc(50% - 10px);
+    gap: 20px;
+    width: 100%;
+    max-width: 900%;
+    margin: 0 auto;
+    box-shadow: 0 4px 10px rgba(0, 0, o, 0.5);
 }
 
 .evento img {
-    width: 120px;
-    height: 90px;
+    width: 150px;
+    height: 100px;
     object-fit: cover;
-    border-radius: 6px;
+    border-radius: 8px;
 }
 
 .evento-info {
     color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .evento-link {
     text-decoration: none;
     color: inherit;
-    flex: 1 1 calc(50% - 10px);
     transition: transform 0.2s ease;
 }
 
