@@ -108,10 +108,27 @@ main.contenedor {
 /* Icono de check */
 .icono-check {
   font-size: 60px;
-  color: #00ff88;
+  color: #4c0000;
   margin-bottom: 20px;
 }
+.btn-siguiente {
+  background-color: #4c0000;
+  color: white;
+  font-weight: bold;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 10px;
+  display: block;
+  margin: 30px auto 0 auto;
+  font-size: 1rem;
+  transition: 0.3s ease;
+  cursor: pointer;
+}
 
+.btn-siguiente:hover {
+  background-color: #7a0000;
+  box-shadow: 0 0 10px #ff0000;
+}
 /* FOOTER */
 footer {
   text-align: center;
