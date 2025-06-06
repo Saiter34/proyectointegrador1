@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Teycketan</title>
+    <link rel="stylesheet" href="principal.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <div class="overlay"></div>
+    <main>
+        <header class="encabezado">
+            <div class="logo"><img src="img/logo.png" alt="Logo"></div>
+            <nav>
+                <div class="nav-box dropdown">
+                    <button>Categorías</button>
+                    <div class="dropdown-content">
+                        <a href="concierto.html">Conciertos</a>
+                        <a href="teatro.html">Teatro</a>
+                        <a href="deportes.html">Deportes</a>
+                    </div>
+                </div>
+                <div class="nav-box"><a href="#" id="nombreUsuarioLink">Mi Cuenta</a></div>
+            </nav>
+        </header>
+
+        <div class="contenido-principal">
+            <section class="damiano contenedor-estilo">
+                <div class="info">
+                    <h2>Your Damiano David</h2>
+                    <p><strong>Música</strong> / Presencial</p>
+                    <p>Damiano David en Lima</p>
+                    <p>14 al 18 mayo 2025</p>
+                    <a href="detalles.html" class="btn-vermas">Ver más</a>
+                </div>
+                <img src="img/damiano.jpg" alt="Damiano David">
+            </section>
+
+            <aside class="destacados contenedor-estilo">
+                <h3>Destacados</h3>
+                <div class="circulos">
+                    <a href="sanmarcos.html" class="circulo">
+                        <img src="img/sanmarcos.png" alt="San Marcos">
+                        <span>San Marcos</span>
+                    </a>
+                    <a href="teatrocanut.html" class="circulo">
+                        <img src="img/teatrocanout.jpg" alt="Canut">
+                        <span>Teatro Canut</span>
+                    </a>
+                    <a href="teatronacional.html" class="circulo">
+                        <img src="img/teatronacional.jpg" alt="Nacional">
+                        <span>Teatro Nacional</span>
+                    </a>
+                </div>
+            </aside>
+        </div>
+
+    <section class="eventos contenedor-estilo">
+    <h3>Próximos eventos</h3>
+    <div class="eventos-grid">
+        <a href="grupo5.html" target="_blank" class="evento-link">
+            <div class="evento">
+                <img src="img/grupo5.jpg" alt="Gran Combo de Puerto Rico">
+                <div class="evento-info">
+                    <h4>Gran Combo de Puerto Rico</h4>
+                    <p>Gran Teatro Nacional - Lima</p>
+                    <p>16 agosto 2025</p>
+                </div>
+            </div>
+        </a>
+
+        <a href="ballet.html" target="_blank" class="evento-link">
+            <div class="evento">
+                <img src="img/ballet.jpg" alt="Ballet Cascanueces">
+                <div class="evento-info">
+                    <h4>Ballet Cascanueces</h4>
+                    <p>San Borja - Lima</p>
+                    <p>17 agosto 2025</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</section>
+
+    </main>
+
+    <footer>
+    <img src="img/logo.png" alt="Logo Footer" class="logo-footer"/>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userName = localStorage.getItem('userName');
+    
+            if (userName) {
+                const nombreUsuarioLink = document.getElementById('nombreUsuarioLink');
+                if (nombreUsuarioLink) {
+                    nombreUsuarioLink.textContent = userName;
+                }
+            } else {
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,15 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db');
+const { pool } = require('../db');
 
-// GET /api/eventos
 router.get('/', async (req, res) => {
     try {
-    const result = await db.query('SELECT * FROM "Eventos" WHERE "Estado" = \'Activo\'');
-    res.json(result.rows);
+        const result = await pool.query('SELECT * FROM "Eventos" WHERE "Estado" = \'Activo\'');
+        res.json(result.rows);
     } catch (error) {
-    console.error('Error al obtener eventos:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+        console.error('Error al obtener eventos:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
