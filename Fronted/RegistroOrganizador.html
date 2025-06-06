@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Teycketan</title>
+    <link rel="stylesheet" href="registro.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+<body>
+    <!-- Encabezado (opcional, si quieres que también esté en esta página) -->
+    <!-- Si lo incluyes, asegúrate de que el usuario ya esté logueado al llegar aquí -->
+    
+    <div class="encabezado">
+        <div class="barra-logo">
+            <img src="img/logo.png" alt="Logo">
+        </div>
+        <div class="barra-pasos">
+            <div class="paso activo">
+                <div class="circulo">1</div>
+                <span>Datos de Organizador</span>
+            </div>
+            <div class="paso">
+                <div class="circulo">2</div>
+                <span>Confirmación</span>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container-registro">
+        <div class="form-box">
+            <form id="registroForm">
+                <h3>Conviértete en Organizador</h3>
+                <p style="color: #bbb; text-align: center; margin-bottom: 20px;">Por favor, ingresa los detalles de tu empresa para completar tu registro como organizador.</p>
+
+                <label for="nomEmpresa">Nombre de la Empresa</label>
+                <input type="text" id="nomEmpresa" name="nomEmpresa" placeholder="Ingresa el nombre de tu empresa" required />
+
+                <label for="descripcion">Descripción de la Empresa</label>
+                <textarea id="descripcion" name="descripcion" placeholder="Describe brevemente tu empresa" rows="4" required></textarea>
+
+                <button type="submit">Enviar Solicitud de Organizador</button>
+            </form>
+        </div>
+        <footer>
+            <img src="img/logo.png" alt="Logo Footer" class="logo-footer"/>
+        </footer>
+    </div>
+
+    <!-- The Message Modal -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <p id="modalMessage"></p>
+            <button id="modalOkButton">OK</button>
+        </div>
+    </div>
+
+    <script>
+        const registroForm = document.getElementById('registroForm');
+        const messageModal = document.getElementById('messageModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const closeButton = document.getElementsByClassName('close-button')[0];
+        const modalOkButton = document.getElementById('modalOkButton');
+
+        // Function to display custom message box
+        function showMessage(message, isSuccess = false) {
+            messageModal.style.display = 'flex'; // Use flex to center
+            modalMessage.textContent = message;
+            modalMessage.style.color = isSuccess ? '#28a745' : '#ff3b3b'; // Green for success, red for error
+        }
+
+        // Close modal when X is clicked
+        closeButton.onclick = function() {
+            messageModal.style.display = 'none';
+        }
+
+        // Close modal when OK button is clicked
+        modalOkButton.onclick = function() {
+            messageModal.style.display = 'none';
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            if (event.target == messageModal) {
+                messageModal.style.display = 'none';
+            }
+        }
+
+        registroForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            // Obtener el token de autenticación del localStorage
+            const token = localStorage.getItem('jwtToken'); // Asume que el token se guarda con esta clave al iniciar sesión
+
+            if (!token) {
+                showMessage('No estás autenticado. Por favor, inicia sesión primero.', false);
+                // Opcional: Redirigir a la página de login
+                // setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+                return;
+            }
+
+            // Get form values (only organizer-specific data)
+            const nomEmpresa = document.getElementById('nomEmpresa').value;
+            const descripcion = document.getElementById('descripcion').value;
+
+            // Create data object for the API request
+            const organizerData = {
+                nom_empresa: nomEmpresa, // Asegúrate que coincida con el nombre de la variable en tu backend
+                descripcion: descripcion
+            };
+
+            try {
+                // Send data to your backend API endpoint for organizer request
+                // Esta es la ruta que ya tienes y usa authenticateToken
+                const response = await fetch('http://localhost:3000/organizer-request', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` // ¡Envía el token!
+                    },
+                    body: JSON.stringify(organizerData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage(data.message || 'Solicitud de organizador procesada exitosamente!', true);
+                    // Opcional: Redirigir a un dashboard de organizador o página principal
+                    setTimeout(() => {
+                        window.location.href = 'principal.HTML'; // O a donde corresponda
+                    }, 2000);
+                } else {
+                    showMessage('Error al procesar solicitud: ' + (data.message || 'Error desconocido del servidor.'), false);
+                }
+            } catch (error) {
+                console.error('Error de red o del servidor:', error);
+                showMessage('No se pudo conectar con el servidor. Por favor, asegúrate de que el backend esté funcionando.', false);
+            }
+        });
+    </script>
+    </body>
+</html>

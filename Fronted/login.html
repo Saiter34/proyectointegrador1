@@ -6,6 +6,78 @@
   <title>Iniciar Sesión - TEYCKETAN</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="login.css" />
+  <style>
+    /* Custom styles for the message modal - similar to registroorgani.html */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 10; /* Sit on top of other content */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0,0,0,0.7); /* Darker overlay */
+        justify-content: center;
+        align-items: center;
+        font-family: 'Poppins', sans-serif; /* Use theme font */
+    }
+
+    .modal-content {
+        background-color: rgba(90, 0, 0, 0.9); /* Similar to form-box background */
+        margin: auto;
+        padding: 30px;
+        border: 2px solid #ff0000; /* Red border */
+        border-radius: 15px;
+        width: 80%;
+        max-width: 450px;
+        text-align: center;
+        box-shadow: 0 0 30px rgba(255, 0, 0, 0.5); /* Red glowing shadow */
+        position: relative;
+        color: white; /* White text for modal content */
+    }
+
+    .close-button {
+        color: #ccc;
+        float: right;
+        font-size: 30px;
+        font-weight: bold;
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .close-button:hover,
+    .close-button:focus {
+        color: #ff3b3b; /* Active red on hover */
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    #modalMessage {
+        margin-bottom: 20px;
+        font-size: 1.1rem;
+        line-height: 1.4;
+    }
+
+    #modalOkButton {
+        background-color: #610000; /* Similar to form button */
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 20px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    #modalOkButton:hover {
+        background-color: #4c0000;
+        box-shadow: 0 0 10px #ff0000;
+    }
+  </style>
 </head>
 <body>
   <header class="encabezado">
@@ -43,40 +115,108 @@
   <footer>
     <img src="img/logo.png" alt="Logo Footer" class="logo-footer"/>
   </footer>
+
+  <!-- The Message Modal -->
+  <div id="messageModal" class="modal">
+      <div class="modal-content">
+          <span class="close-button">&times;</span>
+          <p id="modalMessage"></p>
+          <button id="modalOkButton">OK</button>
+      </div>
+  </div>
+
   <script>
-      document.getElementById('loginForm').addEventListener('submit', async function(event) {
-          event.preventDefault(); 
+    // --- DEFINICIÓN DE VARIABLES Y FUNCIONES DEL MODAL AL PRINCIPIO ---
+    // Get references to modal elements
+    const messageModal = document.getElementById('messageModal');
+    const modalMessage = document.getElementById('modalMessage');
+    const closeButton = document.getElementsByClassName('close-button')[0];
+    const modalOkButton = document.getElementById('modalOkButton');
 
-          const email = document.getElementById('email').value; 
-          const password = document.getElementById('password').value;
+    // --- CONSOLE.LOGS DE DEPURACIÓN ---
+    console.log('Script cargado. Verificación de elementos:');
+    console.log('messageModal:', messageModal);
+    console.log('modalMessage:', modalMessage);
+    console.log('closeButton:', closeButton);
+    console.log('modalOkButton:', modalOkButton);
+    // --- FIN CONSOLE.LOGS DE DEPURACIÓN ---
 
-          try {
-              const response = await fetch('http://localhost:3000/login', {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({ email, password })
-              });
 
-              const data = await response.json();
+    // Function to display custom message box
+    function showMessage(message, isSuccess = false) {
+        // Verificaciones robustas para asegurar que los elementos existan
+        if (!messageModal || !modalMessage) {
+            console.error("Error Crítico: Uno o ambos elementos esenciales del modal (messageModal o modalMessage) no fueron encontrados en el DOM. Mostrando mensaje con alert() como fallback.");
+            alert("ERROR: No se pudo mostrar el mensaje de la aplicación. Mensaje: " + message);
+            return; // Salir de la función para evitar TypeError
+        }
 
-              if (response.ok) {
-                  console.log('Inicio de sesión exitoso:', data);
-                  localStorage.setItem('userId', data.userId);
-                  localStorage.setItem('userName', data.userName); 
-                  localStorage.setItem('isOrganizer', data.isOrganizer); 
+        messageModal.style.display = 'flex'; 
+        modalMessage.textContent = message;
+        modalMessage.style.color = isSuccess ? '#28a745' : '#ff3b3b'; // Green for success, red for error
+    }
 
-                  window.location.href = 'Cliente.html'; 
-              } else {
-                  alert('Error al iniciar sesión: ' + data.message);
-                  console.error('Error al iniciar sesión:', data.message);
-              }
-          } catch (error) {
-              console.error('Error de red o del servidor:', error);
-              alert('No se pudo conectar con el servidor.');
-          }
-      });
+    // Close modal when X is clicked
+    if (closeButton) { 
+        closeButton.onclick = function() {
+            if (messageModal) messageModal.style.display = 'none'; // Verificar messageModal antes de usar
+        }
+    }
+
+    // Close modal when OK button is clicked
+    if (modalOkButton) { 
+        modalOkButton.onclick = function() {
+            if (messageModal) messageModal.style.display = 'none'; // Verificar messageModal antes de usar
+        }
+    }
+
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+        if (messageModal && event.target == messageModal) { // Verificar messageModal antes de usar
+            messageModal.style.display = 'none';
+        }
+    }
+    // --- FIN DE DEFINICIONES DEL MODAL ---
+
+
+    // --- LISTENER DEL FORMULARIO DE LOGIN ---
+    document.getElementById('loginForm').addEventListener('submit', async function(event) {
+        event.preventDefault(); 
+
+        const email = document.getElementById('email').value; 
+        const password = document.getElementById('password').value;
+
+        try {
+            const response = await fetch('http://localhost:3000/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json(); 
+
+            if (response.ok) {
+                console.log('Inicio de sesión exitoso:', data);
+                localStorage.setItem('userId', data.userId);
+                localStorage.setItem('userName', data.userName); 
+                localStorage.setItem('isOrganizer', data.isOrganizer); 
+                localStorage.setItem('jwtToken', data.token);
+
+                showMessage('Inicio de sesión exitoso!', true);
+                setTimeout(() => {
+                    window.location.href = 'Cliente.html'; 
+                }, 1500); // Pequeño retraso para que el mensaje se vea
+            } else {
+                showMessage('Error al iniciar sesión: ' + (data.message || 'Error desconocido.'), false);
+                console.error('Error al iniciar sesión:', data.message);
+            }
+        } catch (error) {
+            console.error('Error de red o del servidor:', error);
+            showMessage('No se pudo conectar con el servidor. Por favor, asegúrate de que el backend esté funcionando.', false);
+        }
+    });
   </script>
 </body>
 </html>
