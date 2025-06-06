@@ -96,13 +96,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnSiguiente = document.getElementById('btnSiguiente');
     const radioButtons = document.querySelectorAll('input[name="zona"]');
 
-    // Initialize quantities for all inputs
     cantidadInputs.forEach(input => {
-        input.value = 0; // Ensure all start at 0
-        input.readOnly = true; // Make them read-only
+        input.value = 0; 
+        input.readOnly = true;
     });
 
-    // Event listeners for quantity buttons
     btnMas.forEach(button => {
         button.addEventListener('click', () => {
             const input = button.previousElementSibling;
@@ -112,14 +110,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     btnMenos.forEach(button => {
         button.addEventListener('click', () => {
-            const input = button.nextElementSibling; // Changed this line, it should be next
+            const input = button.nextElementSibling;
             if (parseInt(input.value) > 0) {
                 input.value = parseInt(input.value) - 1;
             }
         });
     });
 
-    // Disable/Enable quantity inputs based on radio selection
     function updateQuantityInputsState() {
         const selectedRadio = document.querySelector('input[name="zona"]:checked');
         const selectedZoneValue = selectedRadio ? selectedRadio.value : null;
@@ -128,12 +125,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const parentDiv = input.closest('.cantidad');
             if (parentDiv && parentDiv.dataset.zone) {
                 if (parentDiv.dataset.zone === selectedZoneValue) {
-                    input.closest('.cantidad').style.opacity = '1'; // Make visible/active
-                    input.closest('.cantidad').style.pointerEvents = 'auto'; // Enable interaction
+                    input.closest('.cantidad').style.opacity = '1';
+                    input.closest('.cantidad').style.pointerEvents = 'auto';
                 } else {
-                    input.value = '0'; // Reset quantity if not selected
-                    input.closest('.cantidad').style.opacity = '0.5'; // Dim out
-                    input.closest('.cantidad').style.pointerEvents = 'none'; // Disable interaction
+                    input.value = '0'; 
+                    input.closest('.cantidad').style.opacity = '0.5';
+                    input.closest('.cantidad').style.pointerEvents = 'none';
                 }
             }
         });
@@ -143,10 +140,8 @@ document.addEventListener('DOMContentLoaded', function () {
         radio.addEventListener('change', updateQuantityInputsState);
     });
 
-    // Initial state setup (e.g., if a radio is pre-checked)
     updateQuantityInputsState();
 
-    // Event listener for "SIGUIENTE" button
     btnSiguiente.addEventListener('click', () => {
         const selectedRadio = document.querySelector('input[name="zona"]:checked');
         if (!selectedRadio) {
@@ -157,11 +152,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const selectedTickets = [];
         let totalAmount = 0;
 
-        // Get the selected radio button's price and name
         const selectedZoneName = selectedRadio.dataset.name;
         const selectedZonePrice = parseFloat(selectedRadio.dataset.price);
 
-        // Get the quantity from the input associated with the selected radio
         const selectedQuantityInput = document.querySelector(`.cantidad[data-zone="${selectedRadio.value}"] .cantidad-input`);
         const quantity = parseInt(selectedQuantityInput ? selectedQuantityInput.value : 0);
 
@@ -181,14 +174,12 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
 
-        // Store selected data in localStorage
         localStorage.setItem('purchaseDetails', JSON.stringify({
             tickets: selectedTickets,
             total: totalAmount,
-            eventName: "Your Damiano David" // Hardcoded for now, get from actual event details page later
+            eventName: "Your Damiano David" 
         }));
 
-        // Redirect to pago2.html
         window.location.href = 'pago2.html';
     });
 });

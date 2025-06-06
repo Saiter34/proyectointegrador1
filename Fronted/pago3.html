@@ -55,12 +55,11 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Retrieve purchase details from localStorage
     const purchaseDetails = JSON.parse(localStorage.getItem('purchaseDetails'));
 
     if (!purchaseDetails || !purchaseDetails.tickets || purchaseDetails.tickets.length === 0) {
         alert('No se encontraron detalles de la compra. Redirigiendo al inicio.');
-        window.location.href = 'principal.HTML'; // Or login.html, etc.
+        window.location.href = 'principal.HTML';
         return;
     }
 
@@ -73,27 +72,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const ticketCantidad = document.getElementById('ticketCantidad');
     const ticketTotal = document.getElementById('ticketTotal');
 
-    // Assuming a single ticket type is selected per purchase for simplicity
     const firstTicket = purchaseDetails.tickets[0];
 
     ticketEvento.textContent = purchaseDetails.eventName || '#';
-    // For Fecha, Hora, Ubicacion: You'll need to fetch these from your event data/database
-    // For now, using placeholders or previously hardcoded values if available
-    ticketFecha.textContent = '14 - 18 mayo 2025'; // Placeholder
-    ticketHora.textContent = '8:00 PM';         // Placeholder
-    ticketUbicacion.textContent = 'Jockey Club del Perú'; // Placeholder
+    ticketFecha.textContent = '14 - 18 mayo 2025';
+    ticketHora.textContent = '8:00 PM'; 
+    ticketUbicacion.textContent = 'Jockey Club del Perú'; 
     ticketZona.textContent = firstTicket.name || '#';
     ticketCantidad.textContent = firstTicket.quantity || '#';
     ticketTotal.textContent = `S/ ${purchaseDetails.total.toFixed(2)}`;
 
-    // Optionally clear localStorage after successful purchase and display
-    // This prevents re-downloading the same ticket if the user revisits
-    // localStorage.removeItem('purchaseDetails'); 
 });
 
 function descargarTicket(){
     const elemento = document.getElementById("ticket");
-    elemento.style.display = 'block'; // Make it visible for PDF generation
+    elemento.style.display = 'block';
 
     const opciones = {
         margin: 1,
@@ -104,7 +97,7 @@ function descargarTicket(){
     };
 
     html2pdf().set(opciones).from(elemento).save().then(()=>{
-        elemento.style.display='none'; // Hide it again after PDF is generated
+        elemento.style.display='none'; 
     });
 }
 </script>

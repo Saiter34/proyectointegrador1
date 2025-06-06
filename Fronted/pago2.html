@@ -73,15 +73,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let purchaseDetails = JSON.parse(localStorage.getItem('purchaseDetails'));
 
-    // If no purchase details, redirect back or show error
     if (!purchaseDetails || !purchaseDetails.tickets || purchaseDetails.tickets.length === 0) {
         alert('No se encontraron detalles de la compra. Volviendo al paso anterior.');
         window.location.href = 'pago1.html';
         return;
     }
 
-    // Populate the summary
-    summaryTicketsDiv.innerHTML = ''; // Clear existing content
+    summaryTicketsDiv.innerHTML = '';
     purchaseDetails.tickets.forEach(ticket => {
         const ticketLine = document.createElement('div');
         ticketLine.className = 'linea';
@@ -94,7 +92,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     totalAmountSpan.textContent = `S/ ${purchaseDetails.total.toFixed(2)}`;
 
-    // Event listener for "SIGUIENTE" button
     btnSiguiente2.addEventListener('click', () => {
         const selectedPaymentMethod = document.querySelector('input[name="pago"]:checked');
 
@@ -105,10 +102,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         purchaseDetails.paymentMethod = selectedPaymentMethod.value;
 
-        // Store updated purchase details in localStorage
         localStorage.setItem('purchaseDetails', JSON.stringify(purchaseDetails));
 
-        // Redirect to pago3.html
         window.location.href = 'pago3.html';
     });
 });
