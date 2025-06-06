@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registro - Teycketan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="registro.css" />
+</head>
+<header class="encabezado">
+    <div class="barra-logo">
+      <img src="img/logo.png" alt="Logo Teycketan" class="logo" />
+    </div>
+    <div class="barra-pasos">
+      <a href="proveedor.html" class="paso activo">
+        <div class="circulo">1</div>
+        <span>INICIO</span>
+      </a>
+    </div>
+  </header>
+<body>
+  <div class="container-registro">
+    <div class="form-box">
+      <form id="registroForm"> <h3>Registro de organizador</h3>
+
+        <label for="nombre">Nombres</label>
+        <input type="text" id="nombre" name="nombres" placeholder="Ingresa tu nombre" required /> <label for="apellido">Apellidos</label>
+        <input type="text" id="apellido" name="apellidos" placeholder="Ingresa tus apellidos" required /> <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="Ingresa tu Email" required />
+
+        <label for="telefono">Teléfono</label>
+        <input type="tel" id="telefono" name="telefono" placeholder="Ingresa tu teléfono" required />
+
+        <label for="contrasena">Contraseña</label>
+        <input type="password" id="contrasena" name="contrasena" placeholder="Ingresa tu contraseña" required />
+
+        <label>Fecha de nacimiento</label>
+        <div class="fecha-nac">
+          <input type="text" id="dia" name="dia" placeholder="dd" maxlength="2" required />
+          <input type="text" id="mes" name="mes" placeholder="mm" maxlength="2" required />
+          <input type="text" id="anio" name="anio" placeholder="yyyy" maxlength="4" required />
+        </div>
+
+        <button type="submit">Solicitar ser organizador</button>
+      </form>
+    </div>
+   <footer>
+    <img src="img/logo.png" alt="Logo Footer" class="logo-footer"/>
+   </footer>
+  </div>
+
+  <script>
+    const registroForm = document.getElementById('registroForm');
+
+    registroForm.addEventListener('submit', async (event) => {
+      event.preventDefault(); 
+
+      const nombres = document.getElementById('nombre').value;
+      const apellidos = document.getElementById('apellido').value;
+      const email = document.getElementById('email').value;
+      const telefono = document.getElementById('telefono').value;
+      const contrasena = document.getElementById('contrasena').value;
+      const dia = document.getElementById('dia').value;
+      const mes = document.getElementById('mes').value;
+      const anio = document.getElementById('anio').value;
+
+      const userData = {
+        nombres,
+        apellidos,
+        email,
+        telefono,
+        contrasena,
+        dia,
+        mes,
+        anio
+      };
+
+      try {
+        const response = await fetch('http://localhost:3000/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(userData)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert(data.message);
+          window.location.href = 'login.html';
+        } else {
+          alert('Error al registrar: ' + (data.message || 'Error desconocido del servidor.'));
+        }
+      } catch (error) {
+        console.error('Error de red o del servidor:', error);
+        alert('No se pudo conectar con el servidor. Por favor, asegúrate de que el backend esté funcionando.');
+      }
+    });
+  </script>
+</body>
+</html>

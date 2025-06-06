@@ -378,7 +378,15 @@ main {
     padding: 100px 30px 20px; 
 }
 
-
+footer{
+    background: radial-gradient(circle at center, #1a1a1a 0%, #0d0d0d 100%);
+    color: #ccc;
+    padding: 2rem;
+    border-top: 1 px solid #520000;
+    box-shadow: 0 -2px 10px rgba(255, 0, 0, 0.2);
+    position: relative;
+    z-index: 10;
+}    
 .footer-completo {
     width: 100%;
     background-color: #0b2f43;
@@ -455,6 +463,10 @@ main {
 
 .payment-methods img:hover {
     transform: scale(1.1);
+}
+.btn-proveedor{
+    font-family: "Orbitron", sans-serif;
+    color: white;
 }
 
 .footer-copy {
