@@ -29,42 +29,89 @@
   </header>
 
   <main class="contenedor">
-  <h2 class="subtitulo">Selecciona método de pago</h2>
+    <h2 class="subtitulo">Selecciona método de pago</h2>
 
-  <section class="metodos-pago">
-    <label class="metodo">
-      <input type="radio" name="pago" value="efectivo" required />
-      <span>PAGO EFECTIVO</span>
-    </label>
+    <section class="metodos-pago">
+      <label class="metodo">
+        <input type="radio" name="pago" value="efectivo" required />
+        <span>PAGO EFECTIVO</span>
+      </label>
 
-    <label class="metodo">
-      <input type="radio" name="pago" value="yape" />
-      <span>YAPE</span>
-    </label>
-  </section>
+      <label class="metodo">
+        <input type="radio" name="pago" value="yape" />
+        <span>YAPE</span>
+      </label>
+      </section>
 
-  <section class="resumen">
-    <h3>RESUMEN</h3>
-    <div class="linea">
-      <span class="item">TICKET</span>
-      <span class="item">PRECIO</span>
-    </div>
-    <div class="linea">
-      <span class="item">1 ZONA VIP</span>
-      <span class="item">S/ 120.00</span>
-    </div>
-    <div class="linea total">
-      <span class="item">TOTAL</span>
-      <span class="item">S/ 120.00</span>
-    </div>
-  </section>
+    <section class="resumen">
+      <h3>RESUMEN</h3>
+      <div class="linea">
+        <span class="item">TICKET</span>
+        <span class="item">PRECIO</span>
+      </div>
+      <div id="summaryTickets">
+        </div>
+      <div class="linea total">
+        <span class="item">TOTAL</span>
+        <span class="item" id="totalAmount">S/ 0.00</span>
+      </div>
+    </section>
 
-  <a href="pago3.html" class="btn-siguiente">SIGUIENTE</a>
-</main>
-
+    <button id="btnSiguiente2" class="btn-siguiente">SIGUIENTE</button>
+  </main>
 
   <footer>
     <img src="img/logo.png" alt="Logo Footer" class="logo-footer" />
   </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const summaryTicketsDiv = document.getElementById('summaryTickets');
+    const totalAmountSpan = document.getElementById('totalAmount');
+    const btnSiguiente2 = document.getElementById('btnSiguiente2');
+    const paymentMethodsRadios = document.querySelectorAll('input[name="pago"]');
+
+    let purchaseDetails = JSON.parse(localStorage.getItem('purchaseDetails'));
+
+    // If no purchase details, redirect back or show error
+    if (!purchaseDetails || !purchaseDetails.tickets || purchaseDetails.tickets.length === 0) {
+        alert('No se encontraron detalles de la compra. Volviendo al paso anterior.');
+        window.location.href = 'pago1.html';
+        return;
+    }
+
+    // Populate the summary
+    summaryTicketsDiv.innerHTML = ''; // Clear existing content
+    purchaseDetails.tickets.forEach(ticket => {
+        const ticketLine = document.createElement('div');
+        ticketLine.className = 'linea';
+        ticketLine.innerHTML = `
+            <span class="item">${ticket.quantity} ${ticket.name}</span>
+            <span class="item">S/ ${ticket.subtotal.toFixed(2)}</span>
+        `;
+        summaryTicketsDiv.appendChild(ticketLine);
+    });
+
+    totalAmountSpan.textContent = `S/ ${purchaseDetails.total.toFixed(2)}`;
+
+    // Event listener for "SIGUIENTE" button
+    btnSiguiente2.addEventListener('click', () => {
+        const selectedPaymentMethod = document.querySelector('input[name="pago"]:checked');
+
+        if (!selectedPaymentMethod) {
+            alert('Por favor, selecciona un método de pago.');
+            return;
+        }
+
+        purchaseDetails.paymentMethod = selectedPaymentMethod.value;
+
+        // Store updated purchase details in localStorage
+        localStorage.setItem('purchaseDetails', JSON.stringify(purchaseDetails));
+
+        // Redirect to pago3.html
+        window.location.href = 'pago3.html';
+    });
+});
+</script>
 </body>
 </html>

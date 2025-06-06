@@ -33,16 +33,18 @@
     <div class="mensaje-confirmacion">
       <h1>PAGO REALIZADO</h1>
       <p>GRACIAS POR SU COMPRA</p>
-      <button onclick="descargarTicket()">Descargar Ticket</button>
-     <div id="ticket" style="display: none; padding: 20px; border: 2px solid black; width: 400px;">
-      <img src="img/logo.png" alt="Logo" style="width: 100px; margin-bottom: 10px;">
-      <h2>Ticket entrada</h2>
-      <p><strong>Evento:</strong> "#"</p>
-      <p><strong>Fecha:</strong> "#"</p>
-      <p><strong>Hora:</strong> "#"</p>
-      <p><strong>Ubicacion:</strong> "#"</p>
-      <p><strong>Nombre:</strong> "#"</p>
-     </div>
+      <p>Se ha enviado un correo de confirmación a tu email.</p> <button onclick="descargarTicket()">Descargar Ticket</button>
+
+      <div id="ticket" style="display: none; padding: 20px; border: 2px solid black; width: 400px; margin: 20px auto; background-color: white; color: black; font-family: sans-serif;">
+        <img src="img/logo.png" alt="Logo" style="width: 100px; margin-bottom: 10px;">
+        <h2>Ticket de Entrada</h2>
+        <p><strong>Evento:</strong> <span id="ticketEvento"></span></p>
+        <p><strong>Fecha:</strong> <span id="ticketFecha">14 - 18 mayo 2025</span></p> <p><strong>Hora:</strong> <span id="ticketHora">8:00 PM</span></p> <p><strong>Ubicación:</strong> <span id="ticketUbicacion">Jockey Club del Perú</span></p> <p><strong>Zona:</strong> <span id="ticketZona"></span></p>
+        <p><strong>Cantidad:</strong> <span id="ticketCantidad"></span></p>
+        <p><strong>Total Pagado:</strong> <span id="ticketTotal"></span></p>
+        <p style="margin-top: 20px; font-size: 0.8em;">¡Nos vemos en el evento!</p>
+      </div>
+
       <a href="principal.HTML" class="btn-siguiente">Volver a inicio</a>
     </div>
   </main>
@@ -50,21 +52,61 @@
   <footer>
     <img src="img/logo.png" alt="Logo Footer" class="logo-footer"/>
   </footer>
+
 <script>
-  function descargarTicket(){
+document.addEventListener('DOMContentLoaded', () => {
+    // Retrieve purchase details from localStorage
+    const purchaseDetails = JSON.parse(localStorage.getItem('purchaseDetails'));
+
+    if (!purchaseDetails || !purchaseDetails.tickets || purchaseDetails.tickets.length === 0) {
+        alert('No se encontraron detalles de la compra. Redirigiendo al inicio.');
+        window.location.href = 'principal.HTML'; // Or login.html, etc.
+        return;
+    }
+
+    // Populate the ticket details for PDF download
+    const ticketEvento = document.getElementById('ticketEvento');
+    const ticketFecha = document.getElementById('ticketFecha');
+    const ticketHora = document.getElementById('ticketHora');
+    const ticketUbicacion = document.getElementById('ticketUbicacion');
+    const ticketZona = document.getElementById('ticketZona');
+    const ticketCantidad = document.getElementById('ticketCantidad');
+    const ticketTotal = document.getElementById('ticketTotal');
+
+    // Assuming a single ticket type is selected per purchase for simplicity
+    const firstTicket = purchaseDetails.tickets[0];
+
+    ticketEvento.textContent = purchaseDetails.eventName || '#';
+    // For Fecha, Hora, Ubicacion: You'll need to fetch these from your event data/database
+    // For now, using placeholders or previously hardcoded values if available
+    ticketFecha.textContent = '14 - 18 mayo 2025'; // Placeholder
+    ticketHora.textContent = '8:00 PM';         // Placeholder
+    ticketUbicacion.textContent = 'Jockey Club del Perú'; // Placeholder
+    ticketZona.textContent = firstTicket.name || '#';
+    ticketCantidad.textContent = firstTicket.quantity || '#';
+    ticketTotal.textContent = `S/ ${purchaseDetails.total.toFixed(2)}`;
+
+    // Optionally clear localStorage after successful purchase and display
+    // This prevents re-downloading the same ticket if the user revisits
+    // localStorage.removeItem('purchaseDetails'); 
+});
+
+function descargarTicket(){
     const elemento = document.getElementById("ticket");
-    elemento.style.display = 'block';
+    elemento.style.display = 'block'; // Make it visible for PDF generation
+
     const opciones = {
-      margin: 1,
-      filename: 'tiket_Teycketan.pdf',
-      image: {type:'jpeg', quality: 0.98},
-      html2canvas:{scale:2},
-      jsPDF:{unit: 'in', format: 'letter', orientation:'portrait'}
+        margin: 1,
+        filename: 'ticket_Teycketan.pdf',
+        image: {type:'jpeg', quality: 0.98},
+        html2canvas:{scale:2},
+        jsPDF:{unit: 'in', format: 'letter', orientation:'portrait'}
     };
+
     html2pdf().set(opciones).from(elemento).save().then(()=>{
-      elemento.style.display='none';
+        elemento.style.display='none'; // Hide it again after PDF is generated
     });
-  }
+}
 </script>
 </body>
 </html>

@@ -9,25 +9,24 @@
 </head>
 <body>
   <header class="encabezado">
-  <div class="barra-logo">
-    <img src="img/logo.png" alt="Logo Teycketan" class="logo" />
-  </div>
-  <div class="barra-pasos">
-    <div class="paso activo">
-      <div class="circulo">1</div>
-      <span>TIK</span>
+    <div class="barra-logo">
+      <img src="img/logo.png" alt="Logo Teycketan" class="logo" />
     </div>
-    <div class="paso">
-      <div class="circulo">2</div>
-      <span>DATOS DE COMPRA</span>
+    <div class="barra-pasos">
+      <div class="paso activo">
+        <div class="circulo">1</div>
+        <span>TIK</span>
+      </div>
+      <div class="paso">
+        <div class="circulo">2</div>
+        <span>DATOS DE COMPRA</span>
+      </div>
+      <div class="paso">
+        <div class="circulo">3</div>
+        <span>CONFIRMACIÓN</span>
+      </div>
     </div>
-    <div class="paso">
-      <div class="circulo">3</div>
-      <span>CONFIRMACIÓN</span>
-    </div>
-  </div>
-</header>
-
+  </header>
 
   <main class="contenedor">
     <h1><span class="evento">Your Damiano David</span><br><span class="en-vivo">EN VIVO</span></h1>
@@ -43,9 +42,9 @@
 
     <section class="detalles">
       <div class="precios">
-        <label><input type="radio" name="zona" value="vip" required /> ZONA VIP - S/ 120.00</label><br>
-        <label><input type="radio" name="zona" value="comodis" /> ZONA VIP - COMODIS S/ 105.00</label><br>
-        <label><input type="radio" name="zona" value="general" /> ZONA GENERAL - S/ 84.00</label>
+        <label><input type="radio" name="zona" value="vip-standard" data-price="120.00" data-name="ZONA VIP" required /> ZONA VIP - S/ 120.00</label><br>
+        <label><input type="radio" name="zona" value="vip-comodis" data-price="105.00" data-name="ZONA VIP - COMODIS" /> ZONA VIP - CONADIS S/ 105.00</label><br>
+        <label><input type="radio" name="zona" value="general" data-price="84.00" data-name="ZONA GENERAL" /> ZONA GENERAL - S/ 84.00</label>
       </div>
 
       <table class="tabla-compra">
@@ -61,10 +60,9 @@
             <td>ZONA VIP</td>
             <td>S/ 120.00</td>
             <td>
-              <div class="cantidad">
-                <button>-</button>
-                <input type="text" value="0" />
-                <button>+</button>
+              <div class="cantidad" data-zone="vip-standard"> <button class="btn-menos">-</button>
+                <input type="text" value="0" class="cantidad-input" data-price="120.00" data-name="ZONA VIP" />
+                <button class="btn-mas">+</button>
               </div>
             </td>
           </tr>
@@ -72,18 +70,16 @@
             <td>ZONA GENERAL</td>
             <td>S/ 84.00</td>
             <td>
-              <div class="cantidad">
-                <button>-</button>
-                <input type="text" value="0" />
-                <button>+</button>
+              <div class="cantidad" data-zone="general"> <button class="btn-menos">-</button>
+                <input type="text" value="0" class="cantidad-input" data-price="84.00" data-name="ZONA GENERAL" />
+                <button class="btn-mas">+</button>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
 
-      <button class="btn-agregar">AGREGAR</button>
-      <a href="pago2.html" class="btn-siguiente">SIGUIENTE</a>
+      <button id="btnSiguiente" class="btn-siguiente">SIGUIENTE</button>
 
 
     </section>
@@ -92,27 +88,110 @@
   <footer>
     <img src="img/logo.png" alt="Logo Footer" class="logo-footer"/>
   </footer>
-  <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const botonesCantidad = document.querySelectorAll('.cantidad');
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const cantidadInputs = document.querySelectorAll('.cantidad-input');
+    const btnMas = document.querySelectorAll('.btn-mas');
+    const btnMenos = document.querySelectorAll('.btn-menos');
+    const btnSiguiente = document.getElementById('btnSiguiente');
+    const radioButtons = document.querySelectorAll('input[name="zona"]');
 
-    botonesCantidad.forEach((contenedor) => {
-      const input = contenedor.querySelector('input');
-      const btnMenos = contenedor.querySelectorAll('button')[0];
-      const btnMas = contenedor.querySelectorAll('button')[1];
-
-      btnMas.addEventListener('click', () => {
-        input.value = parseInt(input.value) + 1;
-      });
-
-      btnMenos.addEventListener('click', () => {
-        if (parseInt(input.value) > 0) {
-          input.value = parseInt(input.value) - 1;
-        }
-      });
+    // Initialize quantities for all inputs
+    cantidadInputs.forEach(input => {
+        input.value = 0; // Ensure all start at 0
+        input.readOnly = true; // Make them read-only
     });
-  });
-</script>
 
+    // Event listeners for quantity buttons
+    btnMas.forEach(button => {
+        button.addEventListener('click', () => {
+            const input = button.previousElementSibling;
+            input.value = parseInt(input.value) + 1;
+        });
+    });
+
+    btnMenos.forEach(button => {
+        button.addEventListener('click', () => {
+            const input = button.nextElementSibling; // Changed this line, it should be next
+            if (parseInt(input.value) > 0) {
+                input.value = parseInt(input.value) - 1;
+            }
+        });
+    });
+
+    // Disable/Enable quantity inputs based on radio selection
+    function updateQuantityInputsState() {
+        const selectedRadio = document.querySelector('input[name="zona"]:checked');
+        const selectedZoneValue = selectedRadio ? selectedRadio.value : null;
+
+        cantidadInputs.forEach(input => {
+            const parentDiv = input.closest('.cantidad');
+            if (parentDiv && parentDiv.dataset.zone) {
+                if (parentDiv.dataset.zone === selectedZoneValue) {
+                    input.closest('.cantidad').style.opacity = '1'; // Make visible/active
+                    input.closest('.cantidad').style.pointerEvents = 'auto'; // Enable interaction
+                } else {
+                    input.value = '0'; // Reset quantity if not selected
+                    input.closest('.cantidad').style.opacity = '0.5'; // Dim out
+                    input.closest('.cantidad').style.pointerEvents = 'none'; // Disable interaction
+                }
+            }
+        });
+    }
+
+    radioButtons.forEach(radio => {
+        radio.addEventListener('change', updateQuantityInputsState);
+    });
+
+    // Initial state setup (e.g., if a radio is pre-checked)
+    updateQuantityInputsState();
+
+    // Event listener for "SIGUIENTE" button
+    btnSiguiente.addEventListener('click', () => {
+        const selectedRadio = document.querySelector('input[name="zona"]:checked');
+        if (!selectedRadio) {
+            alert('Por favor, selecciona una zona primero.');
+            return;
+        }
+
+        const selectedTickets = [];
+        let totalAmount = 0;
+
+        // Get the selected radio button's price and name
+        const selectedZoneName = selectedRadio.dataset.name;
+        const selectedZonePrice = parseFloat(selectedRadio.dataset.price);
+
+        // Get the quantity from the input associated with the selected radio
+        const selectedQuantityInput = document.querySelector(`.cantidad[data-zone="${selectedRadio.value}"] .cantidad-input`);
+        const quantity = parseInt(selectedQuantityInput ? selectedQuantityInput.value : 0);
+
+        if (quantity <= 0) {
+            alert('Por favor, selecciona al menos 1 ticket para la zona elegida.');
+            return;
+        }
+
+        const ticketSubtotal = selectedZonePrice * quantity;
+        totalAmount += ticketSubtotal;
+
+        selectedTickets.push({
+            name: selectedZoneName,
+            price: selectedZonePrice,
+            quantity: quantity,
+            subtotal: ticketSubtotal
+        });
+
+
+        // Store selected data in localStorage
+        localStorage.setItem('purchaseDetails', JSON.stringify({
+            tickets: selectedTickets,
+            total: totalAmount,
+            eventName: "Your Damiano David" // Hardcoded for now, get from actual event details page later
+        }));
+
+        // Redirect to pago2.html
+        window.location.href = 'pago2.html';
+    });
+});
+</script>
 </body>
 </html>
