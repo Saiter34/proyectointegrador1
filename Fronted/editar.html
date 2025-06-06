@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Crear Evento - Panel Admin TEYCKETAN</title>
+  <link rel="stylesheet" href="evneto.css">
+</head>
+<body>
+  <header>
+    <h1>Panel de Administración - Crear Evento</h1>
+    <nav>
+      <ul>
+        <li><a href="admin.html">Inicio</a></li>
+        <li><a href="solicitud.html">Solicitudes</a></li>
+        <li><a href="aprobados.html">Proveedores</a></li>
+        <li><a href="eventos.html">Crear Evento</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <h2>Nuevo Evento</h2>
+      <form action="guardar_evento.jsp" method="post" class="form-evento">
+        <label for="nombre">Nombre del Evento:</label><br>
+        <input type="text" id="nombre" name="nombre" required><br><br>
+
+        <label for="artista">Artista Principal:</label><br>
+        <input type="text" id="artista" name="artista" required><br><br>
+
+        <label for="fecha">Fecha:</label><br>
+        <input type="date" id="fecha" name="fecha" required><br><br>
+
+        <label for="hora">Hora:</label><br>
+        <input type="time" id="hora" name="hora" required><br><br>
+
+        <label for="lugar">Lugar:</label><br>
+        <input type="text" id="lugar" name="lugar" required><br><br>
+
+        <label for="descripcion">Descripción:</label><br>
+        <textarea id="descripcion" name="descripcion" rows="5" required></textarea><br><br>
+
+        <label for="imagen">URL de Imagen del Evento:</label><br>
+        <input type="url" id="imagen" name="imagen" placeholder="https://..."><br><br>
+
+        <label for="categoria">Categoría:</label><br>
+        <select id="categoria" name="categoria" required>
+          <option value="rock">Rock</option>
+          <option value="pop">Pop</option>
+          <option value="metal">Metal</option>
+          <option value="electronica">Electrónica</option>
+          <option value="otro">Otro</option>
+        </select><br><br>
+
+        <button type="submit" class="btn-agregar">Crear Evento</button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

@@ -7,12 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+    <a href="confirmacionorga.html" class="paso activo"></a>
 </head>
 <body>
-    <!-- Encabezado (opcional, si quieres que también esté en esta página) -->
-    <!-- Si lo incluyes, asegúrate de que el usuario ya esté logueado al llegar aquí -->
-    
     <div class="encabezado">
         <div class="barra-logo">
             <img src="img/logo.png" alt="Logo">
@@ -66,7 +63,7 @@
         const closeButton = document.getElementsByClassName('close-button')[0];
         const modalOkButton = document.getElementById('modalOkButton');
 
-        // Function to display custom message box
+    
         function showMessage(message, isSuccess = false) {
             messageModal.style.display = 'flex'; // Use flex to center
             modalMessage.textContent = message;

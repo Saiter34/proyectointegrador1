@@ -1,0 +1,127 @@
+/* Fondo general */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: url('img/textura-metal.jpg') repeat;
+  color: #f5f5f5;
+}
+
+/* Encabezado */
+header {
+  background-color: rgba(20, 20, 20, 0.95);
+  padding: 20px;
+  border-bottom: 2px solid #c10000;
+  box-shadow: 0 0 20px #c10000;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 32px;
+  color: #c10000;
+  margin: 0;
+}
+
+/* Navegación */
+nav ul {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  padding: 10px 0;
+  margin: 0;
+  background-color: #1a1a1a;
+  border-top: 1px solid #c10000;
+  border-bottom: 1px solid #c10000;
+}
+
+nav li {
+  margin: 0 15px;
+}
+
+nav a {
+  color: #f5f5f5;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+nav a:hover {
+  background-color: #c10000;
+  color: #000;
+}
+
+/* Contenedor principal */
+main {
+  padding: 40px;
+}
+
+/* Sección de creación de eventos */
+section {
+  max-width: 700px;
+  margin: auto;
+  background-color: rgba(10, 10, 10, 0.9);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px #c10000;
+  border: 1px solid #c10000;
+}
+
+h2 {
+  text-align: center;
+  color: #f5f5f5;
+  margin-bottom: 30px;
+  font-size: 28px;
+}
+
+/* Formulario */
+.form-evento label {
+  display: block;
+  font-weight: bold;
+  margin-top: 15px;
+  color: #f5f5f5;
+}
+
+.form-evento input,
+.form-evento textarea,
+.form-evento select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  background-color: #111;
+  border: 1px solid #c10000;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 14px;
+}
+
+.form-evento input:focus,
+.form-evento textarea:focus,
+.form-evento select:focus {
+  outline: none;
+  box-shadow: 0 0 5px #c10000;
+  border-color: #ff3b3b;
+}
+
+textarea {
+  resize: vertical;
+}
+
+/* Botón */
+.btn-agregar {
+  margin-top: 25px;
+  background-color: #c10000;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.btn-agregar:hover {
+  background-color: #e60000;
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #ff3b3b;
+}

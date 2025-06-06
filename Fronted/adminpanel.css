@@ -1,0 +1,115 @@
+body {
+  background-color: #121212;
+  color: #fff;
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #7c0000;
+  border-bottom: 4px solid #b30000;
+  padding: 10px 30px;
+  position: relative;
+  z-index: 2;
+}
+
+.barra-logo .logo {
+  height: 45px;
+}
+
+.barra-pasos {
+  display: flex;
+  gap: 40px;
+}
+
+.paso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+  opacity: 0.5;
+}
+
+.paso.activo {
+  opacity: 1;
+  color: #ff3b3b;
+}
+
+.circulo {
+  width: 30px;
+  height: 30px;
+  background-color: #400000;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-bottom: 5px;
+  border: 2px solid #ff0000;
+}
+
+.hero {
+  position: relative;
+  height: 200vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+}
+
+.fondo-mapa {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("img/fondodetalles.jpg") center center no-repeat;
+  background-size: cover;
+  z-index: 0;
+}
+
+header h1 {
+  margin: 0;
+  color: red;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+nav ul li a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+main {
+  padding: 20px;
+}
+
+.btn-siguiente {
+  background-color: #610000;
+  color: white;
+  font-weight: bold;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  display: block;
+  margin: 20px auto 0 auto;
+  transition: 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-siguiente:hover {
+  background-color: #610000;
+  box-shadow: 0 0 10px red;
+}
