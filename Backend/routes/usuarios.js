@@ -1,4 +1,3 @@
-// Backend/routes/usuarios.js
 const express = require('express');
 const router = express.Router();
 const { pool } = require('../db');
@@ -11,14 +10,14 @@ const verifyToken = (req, res, next) => {
         return res.status(401).json({ message: 'Acceso denegado. No se proporcionó token.' });
     }
 
-    const token = authHeader.split(' ')[1]; 
+    const token = authHeader.split(' ')[1];
     if (!token) {
         return res.status(401).json({ message: 'Acceso denegado. Formato de token incorrecto.' });
     }
 
     try {
         const verified = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = verified; 
+        req.user = verified;
         next();
     } catch (err) {
         res.status(400).json({ message: 'Token inválido o expirado.' });
@@ -26,7 +25,6 @@ const verifyToken = (req, res, next) => {
 };
 
 router.post('/registro', async (req, res) => {
-    
     const { nombre, apellido, email, telefono, contrasena, dia, mes, anio } = req.body;
 
     if (!nombre || !apellido || !email || !contrasena || !dia || !mes || !anio) {
@@ -44,14 +42,15 @@ router.post('/registro', async (req, res) => {
                 "Nom_Usuario",
                 "Ape_Usuario",
                 "Correo_Usuario",
-                "password_hash", -- CAMBIAR: Usar password_hash en lugar de Contra_Usuario directamente
+                "password_hash",
                 "Tlf_Usuario",
-                "Fecha_Nacimiento", -- NUEVO: Agregar la fecha de nacimiento
+                "Fecha_Nacimiento",
                 "Fecha_Reg",
                 "ES_Organizador",
-                "Autenticacion_2fa"
-            ) VALUES ($1, $2, $3, $4, $5, $6, NOW(), false, false)
-            RETURNING "id", "Nom_Usuario", "Correo_Usuario"`,
+                "Autenticacion_2fa",
+                "Rol_Usuario" -- Asegúrate de incluir esta columna
+            ) VALUES ($1, $2, $3, $4, $5, $6, NOW(), false, false, 'cliente') -- 'cliente' como valor por defecto
+            RETURNING "id", "Nom_Usuario", "Correo_Usuario", "Rol_Usuario"`,
             [nombre, apellido, email, password_hash, telefono, fecha_nacimiento]
         );
 
@@ -88,8 +87,14 @@ router.post('/login', async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: user.id, email: user.Correo_Usuario, nombre: user.Nom_Usuario },
-            process.env.JWT_SECRET, 
+            {
+                id: user.id,
+                email: user.Correo_Usuario,
+                nombre: user.Nom_Usuario,
+                is_organizador: user.ES_Organizador,
+                rol: user.Rol_Usuario  
+            },
+            process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
 
@@ -100,7 +105,9 @@ router.post('/login', async (req, res) => {
                 id: user.id,
                 nombre: user.Nom_Usuario,
                 apellido: user.Ape_Usuario,
-                email: user.Correo_Usuario
+                email: user.Correo_Usuario,
+                isOrganizer: user.ES_Organizador, 
+                rol: user.Rol_Usuario 
             }
         });
 
@@ -113,7 +120,7 @@ router.post('/login', async (req, res) => {
 router.get('/me', verifyToken, async (req, res) => {
     try {
         const result = await pool.query(
-            'SELECT "id", "Nom_Usuario", "Ape_Usuario", "Correo_Usuario", "Tlf_Usuario", "Fecha_Nacimiento" FROM "Usuarios" WHERE "id" = $1',
+            'SELECT "id", "Nom_Usuario", "Ape_Usuario", "Correo_Usuario", "Tlf_Usuario", "Fecha_Nacimiento", "ES_Organizador", "Rol_Usuario" FROM "Usuarios" WHERE "id" = $1',
             [req.user.id]
         );
         const user = result.rows[0];

@@ -1,45 +1,145 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Panel de Administración - TEYCKETAN</title>
-  <link rel="stylesheet" href="solicitud.css">
+  <meta charset="UTF-8">
+  <title>Panel de Administración - TEYCKETAN</title>
+  <link rel="stylesheet" href="solicitud.css">
 </head>
 <body>
-  <header>
-    <h1>Panel de Administración</h1>
-    <nav>
-      <ul>
-        <li><a href="solicitud.html">Solicitudes</a></li>
-        <li><a href="aprobados.html">Proveedores</a></li>
-        <li><a href="eventos.html">Eventos</a></li>
-      </ul>
-    </nav>
-  </header>
+  <header>
+    <h1>Panel de Administración</h1>
+    <nav>
+      <ul>
+        <li><a href="solicitud.html">Solicitudes</a></li>
+        <li><a href="aprobados.html">Proveedores</a></li>
+        <li><a href="eventos.html">Eventos</a></li>
+      </ul>
+    </nav>
+  </header>
 
-  <main>
-    <!-- Sección: Solicitudes de Proveedores -->
-    <section id="solicitudes">
-      <h2>Solicitudes de Proveedores</h2>
-      <div class="contenedor-tabla">
-        <!-- Simulación de solicitudes, luego lo reemplazas por JSP o JS dinámico -->
-        <div class="tarjeta-solicitud">
-          <p><strong>Empresa:</strong> Sonido Infernal</p>
-          <p><strong>Responsable:</strong> L. Vega</p>
-          <p><strong>Email:</strong> lv@infernal.com</p>
-          <button class="btn-aprobar">Aprobar</button>
-          <button class="btn-rechazar">Rechazar</button>
-        </div>
-        <div class="tarjeta-solicitud">
-          <p><strong>Empresa:</strong> Luz Pro Max</p>
-          <p><strong>Responsable:</strong> Andrea Méndez</p>
-          <p><strong>Email:</strong> andrea@lpm.com</p>
-          <button class="btn-aprobar">Aprobar</button>
-          <button class="btn-rechazar">Rechazar</button>
-        </div>
-      </div>
-    </section>
+  <main>
+        <section id="solicitudes-proveedores">
+      <h2>Solicitudes de Proveedores</h2>
+      <div class="contenedor-tabla" id="listaSolicitudes">
+                <p>Cargando solicitudes...</p>
+      </div>
+    </section>
+  </main>
 
-  </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('jwtToken');
+            const userRole = localStorage.getItem('userRole');
+            const listaSolicitudesDiv = document.getElementById('listaSolicitudes');
+
+            if (!token || userRole !== 'admin') {
+                alert('Acceso denegado. Debes ser un administrador para ver esta página.');
+                window.location.href = 'login.html'; 
+                return;
+            }
+
+            async function fetchPendingRequests() {
+                try {
+                    const response = await fetch('http://localhost:3000/admin/organizer-requests/pending', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        renderRequests(data.requests);
+                    } else {
+                        listaSolicitudesDiv.innerHTML = `<p style="color: red;">Error al cargar solicitudes: ${data.message || 'Desconocido'}</p>`;
+                    }
+                } catch (error) {
+                    console.error('Error al cargar solicitudes:', error);
+                    listaSolicitudesDiv.innerHTML = `<p style="color: red;">Error de red al cargar solicitudes.</p>`;
+                }
+            }
+
+            async function handleApproval(userId) {
+                const confirmApproval = confirm(`¿Estás seguro de que quieres APROBAR la solicitud del usuario con ID: ${userId}?`);
+                if (!confirmApproval) return;
+
+                try {
+                    const response = await fetch(`http://localhost:3000/admin/organizer-requests/approve/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        alert(data.message);
+                        fetchPendingRequests(); 
+                    } else {
+                        alert('Error al aprobar: ' + (data.message || 'Desconocido'));
+                    }
+                } catch (error) {
+                    console.error('Error al aprobar:', error);
+                    alert('Error de red al aprobar la solicitud.');
+                }
+            }
+
+            async function handleRejection(userId) {
+                const confirmRejection = confirm(`¿Estás seguro de que quieres RECHAZAR la solicitud del usuario con ID: ${userId}?`);
+                if (!confirmRejection) return;
+
+                try {
+                    const response = await fetch(`http://localhost:3000/admin/organizer-requests/reject/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        alert(data.message);
+                        fetchPendingRequests(); 
+                    } else {
+                        alert('Error al rechazar: ' + (data.message || 'Desconocido'));
+                    }
+                } catch (error) {
+                    console.error('Error al rechazar:', error);
+                    alert('Error de red al rechazar la solicitud.');
+                }
+            }
+
+            function renderRequests(requests) {
+                listaSolicitudesDiv.innerHTML = ''; 
+                if (requests.length === 0) {
+                    listaSolicitudesDiv.innerHTML = '<p>No hay solicitudes pendientes en este momento.</p>';
+                    return;
+                }
+
+                requests.forEach(request => {
+                    const requestItem = document.createElement('div');
+                    requestItem.className = 'tarjeta-solicitud'; 
+                    requestItem.innerHTML = `
+                        <p><strong>Empresa:</strong> ${request.Nom_Empresa || 'N/A'}</p>
+                        <p><strong>Responsable:</strong> ${request.Nom_Usuario} ${request.Ape_Usuario}</p>
+                        <p><strong>Email:</strong> ${request.Correo_Usuario}</p>
+                        <p><strong>Teléfono:</strong> ${request.Tlf_Usuario || 'N/A'}</p>
+                        <p><strong>Descripción:</strong> ${request.Descripcion || 'N/A'}</p>
+                        <button class="btn-aprobar" data-user-id="${request.user_id}">Aprobar</button>
+                        <button class="btn-rechazar" data-user-id="${request.user_id}">Rechazar</button>
+                    `;
+                    listaSolicitudesDiv.appendChild(requestItem);
+                });
+
+                listaSolicitudesDiv.querySelectorAll('.btn-aprobar').forEach(button => {
+                    button.addEventListener('click', (e) => handleApproval(e.target.dataset.userId));
+                });
+                listaSolicitudesDiv.querySelectorAll('.btn-rechazar').forEach(button => {
+                    button.addEventListener('click', (e) => handleRejection(e.target.dataset.userId));
+                });
+            }
+
+            fetchPendingRequests(); 
+        });
+    </script>
 </body>
 </html>

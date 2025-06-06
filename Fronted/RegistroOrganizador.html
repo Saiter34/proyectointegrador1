@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <a href="confirmacionorga.html" class="paso activo"></a>
+
 </head>
 <body>
     <div class="encabezado">
@@ -47,7 +47,6 @@
         </footer>
     </div>
 
-    <!-- The Message Modal -->
     <div id="messageModal" class="modal">
         <div class="modal-content">
             <span class="close-button">&times;</span>
@@ -63,24 +62,20 @@
         const closeButton = document.getElementsByClassName('close-button')[0];
         const modalOkButton = document.getElementById('modalOkButton');
 
-    
         function showMessage(message, isSuccess = false) {
-            messageModal.style.display = 'flex'; // Use flex to center
+            messageModal.style.display = 'flex';
             modalMessage.textContent = message;
-            modalMessage.style.color = isSuccess ? '#28a745' : '#ff3b3b'; // Green for success, red for error
+            modalMessage.style.color = isSuccess ? '#28a745' : '#ff3b3b';
         }
 
-        // Close modal when X is clicked
         closeButton.onclick = function() {
             messageModal.style.display = 'none';
         }
 
-        // Close modal when OK button is clicked
         modalOkButton.onclick = function() {
             messageModal.style.display = 'none';
         }
 
-        // Close modal when clicking outside of it
         window.onclick = function(event) {
             if (event.target == messageModal) {
                 messageModal.style.display = 'none';
@@ -88,36 +83,29 @@
         }
 
         registroForm.addEventListener('submit', async (event) => {
-            event.preventDefault(); // Prevent default form submission
+            event.preventDefault();
 
-            // Obtener el token de autenticación del localStorage
-            const token = localStorage.getItem('jwtToken'); // Asume que el token se guarda con esta clave al iniciar sesión
+            const token = localStorage.getItem('jwtToken');
 
             if (!token) {
                 showMessage('No estás autenticado. Por favor, inicia sesión primero.', false);
-                // Opcional: Redirigir a la página de login
-                // setTimeout(() => { window.location.href = 'login.html'; }, 2000);
                 return;
             }
 
-            // Get form values (only organizer-specific data)
             const nomEmpresa = document.getElementById('nomEmpresa').value;
             const descripcion = document.getElementById('descripcion').value;
 
-            // Create data object for the API request
             const organizerData = {
-                nom_empresa: nomEmpresa, // Asegúrate que coincida con el nombre de la variable en tu backend
+                nom_empresa: nomEmpresa,
                 descripcion: descripcion
             };
 
             try {
-                // Send data to your backend API endpoint for organizer request
-                // Esta es la ruta que ya tienes y usa authenticateToken
                 const response = await fetch('http://localhost:3000/organizer-request', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}` // ¡Envía el token!
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify(organizerData)
                 });
@@ -126,9 +114,10 @@
 
                 if (response.ok) {
                     showMessage(data.message || 'Solicitud de organizador procesada exitosamente!', true);
-                    // Opcional: Redirigir a un dashboard de organizador o página principal
+                    localStorage.setItem('userRole', data.newUserRole);
+                    localStorage.setItem('isOrganizer', true); 
                     setTimeout(() => {
-                        window.location.href = 'principal.HTML'; // O a donde corresponda
+                        window.location.href = 'Cliente.html';
                     }, 2000);
                 } else {
                     showMessage('Error al procesar solicitud: ' + (data.message || 'Error desconocido del servidor.'), false);
@@ -139,5 +128,5 @@
             }
         });
     </script>
-    </body>
+</body>
 </html>

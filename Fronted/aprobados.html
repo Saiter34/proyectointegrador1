@@ -1,39 +1,115 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Panel de Administración - TEYCKETAN</title>
-  <link rel="stylesheet" href="solicitud.css">
+  <meta charset="UTF-8">
+  <title>Panel de Administración - TEYCKETAN</title>
+  <link rel="stylesheet" href="solicitud.css">
 </head>
 <body>
-  <header>
-    <h1>Panel de Administración</h1>
-    <nav>
-      <ul>
-        <li><a href="solicitud.html">Solicitudes</a></li>
-        <li><a href="aprobados.html">Proveedores</a></li>
-        <li><a href="eventos.html">Eventos</a></li>
-      </ul>
-    </nav>
-  </header>
+  <header>
+    <h1>Panel de Administración</h1>
+    <nav>
+      <ul>
+        <li><a href="solicitud.html">Solicitudes</a></li>
+        <li><a href="aprobados.html">Proveedores</a></li>
+        <li><a href="eventos.html">Eventos</a></li>
+      </ul>
+    </nav>
+  </header>
 
-  <main>
-    <!-- Sección: Proveedores Actuales -->
-    <section id="proveedores">
-      <h2>Proveedores Actuales</h2>
-      <div class="contenedor-tabla">
-        <div class="tarjeta-proveedor">
-          <p><strong>Empresa:</strong> Sonido Infernal</p>
-          <p><strong>Estado:</strong> Aprobado</p>
-          <button class="btn-eliminar">Eliminar</button>
-        </div>
-        <div class="tarjeta-proveedor">
-          <p><strong>Empresa:</strong> Iluminación Scorpio</p>
-          <p><strong>Estado:</strong> Aprobado</p>
-          <button class="btn-eliminar">Eliminar</button>
-        </div>
-      </div>
-    </section>
-  </main>
+  <main>
+        <section id="proveedores-actuales">
+      <h2>Proveedores Actuales</h2>
+      <div class="contenedor-tabla" id="listaProveedoresAprobados">
+                <p>Cargando proveedores...</p>
+      </div>
+    </section>
+  </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('jwtToken');
+            const userRole = localStorage.getItem('userRole');
+            const listaProveedoresAprobadosDiv = document.getElementById('listaProveedoresAprobados');
+
+            if (!token || userRole !== 'admin') {
+                alert('Acceso denegado. Debes ser un administrador para ver esta página.');
+                window.location.href = 'login.html'; 
+                return;
+            }
+
+            async function fetchApprovedOrganizers() {
+                try {
+                    const response = await fetch('http://localhost:3000/admin/organizers/approved', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        renderApprovedOrganizers(data.approvedOrganizers);
+                    } else {
+                        listaProveedoresAprobadosDiv.innerHTML = `<p style="color: red;">Error al cargar proveedores: ${data.message || 'Desconocido'}</p>`;
+                    }
+                } catch (error) {
+                    console.error('Error al cargar proveedores:', error);
+                    listaProveedoresAprobadosDiv.innerHTML = `<p style="color: red;">Error de red al cargar proveedores.</p>`;
+                }
+            }
+
+            async function handleRemoveOrganizer(userId) {
+                const confirmRemoval = confirm(`¿Estás seguro de que quieres ELIMINAR a este organizador (ID: ${userId})? Su rol se revertirá a cliente.`);
+                if (!confirmRemoval) return;
+
+                try {
+                    const response = await fetch(`http://localhost:3000/admin/organizers/remove/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        alert(data.message);
+                        fetchApprovedOrganizers(); 
+                    } else {
+                        alert('Error al eliminar: ' + (data.message || 'Desconocido'));
+                    }
+                } catch (error) {
+                    console.error('Error al eliminar:', error);
+                    alert('Error de red al eliminar el organizador.');
+                }
+            }
+
+            function renderApprovedOrganizers(organizers) {
+                listaProveedoresAprobadosDiv.innerHTML = ''; 
+                if (organizers.length === 0) {
+                    listaProveedoresAprobadosDiv.innerHTML = '<p>No hay proveedores aprobados en este momento.</p>';
+                    return;
+                }
+
+                organizers.forEach(org => {
+                    const orgItem = document.createElement('div');
+                    orgItem.className = 'tarjeta-proveedor'; 
+                    orgItem.innerHTML = `
+                        <p><strong>Empresa:</strong> ${org.Nom_Empresa}</p>
+                        <p><strong>Responsable:</strong> ${org.Nom_Usuario} ${org.Ape_Usuario}</p>
+                        <p><strong>Email:</strong> ${org.Correo_Usuario}</p>
+                        <p><strong>Estado:</strong> ${org.Estado_Solicitud}</p>
+                        <button class="btn-eliminar" data-user-id="${org.user_id}">Eliminar</button>
+                    `;
+                    listaProveedoresAprobadosDiv.appendChild(orgItem);
+                });
+
+                listaProveedoresAprobadosDiv.querySelectorAll('.btn-eliminar').forEach(button => {
+                    button.addEventListener('click', (e) => handleRemoveOrganizer(e.target.dataset.userId));
+                });
+            }
+
+            fetchApprovedOrganizers(); 
+        });
+    </script>
 </body>
 </html>

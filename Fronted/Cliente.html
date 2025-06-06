@@ -15,7 +15,7 @@
         <header class="encabezado">
             <div class="logo"><img src="img/logo.png" alt="Logo"></div>
             <nav>
-                <div class="nav-box"><a href="registroorgani.html" id="nombreUsuarioLink">¿Quieres ser organizador?</a></div>
+                <div class="nav-box" id="organizerLinkContainer"><a href="registroorgani.html" id="organizerLink">¿Quieres ser organizador?</a></div>
                 <div class="nav-box dropdown">
                     <button>Categorías</button>
                     <div class="dropdown-content">
@@ -24,8 +24,8 @@
                         <a href="deportes.html">Deportes</a>
                     </div>
                 </div>
-                <div class="nav-box"><a href="#" id="nombreUsuarioLink">Mi Cuenta</a></div>
-                
+                <div class="nav-box"><a href="#" id="miCuentaLink">Mi Cuenta</a></div>
+
             </nav>
         </header>
 
@@ -90,12 +90,11 @@
     </main>
 
     <footer>
-        
+
         <footer class="footer-completo">
             <div class="container-footer">
                 <div class="footer-row">
-        
-                    <!-- Redes sociales -->
+
                     <div class="footer-col">
                         <h4>Síguenos</h4>
                         <div class="social-links">
@@ -105,8 +104,7 @@
                             <a href="#"><i class="fab fa-linkedin"></i></a>
                         </div>
                     </div>
-        
-                    <!-- Enlaces de compañía -->
+
                     <div class="footer-col">
                         <h4>Compañía</h4>
                         <ul>
@@ -116,8 +114,7 @@
                             <li><a href="#">Califícanos</a></li>
                         </ul>
                     </div>
-        
-                    <!-- Ayuda -->
+
                     <div class="footer-col">
                         <h4>Unetenos!</h4>
                         <ul>
@@ -125,8 +122,7 @@
                             <li><a href="#">Correo: Teycketan@gmail.com</a></li>
                         </ul>
                     </div>
-        
-                    <!-- Métodos de pago -->
+
                     <div class="footer-col">
                         <h4>Métodos de pago</h4>
                         <div class="payment-methods">
@@ -136,23 +132,33 @@
                     </div>
                 </div>
                 <img src="img/logo.png" alt="Logo Footer" class="logo-footer"/>
-                <!-- Derechos de autor -->
                 <div class="footer-bottom">
                     <small>&copy; 2024 <b>SLee Dw</b> - Todos los Derechos Reservados.</small>
                 </div>
             </div>
-            
-    </footer>
+
+        </footer>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const userName = localStorage.getItem('userName');
-    
+            const userRole = localStorage.getItem('userRole');
+            const miCuentaLink = document.getElementById('miCuentaLink');
+            const organizerLinkContainer = document.getElementById('organizerLinkContainer');
+
             if (userName) {
-                const nombreUsuarioLink = document.getElementById('nombreUsuarioLink');
-                if (nombreUsuarioLink) {
-                    nombreUsuarioLink.textContent = userName;
+                if (miCuentaLink) {
+                    miCuentaLink.textContent = userName;
                 }
             } else {
+                if (miCuentaLink) {
+                    miCuentaLink.href = 'login.html';
+                }
+            }
+
+            if (userRole === 'organizador' || userRole === 'admin') {
+                if (organizerLinkContainer) {
+                    organizerLinkContainer.style.display = 'none';
+                }
             }
         });
     </script>
