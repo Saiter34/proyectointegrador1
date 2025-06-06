@@ -99,6 +99,11 @@ main.contenedor {
   font-weight: bold;
   margin-bottom: 20px;
 }
+.mensaje-prov{
+    color: white;
+  padding:5px;
+  font-size: 35px;
+}
 
 .confirmacion-sub {
   font-size: 1.1rem;
@@ -110,6 +115,11 @@ main.contenedor {
   font-size: 60px;
   color: #4c0000;
   margin-bottom: 20px;
+}
+.mensaje-de-seguro{
+  color: #4c0000;
+  padding:10px;
+  font-size: 20px;
 }
 .btn-siguiente {
   background-color: #4c0000;
