@@ -3,39 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <title>Panel de Administración - TEYCKETAN</title>
-  <link rel="stylesheet" href="adminPanel.css">
+  <link rel="stylesheet" href="panel.css">
 </head>
 <body>
   
-    <header class="encabezado">
-    <div class="barra-logo">
-      <img src="img/logo.png" alt="Logo Teycketan" class="logo" />
-    </div>
-     <h1>Panel de Administración</h1>  
-    <div class="barra-pasos">
-      <a href="principal.HTML" class="paso activo">
-        <div class="circulo">1</div>
-        <span>INICIO</span>
-      </a>
+     <header class="encabezado">
+    <div class="barra-logo">
+      <img src="img/logo.png" alt="Logo Teycketan" class="logo" />
+    </div>
+    <h1>Panel del Administrador</h1>  
+    <div class="barra-pasos">
+      <a href="principal.html" class="paso activo">
+        <div class="circulo">1</div>
+        <span>INICIO</span>
+      </a>
       <button id="logoutButton" style="background-color: #dc3545; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;">Cerrar Sesión</button>
-    </div>
-  </header>
+    </div>
+  </header>
+ <main>
+     <section class="panel-opcion">
+      <a href="solicitud.html" class="btn-siguiente">Solicitudes de proveedores</a>
+      </section>
 
-  <main>
-    <section id="solicitudes">
-      <a href="solicitud.html" class="btn-siguiente">Solicitudes de proveedores</a>
-    </section>
+<section class="panel-opcion">
+     <a href="aprobados.html" class="btn-siguiente">Proveedores aprobados</a>
+      <div id="listaProveedores">
+      </div>
+ </section>
 
-    <section id="proveedores">
-    <a href="aprobados.html" class="btn-siguiente">Proveedores aprobados</a>
-      <div id="listaProveedores">
-      </div>
-    </section>
-
-    <section id="eventos">
-      <a href="eventos.html" class="btn-siguiente">Gestión de eventos</a>
-    </section>
-  </main>
+   <section class="panel-opcion">
+      <a href="eventos.html" class="btn-siguiente">Gestión de eventos</a>
+    </section>
+   </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -47,11 +46,11 @@
         console.log('JWT Token:', token ? 'Exists' : 'Missing'); 
         console.log('User Role from localStorage:', userRole); 
 
-        if (!token || userRole !== 'admin') {
-            alert('Acceso denegado. Debes ser un administrador para ver esta página.');
-            window.location.href = 'login.html'; 
-            return;
-        }
+       // if (!token || userRole !== 'admin') {
+         //   alert('Acceso denegado. Debes ser un administrador para ver esta página.');
+           // window.location.href = 'login.html'; 
+           // return;
+      //  }
 
             logoutButton.addEventListener('click', () => {
                 localStorage.removeItem('jwtToken');

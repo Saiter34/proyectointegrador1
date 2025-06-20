@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel de Proveedor - TEYCKETAN</title>
+  <link rel="stylesheet" href="panel.css"> <!-- Usamos el mismo CSS -->
+</head>
+<body>
+
+  <header class="encabezado">
+    <div class="barra-logo">
+      <img src="img/logo.png" alt="Logo Teycketan" class="logo" />
+    </div>
+    <h1>Panel del Proveedor</h1>  
+    <div class="barra-pasos">
+      <a href="principal.html" class="paso activo">
+        <div class="circulo">1</div>
+        <span>INICIO</span>
+      </a>
+      <button id="logoutButton" style="background-color: #dc3545; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;">Cerrar Sesión</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel-opcion">
+      <a href="eventoprov.html" class="btn-siguiente">Crear nuevo evento</a>
+    </section>
+
+    <section class="panel-opcion">
+      <a href="editarprov.html" class="btn-siguiente">Editar evento</a>
+    </section>
+
+    <section class="panel-opcion">
+      <a href="estadisticas.html" class="btn-siguiente">Ver estadísticas de evento</a>
+    </section>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('jwtToken');
+      const userRole = localStorage.getItem('userRole');
+      const logoutButton = document.getElementById('logoutButton');
+
+      console.log('Proveedor Page Loaded.'); 
+      console.log('JWT Token:', token ? 'Exists' : 'Missing'); 
+      console.log('User Role from localStorage:', userRole); 
+
+      //if (!token || userRole !== 'proveedor') {
+        //  alert('Acceso denegado. Debes ser un proveedor para ver esta página.');
+         // window.location.href = 'login.html'; 
+         // return;
+     // }
+
+     logoutButton.addEventListener('click', () => {
+          localStorage.removeItem('jwtToken');
+          localStorage.removeItem('userName');
+          localStorage.removeItem('userRole');
+          localStorage.removeItem('isOrganizer');
+          alert('Sesión cerrada.');
+          window.location.href = 'login.html';
+      });
+    });
+  </script>
+</body>
+</html>
