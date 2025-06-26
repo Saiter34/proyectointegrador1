@@ -1,49 +1,212 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Editar Evento - TEYCKETAN</title>
-  <link rel="stylesheet" href="eventoprov.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Evento - TEYCKETAN</title>
+    <link rel="stylesheet" href="proveedor.css"> <!-- Asegúrate que la ruta a tu CSS es correcta -->
 </head>
 <body>
-  <header>
-    <h1>Panel del Proveedor</h1>
-    <nav>
-      <ul>
-        <li><a href="proveedorPanel.html">Inicio</a></li>
-        <li><a href="editarprov.html">Crear Evento</a></li>
-        <li><a href="editarprov.html" class="activo">Editar Evento</a></li>
-        <li><a href="estadisticas.html">Estadísticas</a></li>
-      </ul>
-    </nav>
-  </header>
+    <header>
+        <h1>Panel del Proveedor</h1>
+        <nav>
+            <ul>
+                <li><a href="proveedorPanel.html">Inicio</a></li>
+                <li><a href="eventoprov.html">Crear Evento</a></li>
+                <li><a href="editarprov.html" class="activo">Editar Evento</a></li>
+                <li><a href="estadisticas.html">Estadísticas</a></li>
+            </ul>
+        </nav>
+    </header>
 
-  <main>
-    <section>
-      <h2>Editar Evento Existente</h2>
-      <form class="form-evento">
-        <label>Seleccionar Evento:</label>
-        <select>
-          <option value="1">Damiano David Live</option>
-          <option value="2">Festival Sónico 2025</option>
-        </select>
+    <main>
+        <section>
+            <h2>Editar Evento Existente</h2>
+            <form id="edit-event-form" class="form-evento">
+                <label for="selectEvent">Seleccionar Evento:</label>
+                <select id="selectEvent">
+                    <option value="">Cargando eventos...</option>
+                </select>
 
-        <label>Nombre del Evento:</label>
-        <input type="text">
+                <label for="editNombreEvento">Nombre del Evento:</label>
+                <input type="text" id="editNombreEvento" required>
 
-        <label>Fecha:</label>
-        <input type="date">
+                <label for="editFechaEvento">Fecha del Evento:</label>
+                <input type="date" id="editFechaEvento" required>
 
-        <label>Ubicación:</label>
-        <input type="text">
+                <label for="editHorarioInicio">Horario de Inicio:</label>
+                <input type="time" id="editHorarioInicio" required>
 
-        <label>Descripción:</label>
-        <textarea></textarea>
+                <label for="editHorarioFin">Horario de Fin:</label>
+                <input type="time" id="editHorarioFin" required>
 
-        <label>Precio General:</label>
-        <input type="number">
+                <label for="editUbicacionEvento">Ubicación:</label>
+                <input type="text" id="editUbicacionEvento" required>
 
-        <button type="submit" class="btn-agregar">Guardar Cambios</button>
-      </form>
-    </section>
-  </
+                <label for="editDescripcionEvento">Descripción:</label>
+                <textarea id="editDescripcionEvento" required></textarea>
+
+                <label for="editPrecioGeneral">Precio General:</label>
+                <input type="number" id="editPrecioGeneral" step="0.01" required>
+
+                <label for="editPrecioVIP">Precio VIP:</label>
+                <input type="number" id="editPrecioVIP" step="0.01">
+
+                <!-- Precio CONADIS se calcula automáticamente en el backend, no se edita directamente -->
+                
+                <button type="submit" class="btn-agregar">Guardar Cambios</button>
+            </form>
+            <div id="message-container" style="margin-top: 20px;"></div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const selectEvent = document.getElementById('selectEvent');
+            const editForm = document.getElementById('edit-event-form');
+            const messageContainer = document.getElementById('message-container');
+            const token = localStorage.getItem('jwtToken');
+
+            // Campos del formulario
+            const editNombreEvento = document.getElementById('editNombreEvento');
+            const editFechaEvento = document.getElementById('editFechaEvento');
+            const editHorarioInicio = document.getElementById('editHorarioInicio');
+            const editHorarioFin = document.getElementById('editHorarioFin');
+            const editUbicacionEvento = document.getElementById('editUbicacionEvento');
+            const editDescripcionEvento = document.getElementById('editDescripcionEvento');
+            const editPrecioGeneral = document.getElementById('editPrecioGeneral');
+            const editPrecioVIP = document.getElementById('editPrecioVIP');
+
+            let currentEventId = null; // Para almacenar el ID del evento actualmente seleccionado
+
+            if (!token) {
+                showMessage('No estás autenticado. Por favor, inicia sesión.', 'error');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            function showMessage(msg, type) {
+                messageContainer.innerHTML = `<p style="color: ${type === 'error' ? 'red' : 'green'};">${msg}</p>`;
+                setTimeout(() => { messageContainer.innerHTML = ''; }, 5000);
+            }
+
+            async function fetchEvents() {
+                try {
+                    const response = await fetch('http://localhost:3000/api/proveedor/eventos', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        selectEvent.innerHTML = '<option value="">-- Selecciona un Evento --</option>';
+                        if (data.length === 0) {
+                            showMessage('No tienes eventos creados para editar.', 'info');
+                        } else {
+                            data.forEach(event => {
+                                const option = document.createElement('option');
+                                option.value = event.Id_Evento;
+                                option.textContent = event.Nom_Evento;
+                                selectEvent.appendChild(option);
+                            });
+                        }
+                    } else {
+                        showMessage(`Error al cargar eventos: ${data.error || data.message || 'Error desconocido'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error al obtener eventos:', error);
+                    showMessage('Error de conexión al cargar eventos.', 'error');
+                }
+            }
+
+            async function loadEventDetails(eventId) {
+                if (!eventId) {
+                    // Limpiar formulario si no hay evento seleccionado
+                    editForm.reset();
+                    currentEventId = null;
+                    return;
+                }
+                currentEventId = eventId;
+                try {
+                    const response = await fetch(`http://localhost:3000/api/proveedor/eventos/${eventId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        editNombreEvento.value = data.Nom_Evento;
+                        editFechaEvento.value = data.Fecha ? new Date(data.Fecha).toISOString().split('T')[0] : '';
+                        editHorarioInicio.value = data.Horario_Inicio || '';
+                        editHorarioFin.value = data.Horario_Fin || '';
+                        editUbicacionEvento.value = data.Ubicacion;
+                        editDescripcionEvento.value = data.Descripcion;
+                        editPrecioGeneral.value = data.PrecioGeneral !== null ? parseFloat(data.PrecioGeneral).toFixed(2) : '';
+                        editPrecioVIP.value = data.PrecioVIP !== null ? parseFloat(data.PrecioVIP).toFixed(2) : '';
+                    } else {
+                        showMessage(`Error al cargar detalles del evento: ${data.error || data.message || 'Error desconocido'}`, 'error');
+                        editForm.reset(); // Limpiar formulario si falla la carga
+                    }
+                } catch (error) {
+                    console.error('Error al obtener detalles del evento:', error);
+                    showMessage('Error de conexión al cargar detalles del evento.', 'error');
+                }
+            }
+
+            selectEvent.addEventListener('change', (e) => {
+                loadEventDetails(e.target.value);
+            });
+
+            editForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!currentEventId) {
+                    showMessage('Por favor, selecciona un evento para editar.', 'error');
+                    return;
+                }
+
+                const nombre = editNombreEvento.value;
+                const fecha = editFechaEvento.value;
+                const horarioInicio = editHorarioInicio.value;
+                const horarioFin = editHorarioFin.value;
+                const ubicacion = editUbicacionEvento.value;
+                const descripcion = editDescripcionEvento.value;
+                const precioGeneral = parseFloat(editPrecioGeneral.value);
+                const precioVIP = editPrecioVIP.value ? parseFloat(editPrecioVIP.value) : null;
+
+                try {
+                    const response = await fetch(`http://localhost:3000/api/proveedor/eventos/${currentEventId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ 
+                            nombre, 
+                            fecha, 
+                            horarioInicio, 
+                            horarioFin, 
+                            ubicacion, 
+                            descripcion, 
+                            precioGeneral, 
+                            precioVIP 
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showMessage(data.message || 'Evento actualizado exitosamente.', 'success');
+                        // Opcional: Recargar la lista de eventos o los detalles del evento actual si es necesario
+                        // fetchEvents(); 
+                    } else {
+                        showMessage(`Error al guardar cambios: ${data.error || data.message || 'Error desconocido'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error al guardar cambios del evento:', error);
+                    showMessage('Error de conexión al guardar cambios.', 'error');
+                }
+            });
+
+            fetchEvents(); // Cargar eventos al cargar la página
+        });
+    </script>
+</body>
+</html>

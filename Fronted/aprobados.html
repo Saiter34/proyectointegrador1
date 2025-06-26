@@ -1,46 +1,66 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Panel de Administración - TEYCKETAN</title>
-  <link rel="stylesheet" href="solicitud.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PANEL DE ADMIN - TEYCKETAN</title>
+    <link rel="stylesheet" href="admin.css"> <!-- Asegúrate que la ruta a tu CSS es correcta -->
 </head>
 <body>
-  <header>
-    <h1>Panel de Administración</h1>
-    <nav>
-      <ul>
-        <li><a href="solicitud.html">Solicitudes</a></li>
-        <li><a href="aprobados.html">Proveedores</a></li>
-        <li><a href="eventos.html">Eventos</a></li>
-      </ul>
-    </nav>
-  </header>
+    <header>
+        <h1>Panel de Administración</h1>
+        <nav>
+            <ul>
+                <li><a href="solicitud.html">Solicitudes Organizador</a></li>
+                <li><a href="aprobados.html" class="activo">Proveedores Aprobados</a></li>
+                <li><a href="eventos.html">Solicitudes de Eventos</a></li>
+                <!-- Puedes añadir más enlaces aquí -->
+            </ul>
+        </nav>
+    </header>
 
-  <main>
-        <section id="proveedores-actuales">
-      <h2>Proveedores Actuales</h2>
-      <div class="contenedor-tabla" id="listaProveedoresAprobados">
-                <p>Cargando proveedores...</p>
-      </div>
-    </section>
-  </main>
+    <main>
+        <section id="proveedores-actuales">
+            <h2>Proveedores Actuales (Aprobados)</h2>
+            <!-- Contenedor para mensajes de éxito/error -->
+            <div id="message-container" class="message-container"></div>
+            <div class="contenedor-tabla" id="listaProveedoresAprobados">
+                <p class="no-requests">Cargando proveedores...</p>
+            </div>
+        </section>
+    </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const token = localStorage.getItem('jwtToken');
             const userRole = localStorage.getItem('userRole');
             const listaProveedoresAprobadosDiv = document.getElementById('listaProveedoresAprobados');
+            const messageContainer = document.getElementById('message-container');
 
             if (!token || userRole !== 'admin') {
-                alert('Acceso denegado. Debes ser un administrador para ver esta página.');
-                window.location.href = 'login.html'; 
+                showMessage('Acceso denegado. Debes ser un administrador para ver esta página.', 'error');
+                // O redirigir a la página de login si es necesario
+                // window.location.href = 'login.html'; 
                 return;
             }
 
+            // Función para mostrar mensajes en la UI
+            function showMessage(msg, type) {
+                messageContainer.textContent = msg;
+                messageContainer.className = `message-container message-${type}`;
+                setTimeout(() => {
+                    messageContainer.textContent = '';
+                    messageContainer.className = 'message-container';
+                }, 5000); // El mensaje desaparece después de 5 segundos
+            }
+
             async function fetchApprovedOrganizers() {
+                listaProveedoresAprobadosDiv.innerHTML = '<p class="no-requests">Cargando proveedores...</p>';
+                messageContainer.innerHTML = ''; // Limpiar mensajes anteriores
+
                 try {
-                    const response = await fetch('http://localhost:3000/admin/organizers/approved', {
+                    // *** URL CORREGIDA AQUÍ: /api/admin/solicitudes/organizers/approved ***
+                    const response = await fetch('http://localhost:3000/api/admin/solicitudes/organizers/approved', {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
@@ -50,58 +70,88 @@
                     if (response.ok) {
                         renderApprovedOrganizers(data.approvedOrganizers);
                     } else {
-                        listaProveedoresAprobadosDiv.innerHTML = `<p style="color: red;">Error al cargar proveedores: ${data.message || 'Desconocido'}</p>`;
+                        showMessage(`Error al cargar proveedores: ${data.message || 'Desconocido'}`, 'error');
+                        listaProveedoresAprobadosDiv.innerHTML = `<p class="no-requests">No se pudieron cargar los proveedores aprobados.</p>`;
                     }
                 } catch (error) {
                     console.error('Error al cargar proveedores:', error);
-                    listaProveedoresAprobadosDiv.innerHTML = `<p style="color: red;">Error de red al cargar proveedores.</p>`;
+                    showMessage('Error de red al cargar proveedores.', 'error');
+                    listaProveedoresAprobadosDiv.innerHTML = `<p class="no-requests">Error de red.</p>`;
                 }
             }
 
             async function handleRemoveOrganizer(userId) {
-                const confirmRemoval = confirm(`¿Estás seguro de que quieres ELIMINAR a este organizador (ID: ${userId})? Su rol se revertirá a cliente.`);
-                if (!confirmRemoval) return;
+                // Reemplazando confirm() con un mensaje en la UI
+                if (!window.confirm(`¿Estás seguro de que quieres ELIMINAR a este organizador (ID: ${userId})? Su rol se revertirá a cliente.`)) {
+                     return;
+                }
 
                 try {
-                    const response = await fetch(`http://localhost:3000/admin/organizers/remove/${userId}`, {
+                    // *** URL CORREGIDA AQUÍ: /api/admin/solicitudes/organizers/remove/ ***
+                    const response = await fetch(`http://localhost:3000/api/admin/solicitudes/organizers/remove/${userId}`, {
                         method: 'POST',
                         headers: {
+                            'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`
                         }
                     });
                     const data = await response.json();
 
                     if (response.ok) {
-                        alert(data.message);
+                        showMessage(data.message, 'success');
                         fetchApprovedOrganizers(); 
                     } else {
-                        alert('Error al eliminar: ' + (data.message || 'Desconocido'));
+                        showMessage('Error al eliminar: ' + (data.message || 'Desconocido'), 'error');
                     }
                 } catch (error) {
                     console.error('Error al eliminar:', error);
-                    alert('Error de red al eliminar el organizador.');
+                    showMessage('Error de red al eliminar el organizador.', 'error');
                 }
             }
 
             function renderApprovedOrganizers(organizers) {
                 listaProveedoresAprobadosDiv.innerHTML = ''; 
                 if (organizers.length === 0) {
-                    listaProveedoresAprobadosDiv.innerHTML = '<p>No hay proveedores aprobados en este momento.</p>';
+                    listaProveedoresAprobadosDiv.innerHTML = '<p class="no-requests">No hay proveedores aprobados en este momento.</p>';
                     return;
                 }
 
+                let tableHtml = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID Usuario</th>
+                                <th>Empresa</th>
+                                <th>Responsable</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
                 organizers.forEach(org => {
-                    const orgItem = document.createElement('div');
-                    orgItem.className = 'tarjeta-proveedor'; 
-                    orgItem.innerHTML = `
-                        <p><strong>Empresa:</strong> ${org.Nom_Empresa}</p>
-                        <p><strong>Responsable:</strong> ${org.Nom_Usuario} ${org.Ape_Usuario}</p>
-                        <p><strong>Email:</strong> ${org.Correo_Usuario}</p>
-                        <p><strong>Estado:</strong> ${org.Estado_Solicitud}</p>
-                        <button class="btn-eliminar" data-user-id="${org.user_id}">Eliminar</button>
+                    tableHtml += `
+                        <tr>
+                            <td>${org.user_id}</td>
+                            <td>${org.Nom_Empresa}</td>
+                            <td>${org.Nom_Usuario} ${org.Ape_Usuario}</td>
+                            <td>${org.Correo_Usuario}</td>
+                            <td>${org.Tlf_Usuario || 'N/A'}</td>
+                            <td>${org.Estado_Solicitud}</td>
+                            <td class="actions">
+                                <button class="btn-eliminar reject-btn" data-user-id="${org.user_id}">Eliminar</button>
+                            </td>
+                        </tr>
                     `;
-                    listaProveedoresAprobadosDiv.appendChild(orgItem);
                 });
+                tableHtml += `
+                        </tbody>
+                    </table>
+                `;
+                listaProveedoresAprobadosDiv.innerHTML = tableHtml;
 
                 listaProveedoresAprobadosDiv.querySelectorAll('.btn-eliminar').forEach(button => {
                     button.addEventListener('click', (e) => handleRemoveOrganizer(e.target.dataset.userId));
