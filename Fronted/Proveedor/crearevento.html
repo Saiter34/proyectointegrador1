@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Evento - TEYCKETAN</title>
+    <!-- Usar el archivo CSS específico para el panel de proveedor -->
+    <link rel="stylesheet" href="proveedor.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="prov-sidebar">
+        <div class="prov-barra-logo">
+            <img src="../img/logo.png" alt="Logo Teycketan" class="prov-logo-img" />
+        </div>
+        <ul class="prov-nav-list">
+            <li><a href="proveedorPanel.html" class="prov-nav-item"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
+            <li><a href="crearevento.html" class="prov-nav-item active"><i class="fas fa-plus-circle"></i><span>Crear evento</span></a></li>
+            <li><a href="verEvento.html" class="prov-nav-item"><i class="fas fa-calendar-alt"></i><span>Ver eventos</span></a></li>
+            <li class="prov-extra-option"><a href="#" class="prov-nav-item"><i class="fas fa-envelope"></i><span>Contactar empresa</span></a></li>
+        </ul>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="prov-main-content">
+        <header class="prov-topbar">
+            <h1 class="prov-titulo-seccion">Crear Nuevo Evento</h1>
+            <div class="prov-acciones">
+                <div class="prov-notif-wrapper">
+                    <button class="prov-notif-btn" id="provNotifToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="prov-notif-dot"></span>
+                    </button>
+                    <div class="prov-notif-dropdown" id="provNotifDropdown">
+                        <p class="prov-notif-title">Notificaciones</p>
+                        <ul>
+                            <li>Tu evento “Damiano David” fue aprobado</li>
+                            <li>Nuevo mensaje de TEYCKETAN</li>
+                            <li>Revisa el estado de tu evento</li>
+                        </ul>
+                    </div>
+                </div>
+                <button id="provLogoutButton" class="prov-btn-logout">Cerrar Sesión</button>
+            </div>
+        </header>
+
+        <section class="prov-contenido">
+            <div class="prov-bienvenida">Llena los siguientes datos para registrar un nuevo evento en TEYCKETAN.</div>
+
+            <!-- Contenedor para mensajes (para modales) -->
+            <div id="provMessageContainer" class="prov-message-container"></div>
+            
+            <form id="create-event-form" class="prov-form">
+                <label for="Nom_Evento">Nombre del Evento:</label>
+                <input type="text" id="Nom_Evento" name="Nom_Evento" placeholder="Ej. Concierto Teycketan" required>
+
+                <label for="Fecha">Fecha del Evento:</label>
+                <input type="date" id="Fecha" name="Fecha" required>
+
+                <label for="Horario_Inicio">Horario de Inicio:</label>
+                <input type="time" id="Horario_Inicio" name="Horario_Inicio" required>
+
+                <label for="Horario_Fin">Horario de Fin:</label>
+                <input type="time" id="Horario_Fin" name="Horario_Fin" required>
+
+                <label for="Categoria">Categoría:</label>
+                <select id="Categoria" name="Categoria" required>
+                    <option value="">Selecciona una categoría</option>
+                    <option value="Teatro">Teatro</option>
+                    <option value="Conciertos">Conciertos</option>
+                    <option value="Deportes">Deportes</option>
+                </select>
+
+                <label for="Ubicacion">Ubicación:</label>
+                <select id="Ubicacion" name="Ubicacion" required>
+                    <option value="">Selecciona una categoría primero</option>
+                </select>
+                <!-- Mostrar Asientos Disponibles de la Ubicación -->
+                <div id="ubicacion-detalles" class="prov-ubicacion-detalles"></div>
+
+                <label for="Descripcion">Descripción:</label>
+                <textarea id="Descripcion" name="Descripcion" placeholder="Describe brevemente el evento..." required></textarea>
+
+                <!-- NUEVOS CAMPOS: Asientos Disponibles por tipo -->
+                <label for="AsientosGeneral">GENERAL: Cuántos asientos quieres poner disponibles (según la información de la ubicación)</label>
+                <input type="number" id="AsientosGeneral" name="AsientosGeneral" placeholder="Ej. 1000" min="1" step="1" required>
+
+                <label for="AsientosVIP">VIP: Cuántos asientos quieres poner disponibles (Opcional)</label>
+                <input type="number" id="AsientosVIP" name="AsientosVIP" placeholder="Ej. 100" min="0" step="1">
+
+                <!-- CAMPOS PARA PRECIOS -->
+                <label for="CostoGeneral">Precio General:</label>
+                <input type="number" id="CostoGeneral" name="CostoGeneral" placeholder="Ej. 120.00" step="0.01" min="1.00" required>
+
+                <label for="CostoVIP">Precio VIP (Opcional):</label>
+                <input type="number" id="CostoVIP" name="CostoVIP" placeholder="Ej. 250.00" step="0.01" min="1.00">
+
+                <label for="CostoConadis">Precio CONADIS (80% del General):</label>
+                <input type="number" id="CostoConadis" name="CostoConadis" placeholder="Se calcula automáticamente" step="0.01" readonly>
+
+                <label for="imagenEvento">Imagen del Evento:</label>
+                <input type="file" id="imagenEvento" name="imagenEvento" accept="image/*" required>
+
+                <button type="submit" class="prov-btn-submit">Enviar Solicitud de Evento</button>
+            </form>
+        </section>
+    </div>
+
+    <!-- Modales -->
+    <div id="provConfirmationModal" class="prov-modal">
+        <div class="prov-modal-content">
+            <span class="prov-close-button">&times;</span>
+            <p id="provModalMessage">¿Estás seguro de realizar esta acción?</p>
+            <button id="provModalConfirmBtn" class="prov-modal-btn prov-modal-confirm">Confirmar</button>
+            <button id="provModalCancelBtn" class="prov-modal-btn prov-modal-cancel">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="provMessageModal" class="prov-modal">
+        <div class="prov-modal-content">
+            <span class="prov-close-button">&times;</span>
+            <p id="provMessageModalText"></p>
+            <button id="provMessageModalCloseBtn" class="prov-modal-btn prov-modal-confirm">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta
+
+            // Elementos DOM principales
+            const provLogoutButton = document.getElementById('provLogoutButton');
+            const provNotifToggle = document.getElementById('provNotifToggle');
+            const provNotifDropdown = document.getElementById('provNotifDropdown');
+            const createEventForm = document.getElementById('create-event-form');
+            
+            // Nuevos campos de asiento
+            const asientosGeneralInput = document.getElementById('AsientosGeneral');
+            const asientosVIPInput = document.getElementById('AsientosVIP');
+
+            // Campos de precio
+            const costoGeneralInput = document.getElementById('CostoGeneral');
+            const costoVIPInput = document.getElementById('CostoVIP');
+            const costoConadisInput = document.getElementById('CostoConadis');
+
+            const imagenEventoInput = document.getElementById('imagenEvento');
+            const categoriaSelect = document.getElementById('Categoria'); 
+            const ubicacionSelect = document.getElementById('Ubicacion'); 
+            const ubicacionDetallesDiv = document.getElementById('ubicacion-detalles'); 
+
+            // Referencias a los IDs de modales
+            const provConfirmationModal = document.getElementById('provConfirmationModal');
+            const provModalMessage = document.getElementById('provModalMessage');
+            const provModalConfirmBtn = document.getElementById('provModalConfirmBtn');
+            const provModalCancelBtn = document.getElementById('provModalCancelBtn');
+            const provMessageModal = document.getElementById('provMessageModal');
+            const provMessageModalText = document.getElementById('provMessageModalText');
+            const provMessageModalCloseBtn = document.getElementById('provMessageModalCloseBtn');
+
+            // --- Estructura de datos para capacidades y ubicaciones (CON NÚMEROS CONCRETOS) ---
+            const capacidadesEventos = {
+                "Teatro": {
+                    "Gran Teatro Nacional (San Borja)": {
+                        total: 1500,
+                        vip: 150,
+                        conadis: 30, 
+                        general: 1305 
+                    },
+                    "Teatro Canout (Miraflores)": {
+                        total: 1000,
+                        vip: 100,
+                        conadis: 20,
+                        general: 880
+                    },
+                    "Teatro Manuel Ascencio Segura (Centro de Lima)": {
+                        total: 491,
+                        vip: 174,
+                        conadis: 10,
+                        general: 307
+                    }
+                },
+                "Conciertos": {
+                    "Estadio de San Marcos (UNMSM)": {
+                        total: 32000,
+                        vip: 3200, 
+                        conadis: 40, 
+                        general: 28760
+                    },
+                    "Estadio Nacional (Lima)": { // Para Conciertos
+                        total: 43086, 
+                        vip: 6460, 
+                        conadis: 8, 
+                        general: 36618
+                    },
+                    "Anfiteatro del Parque de la Exposición": {
+                        total: 4500,
+                        vip: 450, 
+                        conadis: 90, 
+                        general: 3960
+                    }
+                },
+                "Deportes": {
+                    "Estadio Nacional": { // Para Deportes
+                        total: 50000,
+                        vip: 7500, 
+                        conadis: 1000, 
+                        general: 41500
+                    },
+                    "Estadio Monumental (Ate, “Monumental U”)": {
+                        total: 80093,
+                        vip: 12014, 
+                        conadis: 1602, 
+                        general: 66477
+                    },
+                    "Estadio Alejandro Villanueva (Matute)": {
+                        total: 33938,
+                        vip: 5091, 
+                        conadis: 679, 
+                        general: 28168
+                    }
+                }
+            };
+            // --- FIN Estructura de datos ---
+
+
+            // --- Funciones para Modales ---
+            function showProvConfirmationModal(message) {
+                return new Promise((resolve) => {
+                    provModalMessage.textContent = message;
+                    provConfirmationModal.style.display = 'flex'; 
+                    
+                    const confirmHandler = () => {
+                        provConfirmationModal.style.display = 'none';
+                        provModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        provModalCancelBtn.removeEventListener('click', cancelHandler);
+                        provConfirmationModal.querySelector('.prov-close-button').removeEventListener('click', cancelHandler);
+                        resolve(true);
+                    };
+
+                    const cancelHandler = () => {
+                        provConfirmationModal.style.display = 'none';
+                        provModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        provModalCancelBtn.removeEventListener('click', cancelHandler);
+                        provConfirmationModal.querySelector('.prov-close-button').removeEventListener('click', cancelHandler);
+                        resolve(false);
+                    };
+
+                    provModalConfirmBtn.addEventListener('click', confirmHandler);
+                    provModalCancelBtn.addEventListener('click', cancelHandler);
+                    provConfirmationModal.querySelector('.prov-close-button').addEventListener('click', cancelHandler);
+                });
+            }
+
+            function showProvMessageModal(message, type = '') {
+                provMessageModalText.textContent = message;
+                provMessageModalText.className = `prov-message-text ${type ? 'prov-message-' + type : ''}`;
+                provMessageModal.style.display = 'flex'; 
+                
+                provMessageModalCloseBtn.onclick = () => {
+                    provMessageModal.style.display = 'none';
+                };
+                provMessageModal.querySelector('.prov-close-button').onclick = () => {
+                    provMessageModal.style.display = 'none';
+                };
+            }
+
+            // --- Lógica de Autenticación al cargar la página ---
+            const token = localStorage.getItem('jwtToken');
+            const userRole = localStorage.getItem('userRole');
+            const userId = localStorage.getItem('userId');
+
+            // Seguridad: Redirige si no hay token o el rol no es 'organizador'
+            if (!token || userRole !== 'organizador' || !userId) {
+                showProvMessageModal('Acceso denegado. Debes ser un proveedor autenticado para ver esta página.', 'error'); 
+                setTimeout(() => {
+                    window.location.replace('../login.html'); 
+                }, 2000); 
+                return; 
+            }
+
+            // --- Event Listener para Cerrar Sesión ---
+            provLogoutButton.addEventListener('click', async () => {
+                const confirmLogout = await showProvConfirmationModal('¿Estás seguro de que quieres cerrar sesión?');
+                if (confirmLogout) {
+                    localStorage.removeItem('jwtToken');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('isOrganizer');
+                    localStorage.removeItem('userId'); 
+                    showProvMessageModal('Sesión cerrada correctamente.', 'success');
+                    setTimeout(() => {
+                        window.location.replace('../login.html'); 
+                    }, 500); 
+                }
+            });
+
+            // --- Lógica para Notificaciones (Dropdown) ---
+            provNotifToggle.addEventListener('click', (event) => {
+                event.stopPropagation(); 
+                provNotifDropdown.style.display = provNotifDropdown.style.display === 'block' ? 'none' : 'block';
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!provNotifDropdown.contains(event.target) && !provNotifToggle.contains(event.target)) {
+                    provNotifDropdown.style.display = 'none';
+                }
+            });
+
+            // Añadir clase 'active' al enlace de la página actual en el sidebar
+            document.querySelectorAll('.prov-nav-item').forEach(link => {
+                if (link.href.includes('crearevento.html')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+
+            // --- Lógica para el cálculo automático de Precio CONADIS y validación de precios ---
+            function calculateConadisPrice() {
+                const generalCost = parseFloat(costoGeneralInput.value);
+                let conadisCost = 0;
+
+                if (!isNaN(generalCost) && generalCost >= 1.00) { 
+                    conadisCost = (generalCost * 0.8);
+                    if (conadisCost < 1.00) { 
+                        conadisCost = 1.00;
+                    }
+                    costoConadisInput.value = conadisCost.toFixed(2);
+                } else {
+                    costoConadisInput.value = ''; 
+                }
+            }
+            
+            costoGeneralInput.addEventListener('input', calculateConadisPrice);
+            calculateConadisPrice(); // Calcular al cargar la página
+
+            // --- Lógica para actualizar ubicaciones y mostrar detalles ---
+            function updateUbicaciones() {
+                const selectedCategory = categoriaSelect.value;
+                ubicacionSelect.innerHTML = '<option value="">Selecciona una ubicación</option>';
+                ubicacionDetallesDiv.innerHTML = ''; 
+
+                if (selectedCategory && capacidadesEventos[selectedCategory]) {
+                    const locations = Object.keys(capacidadesEventos[selectedCategory]);
+                    locations.forEach(loc => {
+                        const option = document.createElement('option');
+                        option.value = loc;
+                        option.textContent = loc;
+                        ubicacionSelect.appendChild(option);
+                    });
+                } else {
+                    ubicacionSelect.innerHTML = '<option value="">Selecciona una categoría primero</option>';
+                }
+                ubicacionSelect.dispatchEvent(new Event('change')); 
+            }
+
+            function displayUbicacionDetails() {
+                const selectedCategory = categoriaSelect.value;
+                const selectedUbicacion = ubicacionSelect.value;
+                ubicacionDetallesDiv.innerHTML = ''; 
+
+                if (selectedCategory && selectedUbicacion && capacidadesEventos[selectedCategory] && capacidadesEventos[selectedCategory][selectedUbicacion]) {
+                    const details = capacidadesEventos[selectedCategory][selectedUbicacion];
+                    let htmlContent = `<p class="prov-ubicacion-titulo">En este tipo de evento que puede ser ${selectedCategory.toLowerCase()}, tenemos disponibles estos recintos:</p>`;
+                    htmlContent += `<p class="prov-ubicacion-subtitulo">${selectedUbicacion}</p>`;
+                    htmlContent += `<ul>`;
+                    htmlContent += `<li><strong>Capacidad total:</strong> ${details.total} asientos</li>`;
+                    htmlContent += `<li><strong>VIP:</strong> ${details.vip} asientos</li>`;
+                    htmlContent += `<li><strong>CONADIS:</strong> ${details.conadis} asientos</li>`;
+                    htmlContent += `<li><strong>GENERAL:</strong> ${details.general} asientos</li>`;
+                    htmlContent += `</ul>`;
+                    ubicacionDetallesDiv.innerHTML = htmlContent;
+                } else if (selectedCategory && !selectedUbicacion) {
+                    ubicacionDetallesDiv.innerHTML = `<p class="prov-ubicacion-info">Selecciona una ubicación para ver los detalles de asientos disponibles.</p>`;
+                } else {
+                    ubicacionDetallesDiv.innerHTML = `<p class="prov-ubicacion-info">Selecciona una categoría y luego una ubicación para ver los detalles de asientos disponibles.</p>`;
+                }
+                // Validar los asientos ingresados cuando cambian los detalles de la ubicación
+                validateAsientosInputs();
+            }
+
+            // Event listeners para los selectores de categoría y ubicación
+            categoriaSelect.addEventListener('change', updateUbicaciones);
+            ubicacionSelect.addEventListener('change', displayUbicacionDetails);
+
+            // --- Validación de asientos disponibles vs. capacidad del recinto ---
+            function validateAsientosInputs() {
+                const selectedCategory = categoriaSelect.value;
+                const selectedUbicacion = ubicacionSelect.value;
+                
+                if (!selectedCategory || !selectedUbicacion || !capacidadesEventos[selectedCategory] || !capacidadesEventos[selectedCategory][selectedUbicacion]) {
+                    // Si no hay categoría o ubicación seleccionada, no hay capacidad que comparar
+                    asientosGeneralInput.setCustomValidity('');
+                    asientosVIPInput.setCustomValidity('');
+                    return;
+                }
+
+                const venueDetails = capacidadesEventos[selectedCategory][selectedUbicacion];
+                const asientosGeneral = parseInt(asientosGeneralInput.value);
+                const asientosVIP = parseInt(asientosVIPInput.value);
+
+                // Validar Asientos General
+                if (!isNaN(asientosGeneral) && asientosGeneral > venueDetails.general) {
+                    asientosGeneralInput.setCustomValidity(`No puedes ofrecer más de ${venueDetails.general} asientos GENERAL en esta ubicación.`);
+                } else if (!isNaN(asientosGeneral) && asientosGeneral < 1) {
+                    asientosGeneralInput.setCustomValidity('Los asientos GENERAL deben ser al menos 1.');
+                }
+                 else {
+                    asientosGeneralInput.setCustomValidity('');
+                }
+
+                // Validar Asientos VIP (solo si se ha ingresado un valor)
+                if (asientosVIPInput.value !== '') { // Solo validar si el campo no está vacío
+                    if (!isNaN(asientosVIP) && asientosVIP > venueDetails.vip) {
+                        asientosVIPInput.setCustomValidity(`No puedes ofrecer más de ${venueDetails.vip} asientos VIP en esta ubicación.`);
+                    } else if (!isNaN(asientosVIP) && asientosVIP < 0) { // Permitir 0 si el campo no es requerido
+                        asientosVIPInput.setCustomValidity('Los asientos VIP no pueden ser negativos.');
+                    } else {
+                        asientosVIPInput.setCustomValidity('');
+                    }
+                } else {
+                     asientosVIPInput.setCustomValidity(''); // Limpiar la validación si está vacío
+                }
+                asientosGeneralInput.reportValidity();
+                asientosVIPInput.reportValidity();
+            }
+
+            // Event listeners para los inputs de asientos para validar en tiempo real
+            asientosGeneralInput.addEventListener('input', validateAsientosInputs);
+            asientosVIPInput.addEventListener('input', validateAsientosInputs);
+
+
+            // Inicializar al cargar la página
+            updateUbicaciones(); 
+            displayUbicacionDetails(); 
+
+            // --- Manejo del envío del formulario ---
+            createEventForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                // Disparar las validaciones finales antes de enviar
+                validateAsientosInputs();
+                costoGeneralInput.reportValidity();
+                costoVIPInput.reportValidity(); // Para mostrar errores si aplica
+
+                // Si alguna validación de campos numéricos (asientos o costos) falla, detener el envío
+                if (!createEventForm.checkValidity()) {
+                    showProvMessageModal('Por favor, corrige los errores en el formulario antes de enviar.', 'error');
+                    return;
+                }
+
+                const costoGeneral = parseFloat(costoGeneralInput.value);
+                const costoVIP = parseFloat(costoVIPInput.value);
+                let costoConadis = parseFloat(costoConadisInput.value);
+
+                // Validaciones de precios
+                if (isNaN(costoGeneral) || costoGeneral < 1.00) {
+                    showProvMessageModal('El Precio General debe ser 1.00 o mayor.', 'error');
+                    return;
+                }
+
+                if (costoVIPInput.value !== '' && (isNaN(costoVIP) || costoVIP < 1.00)) {
+                    showProvMessageModal('El Precio VIP debe ser 1.00 o mayor, o déjalo vacío si no aplica.', 'error');
+                    return;
+                } 
+
+                // Asegurarse de que el precio CONADIS calculado sea al menos 1.00
+                if (isNaN(costoConadis) || costoConadis < 1.00) {
+                    if (costoConadis === 0 && costoGeneral > 0) { 
+                        costoConadis = 1.00;
+                        costoConadisInput.value = costoConadis.toFixed(2);
+                    } else { 
+                        showProvMessageModal('El Precio CONADIS calculado es inválido o menor a 1.00. Asegúrate de que el Precio General sea válido.', 'error');
+                        return;
+                    }
+                }
+                
+                // Asegurarse de que el input de archivo tenga un archivo seleccionado
+                if (!imagenEventoInput.files || imagenEventoInput.files.length === 0) {
+                    showProvMessageModal('Debe seleccionar una imagen para el evento.', 'error');
+                    return;
+                }
+
+                const formData = new FormData();
+                // AÑADIR TODOS LOS CAMPOS AL FORMDATA CON SUS NUEVOS NOMBRES
+                formData.append('Nom_Evento', document.getElementById('Nom_Evento').value);
+                formData.append('Fecha', document.getElementById('Fecha').value);
+                formData.append('Horario_Inicio', document.getElementById('Horario_Inicio').value);
+                formData.append('Horario_Fin', document.getElementById('Horario_Fin').value);
+                formData.append('Categoria', categoriaSelect.value);
+                formData.append('Ubicacion', ubicacionSelect.value);
+                formData.append('Descripcion', document.getElementById('Descripcion').value);
+                
+                // Nuevos campos de Asientos (Stock)
+                formData.append('AsientosGeneral', parseInt(asientosGeneralInput.value));
+                // Solo añadir AsientosVIP si no está vacío
+                if (asientosVIPInput.value !== '') {
+                    formData.append('AsientosVIP', parseInt(asientosVIPInput.value));
+                } else {
+                    formData.append('AsientosVIP', 0); // Enviar 0 si no se especificó VIP
+                }
+                
+                // Campos de Precios
+                formData.append('CostoGeneral', costoGeneral.toFixed(2));
+                if (costoVIPInput.value !== '') {
+                    formData.append('CostoVIP', costoVIP.toFixed(2));
+                } else {
+                    formData.append('CostoVIP', ''); // Enviar cadena vacía si no hay precio VIP
+                }
+                formData.append('CostoConadis', costoConadis.toFixed(2));
+                
+                formData.append('imagenEvento', imagenEventoInput.files[0]);
+
+                showProvMessageModal('Enviando solicitud de evento...', 'info'); 
+
+                try {
+                    const response = await fetch(`${API_URL}/api/proveedor/eventos/crear`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: formData 
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showProvMessageModal(data.message || 'Solicitud de evento enviada con éxito y pendiente de aprobación.', 'success');
+                        createEventForm.reset(); // Limpiar el formulario
+                        costoConadisInput.value = ''; 
+                        updateUbicaciones(); 
+                    } else {
+                        showProvMessageModal(`Error: ${data.error || data.message || 'Error al enviar la solicitud de evento.'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error al enviar la solicitud de evento:', error);
+                    showProvMessageModal(`Error de conexión o del servidor al enviar solicitud: ${error.message}`, 'error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

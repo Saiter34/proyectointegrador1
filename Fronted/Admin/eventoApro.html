@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventos Aprobados - TEYCKETAN</title>
+    <!-- Usar el archivo CSS del panel de administración -->
+    <link rel="stylesheet" href="admin.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- SIDEBAR - Reutilizando la estructura del admin.html -->
+    <div class="admin-sidebar">
+        <div class="admin-barra-logo">
+            <img src="../img/logo.png" alt="Logo Teycketan" class="admin-logo-img" />
+        </div>
+        <ul class="admin-nav-list">
+            <li><a href="admin.html" class="admin-nav-item"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
+            <li><a href="solicitud.html" class="admin-nav-item"><i class="fas fa-user-clock"></i><span>Solicitud de proveedores</span></a></li>
+            <li><a href="aprobados.html" class="admin-nav-item"><i class="fas fa-user-check"></i><span>Proveedores aprobados</span></a></li>
+            <li><a href="eventos.html" class="admin-nav-item"><i class="fas fa-tasks"></i><span>Solicitud de eventos</span></a></li>
+            <li><a href="eventoApro.html" class="admin-nav-item active"><i class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
+        </ul>
+    </div>
+
+    <!-- MAIN CONTENT - Reutilizando la estructura del admin.html -->
+    <div class="admin-main-content">
+        <header class="admin-topbar">
+            <h1 class="admin-titulo-seccion">Eventos Aprobados</h1>
+            <div class="admin-acciones">
+                <div class="admin-notif-wrapper">
+                    <button class="admin-notif-btn" id="adminNotifToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="admin-notif-dot"></span>
+                    </button>
+                    <div class="admin-notif-dropdown" id="adminNotifDropdown">
+                        <p class="admin-notif-title">Notificaciones</p>
+                        <ul>
+                            <li>Evento “Damiano David” fue aprobado</li>
+                            <li>Nuevo mensaje del soporte</li>
+                            <li>Revisa los detalles del evento</li>
+                        </ul>
+                    </div>
+                </div>
+                <button id="adminLogoutButton" class="admin-btn-logout">Cerrar Sesión</button>
+            </div>
+        </header>
+
+        <section class="admin-contenido">
+            <div class="admin-bienvenida">Consulta los eventos que ya fueron aprobados por TEYCKETAN.</div>
+
+            <!-- Contenedor para mensajes -->
+            <div id="adminMessageContainer" class="admin-message-container"></div>
+            
+            <div class="admin-tabla-contenedor">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Imagen</th>
+                            <th>Evento</th>
+                            <th>Categoría</th>
+                            <th>Fecha</th>
+                            <th>Horario</th>
+                            <th>Ubicación</th>
+                            <th>Descripción</th>
+                            <th>Precios (G/V/C)</th>
+                            <th>Organizador</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="approvedEventsListBody">
+                        <!-- Los eventos aprobados se cargarán aquí dinámicamente -->
+                        <tr><td colspan="12" class="admin-loading-message">Cargando eventos aprobados...</td></tr>
+                    </tbody>
+                </table>
+                <p id="noApprovedEventsMessage" class="admin-no-requests-message" style="display: none;">No hay eventos aprobados en este momento.</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modales (copiados de admin.html para auto-contención) -->
+    <div id="adminConfirmationModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="admin-close-button">&times;</span>
+            <p id="adminModalMessage">¿Estás seguro de realizar esta acción?</p>
+            <button id="adminModalConfirmBtn" class="admin-modal-btn admin-modal-confirm">Confirmar</button>
+            <button id="adminModalCancelBtn" class="admin-modal-btn admin-modal-cancel">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="adminMessageModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="admin-close-button">&times;</span>
+            <p id="adminMessageModalText"></p>
+            <button id="adminMessageModalCloseBtn" class="admin-modal-btn admin-modal-confirm">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta
+
+            // Elementos DOM principales
+            const adminLogoutButton = document.getElementById('adminLogoutButton');
+            const adminNotifToggle = document.getElementById('adminNotifToggle');
+            const adminNotifDropdown = document.getElementById('adminNotifDropdown');
+            const approvedEventsListBody = document.getElementById('approvedEventsListBody'); // Usar tbody directamente
+            const adminMessageContainer = document.getElementById('adminMessageContainer');
+            const noApprovedEventsMessage = document.getElementById('noApprovedEventsMessage');
+
+            // Referencias a los IDs de modales
+            const adminConfirmationModal = document.getElementById('adminConfirmationModal');
+            const adminModalMessage = document.getElementById('adminModalMessage');
+            const adminModalConfirmBtn = document.getElementById('adminModalConfirmBtn');
+            const adminModalCancelBtn = document.getElementById('adminModalCancelBtn');
+            const adminMessageModal = document.getElementById('adminMessageModal');
+            const adminMessageModalText = document.getElementById('adminMessageModalText');
+            const adminMessageModalCloseBtn = document.getElementById('adminMessageModalCloseBtn');
+
+            // --- Funciones para Modales (copiadas de admin.html para auto-contención) ---
+
+            /**
+             * @brief Muestra un modal de confirmación al usuario (específico para Admin).
+             * @param {string} message - El mensaje a mostrar en el modal.
+             * @returns {Promise<boolean>} Una promesa que se resuelve a `true` si el usuario confirma, `false` si cancela.
+             */
+            function showAdminConfirmationModal(message) {
+                return new Promise((resolve) => {
+                    adminModalMessage.textContent = message;
+                    adminConfirmationModal.style.display = 'flex'; // Usar flex para centrar
+                    
+                    const confirmHandler = () => {
+                        adminConfirmationModal.style.display = 'none';
+                        adminModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        adminModalCancelBtn.removeEventListener('click', cancelHandler);
+                        adminConfirmationModal.querySelector('.admin-close-button').removeEventListener('click', cancelHandler);
+                        resolve(true);
+                    };
+
+                    const cancelHandler = () => {
+                        adminConfirmationModal.style.display = 'none';
+                        adminModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        adminModalCancelBtn.removeEventListener('click', cancelHandler);
+                        adminConfirmationModal.querySelector('.admin-close-button').removeEventListener('click', cancelHandler);
+                        resolve(false);
+                    };
+
+                    adminModalConfirmBtn.addEventListener('click', confirmHandler);
+                    adminModalCancelBtn.addEventListener('click', cancelHandler);
+                    adminConfirmationModal.querySelector('.admin-close-button').addEventListener('click', cancelHandler);
+                });
+            }
+
+            /**
+             * @brief Muestra un modal de mensaje informativo al usuario (específico para Admin).
+             * @param {string} message - El mensaje a mostrar en el modal.
+             * @param {string} type - Tipo de mensaje ('success' o 'error') para estilos. Opcional, si no se usa para estilos.
+             */
+            function showAdminMessageModal(message, type = '') {
+                adminMessageModalText.textContent = message;
+                adminMessageModalText.className = `admin-message-text ${type ? 'admin-message-' + type : ''}`; // Añadir clase para estilo
+                adminMessageModal.style.display = 'flex'; // Usar flex para centrar
+                
+                adminMessageModalCloseBtn.onclick = () => {
+                    adminMessageModal.style.display = 'none';
+                };
+                adminMessageModal.querySelector('.admin-close-button').onclick = () => {
+                    adminMessageModal.style.display = 'none';
+                };
+            }
+
+            // --- Lógica de Autenticación al cargar la página ---
+            const token = localStorage.getItem('jwtToken');
+            const userRole = localStorage.getItem('userRole');
+
+            console.log('Approved Events Page Loaded.'); 
+            console.log('JWT Token:', token ? 'Exists' : 'Missing'); 
+            console.log('User Role from localStorage:', userRole); 
+
+            // Seguridad: Redirige si no hay token o el rol no es 'admin'
+            if (!token || userRole !== 'admin') {
+                showAdminMessageModal('Acceso denegado. Debes ser un administrador para ver esta página.', 'error'); 
+                setTimeout(() => {
+                    window.location.replace('../login.html'); 
+                }, 2000); 
+                return; 
+            }
+
+            // --- Event Listener para Cerrar Sesión ---
+            adminLogoutButton.addEventListener('click', async () => {
+                const confirmLogout = await showAdminConfirmationModal('¿Estás seguro de que quieres cerrar sesión?');
+                if (confirmLogout) {
+                    localStorage.removeItem('jwtToken');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('isOrganizer');
+                    localStorage.removeItem('userId'); 
+                    showAdminMessageModal('Sesión cerrada correctamente.', 'success');
+                    setTimeout(() => {
+                        window.location.replace('../login.html'); 
+                    }, 500); 
+                }
+            });
+
+            // --- Lógica para Notificaciones (Dropdown) ---
+            adminNotifToggle.addEventListener('click', (event) => {
+                event.stopPropagation(); 
+                adminNotifDropdown.style.display = adminNotifDropdown.style.display === 'block' ? 'none' : 'block';
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!adminNotifDropdown.contains(event.target) && !adminNotifToggle.contains(event.target)) {
+                    adminNotifDropdown.style.display = 'none';
+                }
+            });
+
+            // Añadir clase 'active' al enlace de la página actual en el sidebar
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.admin-nav-item').forEach(link => {
+                if (link.href.includes('eventoApro.html')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+
+            // --- Funcionalidad de Eventos Aprobados ---
+
+            /**
+             * @brief Carga los eventos aprobados desde el backend.
+             */
+            async function fetchApprovedEvents() {
+                approvedEventsListBody.innerHTML = '<tr><td colspan="12" class="admin-loading-message">Cargando eventos aprobados...</td></tr>';
+                noApprovedEventsMessage.style.display = 'none'; // Ocultar mensaje de "no hay eventos"
+
+                try {
+                    // Endpoint para obtener eventos aprobados (ajustar si es diferente en tu backend)
+                    const response = await fetch(`${API_URL}/api/admin/eventos/aprobados`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        if (data.events && data.events.length === 0) {
+                            approvedEventsListBody.innerHTML = ''; // Limpiar la tabla si no hay eventos
+                            noApprovedEventsMessage.style.display = 'block'; // Mostrar mensaje de "no hay eventos"
+                        } else if (data.events) {
+                            renderApprovedEvents(data.events);
+                        } else {
+                            // Fallback si el backend responde con un array directo
+                            renderApprovedEvents(data); 
+                        }
+                    } else {
+                        showAdminMessageModal(`Error al cargar eventos aprobados: ${data.message || 'Error desconocido'}`, 'error');
+                        approvedEventsListBody.innerHTML = `<tr><td colspan="12" class="admin-no-requests-message admin-error-text">No se pudieron cargar los eventos aprobados.</td></tr>`;
+                    }
+                } catch (error) {
+                    console.error('Error al obtener eventos aprobados:', error);
+                    showAdminMessageModal('Error de conexión con el servidor al cargar eventos aprobados.', 'error');
+                    approvedEventsListBody.innerHTML = `<tr><td colspan="12" class="admin-no-requests-message admin-error-text">Error de red.</td></tr>`;
+                }
+            }
+
+            /**
+             * @brief Maneja la eliminación de un evento aprobado.
+             * @param {number} eventId - El ID del evento a eliminar.
+             * @param {string} eventName - El nombre del evento para el mensaje de confirmación.
+             */
+            async function handleDeleteEvent(eventId, eventName) {
+                const confirmDelete = await showAdminConfirmationModal(`¿Estás seguro de que quieres ELIMINAR el evento "${eventName}" (ID: ${eventId})? Esta acción no se puede deshacer.`);
+                
+                if (!confirmDelete) {
+                    return; // Usuario canceló la acción
+                }
+
+                try {
+                    const response = await fetch(`${API_URL}/api/admin/eventos/eliminar/${eventId}`, {
+                        method: 'DELETE', // Usar DELETE para eliminar el recurso
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showAdminMessageModal(data.message, 'success');
+                        fetchApprovedEvents(); // Recargar datos después de la eliminación
+                    } else {
+                        showAdminMessageModal(`Error al eliminar el evento: ${data.message || data.error || 'Error desconocido'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error(`Error al eliminar el evento:`, error);
+                    showAdminMessageModal(`Error de conexión con el servidor al eliminar evento.`, 'error');
+                }
+            }
+
+            /**
+             * @brief Renderiza la lista de eventos aprobados en una tabla HTML.
+             * @param {Array<Object>} events - Un array de objetos de evento.
+             */
+            function renderApprovedEvents(events) {
+                approvedEventsListBody.innerHTML = ''; // Limpiar contenido previo del tbody
+                noApprovedEventsMessage.style.display = 'none'; // Ocultar mensaje de "no hay eventos"
+
+                if (events.length === 0) {
+                    noApprovedEventsMessage.style.display = 'block';
+                    return;
+                }
+
+                let tableRowsHtml = '';
+                events.forEach(event => {
+                    const precioGeneral = parseFloat(event.PrecioGeneral);
+                    const formattedPrecioGeneral = isNaN(precioGeneral) ? 'N/A' : `S/. ${precioGeneral.toFixed(2)}`;
+
+                    const precioVIP = parseFloat(event.PrecioVIP);
+                    const formattedPrecioVIP = isNaN(precioVIP) ? 'N/A' : `S/. ${precioVIP.toFixed(2)}`;
+
+                    const precioConadis = parseFloat(event.PrecioConadis);
+                    const formattedPrecioConadis = isNaN(precioConadis) ? 'N/A' : `S/. ${precioConadis.toFixed(2)}`;
+
+                    // Asegurarse de que la URL de la imagen sea absoluta si viene de la raíz del servidor
+                    const imageUrl = event.URL_Imagen ? `${API_URL}${event.URL_Imagen}` : 'https://placehold.co/80x80/cccccc/000000?text=No+Img';
+                    
+                    tableRowsHtml += `
+                        <tr>
+                            <td data-label="ID">${event.Id_Evento}</td>
+                            <td data-label="Imagen"><img src="${imageUrl}" alt="Imagen del evento" class="admin-event-image-thumbnail"></td>
+                            <td data-label="Evento">${event.Nom_Evento}</td>
+                            <td data-label="Categoría">${event.Categoria || 'N/A'}</td>
+                            <td data-label="Fecha">${new Date(event.Fecha).toLocaleDateString('es-ES')}</td>
+                            <td data-label="Horario">${event.Horario_Inicio || 'N/A'} - ${event.Horario_Fin || 'N/A'}</td>
+                            <td data-label="Ubicación">${event.Ubicacion}</td>
+                            <td data-label="Descripción">${event.Descripcion ? event.Descripcion.substring(0, 50) + '...' : 'N/A'}</td>
+                            <td data-label="Precios">${formattedPrecioGeneral}<br>${formattedPrecioVIP}<br>${formattedPrecioConadis}</td>
+                            <td data-label="Organizador">${event.NombreProveedor || 'N/A'} ${event.ApellidoProveedor || ''} (${event.EmailProveedor || 'N/A'})</td>
+                            <td data-label="Estado">${event.Estado}</td>
+                            <td class="admin-actions-cell">
+                                <button class="admin-btn-details" data-id="${event.Id_Evento}" data-name="${event.Nom_Evento}"><i class="fas fa-info-circle"></i> Detalles</button>
+                                <button class="admin-btn-delete" data-id="${event.Id_Evento}" data-name="${event.Nom_Evento}"><i class="fas fa-trash-alt"></i> Eliminar</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                approvedEventsListBody.innerHTML = tableRowsHtml;
+
+                // Añadir event listeners a los botones de acción
+                approvedEventsListBody.querySelectorAll('.admin-btn-details').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const eventId = e.target.dataset.id || e.target.closest('button').dataset.id;
+                        // Aquí podrías redirigir a una página de detalles del evento o abrir un modal con más info
+                        showAdminMessageModal(`Ver detalles del evento ID: ${eventId}. Funcionalidad pendiente.`, 'info');
+                    });
+                });
+                approvedEventsListBody.querySelectorAll('.admin-btn-delete').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const eventId = e.target.dataset.id || e.target.closest('button').dataset.id;
+                        const eventName = e.target.dataset.name || e.target.closest('button').dataset.name;
+                        handleDeleteEvent(eventId, eventName);
+                    });
+                });
+            }
+
+            fetchApprovedEvents(); // Cargar eventos aprobados al cargar la página
+        });
+    </script>
+</body>
+</html>

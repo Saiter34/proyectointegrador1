@@ -1,0 +1,904 @@
+/* Importación de fuentes de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
+
+/* Estilos generales para el documento */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Orbitron', sans-serif;
+    /* RUTA CORRECTA: Desde Fronted/Proveedor/, sube un nivel (../) para ir a Fronted/, luego entra a img/ */
+    background: url('../img/reja.jpg') repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    color: #f5f5f5;
+    display: flex; /* Para que sidebar y main-content se coloquen lado a lado */
+    min-height: 100vh;
+}
+
+/* SIDEBAR STYLES */
+.prov-sidebar {
+    width: 230px;
+    height: 100vh;
+    background-color: rgba(10, 10, 10, 0.95);
+    border-right: 2px solid #00c1c1; /* Color diferente para proveedor */
+    box-shadow: 2px 0 10px rgba(0, 193, 193, 0.5);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+}
+
+.prov-barra-logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.prov-logo-img {
+    height: 60px;
+    max-width: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px #00c1c1); /* Sombra de logo diferente */
+}
+
+.prov-nav-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.prov-nav-list li {
+    margin-bottom: 10px;
+}
+
+.prov-nav-item {
+    text-decoration: none;
+    color: #f5f5f5;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    font-weight: bold;
+}
+
+.prov-nav-item:hover,
+.prov-nav-item.active {
+    background-color: #00c1c1; /* Color diferente para hover/activo */
+    color: #fff;
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.6);
+}
+
+.prov-nav-item i {
+    font-size: 18px;
+    min-width: 20px;
+    text-align: center;
+}
+
+/* MAIN CONTENT STYLES */
+.prov-main-content {
+    margin-left: 230px;
+    width: calc(100% - 230px);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.prov-topbar {
+    background-color: rgba(20, 20, 20, 0.95);
+    padding: 15px 25px;
+    border-bottom: 2px solid #00c1c1; /* Color diferente */
+    box-shadow: 0 0 10px rgba(0, 193, 193, 0.5);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+.prov-titulo-seccion {
+    font-size: 24px;
+    color: #00c1c1; /* Color diferente */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+}
+
+.prov-acciones {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+/* --- NOTIFICATION STYLES --- */
+.prov-notif-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-left: 20px; 
+}
+
+.prov-notif-btn {
+    background: transparent;
+    border: none;
+    color: #f5f5f5; 
+    font-size: 22px; 
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s ease, transform 0.2s ease; 
+    outline: none; 
+}
+
+.prov-notif-btn:hover {
+    color: #3bffff; 
+    transform: scale(1.1); 
+}
+
+.prov-notif-dot {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 10px;
+    height: 10px;
+    background-color: #00ffff; 
+    border-radius: 50%;
+    border: 1px solid #f5f5f5; 
+    display: block; 
+}
+
+.prov-notif-dropdown {
+    position: absolute;
+    top: 100%; 
+    right: 0; 
+    max-width: 90vw; 
+    min-width: 250px; 
+    width: auto; 
+
+    background-color: rgba(20, 20, 20, 0.98); 
+    border: 1px solid #00c1c1; 
+    box-shadow: 0 0 20px rgba(0, 193, 193, 0.7); 
+    border-radius: 8px;
+    
+    display: none; 
+    z-index: 1000; 
+    padding: 15px; 
+    color: #f5f5f5;
+
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    pointer-events: none; 
+}
+
+.prov-notif-dropdown.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all; 
+}
+
+.prov-notif-dropdown .prov-notif-title {
+    font-weight: bold;
+    color: #00c1c1; 
+    margin-bottom: 12px;
+    font-size: 18px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 8px;
+}
+
+.prov-notif-dropdown ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.prov-notif-dropdown ul li {
+    padding: 8px 0;
+    border-bottom: 1px solid #333;
+    color: #f5f5f5;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.prov-notif-dropdown ul li:last-child {
+    border-bottom: none;
+}
+
+/* GENERAL BUTTON STYLES (for logout and other primary actions) */
+.prov-btn-logout {
+    background-color: #dc3545; 
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.3s, background-color 0.3s;
+    font-size: 1em;
+}
+
+.prov-btn-logout:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 12px rgba(220, 53, 69, 0.7);
+    background-color: #c82333;
+}
+
+.prov-btn-crear-evento { 
+    background-color: #007bff; 
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.3s, background-color 0.3s;
+    font-size: 1em;
+    text-decoration: none; 
+    display: inline-block; 
+    text-align: center;
+}
+.prov-btn-crear-evento:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 12px rgba(0, 123, 255, 0.7);
+    background-color: #0056b3;
+}
+
+
+/* MAIN CONTENT SECTIONS */
+.prov-contenido {
+    padding: 30px 40px;
+    flex-grow: 1;
+}
+
+.prov-bienvenida {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: #fff;
+    background-color: rgba(10, 10, 10, 0.9);
+    padding: 25px 30px;
+    border-left: 6px solid #00c1c1; 
+    box-shadow: 0 0 15px rgba(0, 193, 193, 0.7);
+    text-align: center;
+    border-radius: 8px;
+}
+
+/* Info Cards Grid for Dashboard (Assuming these are for proveedorPanel.html) */
+.prov-info-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.prov-info-card {
+    background-color: rgba(10, 10, 10, 0.95);
+    border: 1px solid #00c1c1; 
+    box-shadow: 0 0 15px rgba(0, 193, 193, 0.7);
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+    color: #fff;
+    font-weight: bold;
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.prov-info-card h4 {
+    font-size: 1.5em;
+    color: #00ffff; 
+    margin-bottom: 10px;
+}
+
+.prov-info-card p {
+    font-size: 2.5em; 
+    font-weight: 700;
+    color: #f5f5f5;
+    margin-bottom: 10px;
+}
+
+.prov-info-card small {
+    font-size: 0.9em;
+    color: #ccc;
+}
+
+
+/* Table styles (for events in verEvento.html) */
+.prov-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: rgba(20, 20, 20, 0.95);
+    color: #f5f5f5;
+    box-shadow: 0 0 15px rgba(0, 193, 193, 0.7); 
+    border: 1px solid #00c1c1; 
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+.prov-table th, .prov-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid #444;
+}
+
+.prov-table th {
+    background-color: #00c1c1; 
+    color: #fff;
+    font-size: 1em;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+/* Alternating row colors for main event rows (excluding detail rows) */
+.prov-table tbody tr.event-main-row:nth-child(4n-3), /* First main row (1st, 5th, etc.) */
+.prov-table tbody tr.event-main-row:nth-child(4n-2) { /* Second main row (2nd, 6th, etc.) */
+    background-color: rgba(20, 20, 20, 0.9); /* Darker background for main rows */
+}
+.prov-table tbody tr.event-main-row:nth-child(4n-1), /* Third main row (3rd, 7th, etc.) */
+.prov-table tbody tr.event-main-row:nth-child(4n) { /* Fourth main row (4th, 8th, etc.) */
+    background-color: rgba(30, 30, 30, 0.9); /* Slightly lighter dark background for main rows */
+}
+
+
+.prov-table tbody tr.event-main-row:hover {
+    background-color: rgba(0, 255, 255, 0.15); 
+    transition: background 0.3s;
+}
+
+/* Image thumbnail for event tables */
+.prov-event-image-thumbnail {
+    width: 60px; 
+    height: 60px; 
+    object-fit: cover; 
+    border-radius: 5px; 
+    border: 1px solid #444; 
+    vertical-align: middle; 
+}
+
+/* Estilos para el estado del evento (pendiente, aprobado, rechazado) */
+.event-status {
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+.event-status-pendiente {
+    background-color: #ffc107; 
+    color: #333;
+}
+.event-status-aprobado {
+    background-color: #28a745; 
+    color: white;
+}
+.event-status-rechazado {
+    background-color: #dc3545; 
+    color: white;
+}
+
+
+/* Button styles for tables (e.g., Edit, Delete, Details) */
+.prov-actions-cell button { /* Combined selector for all buttons in this cell */
+    padding: 8px 14px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 4px; /* Maintain individual margins */
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-flex; /* Use flex to align icon and text */
+    align-items: center;
+    justify-content: center; /* Center content horizontally */
+    gap: 5px; /* Space between icon and text */
+    color: #fff; /* Default text color for all buttons in this cell */
+}
+
+/* Individual button colors */
+.prov-actions-cell .prov-btn-edit {
+    background-color: #007bff; /* Azul */
+}
+.prov-actions-cell .prov-btn-edit:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.7);
+    background-color: #0056b3;
+}
+
+.prov-actions-cell .prov-btn-delete {
+    background-color: #dc3545; /* Rojo */
+}
+.prov-actions-cell .prov-btn-delete:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.7);
+    background-color: #c82333;
+}
+
+.prov-actions-cell .prov-btn-details {
+    background-color: #6c757d; /* Gris */
+}
+.prov-actions-cell .prov-btn-details:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(108, 117, 125, 0.7);
+    background-color: #5a6268;
+}
+
+
+/* --- Form Styles (for crearevento.html) --- */
+.prov-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; 
+    background-color: rgba(10, 10, 10, 0.95);
+    padding: 25px 30px;
+    border: 1px solid #00c1c1; 
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 193, 193, 0.7); 
+    max-width: 600px; 
+    margin: 30px auto; 
+    color: #f5f5f5; 
+}
+
+.prov-form label {
+    font-weight: bold;
+    color: #f5f5f5;
+    margin-top: 10px; 
+    margin-bottom: 5px; 
+    display: block; 
+}
+
+.prov-form input,
+.prov-form textarea,
+.prov-form select {
+    padding: 10px;
+    background-color: #1a1a1a;
+    color: #f5f5f5;
+    border: 1px solid #00c1c1; 
+    border-radius: 6px;
+    font-family: 'Orbitron', sans-serif;
+    resize: vertical; 
+    width: 100%;
+}
+
+.prov-form input[type="file"] {
+    border: none; 
+    padding: 5px;
+    background-color: transparent;
+}
+
+.prov-form input:focus,
+.prov-form textarea:focus,
+.prov-form select:focus {
+    outline: none;
+    box-shadow: 0 0 10px #3bffff; 
+    border-color: #3bffff;
+}
+
+.prov-btn-submit {
+    display: inline-block;
+    margin-top: 20px;
+    background-color: #00c1c1; 
+    color: #fff;
+    padding: 10px 16px;
+    font-family: 'Orbitron', sans-serif;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-align: center;
+    cursor: pointer;
+}
+
+.prov-btn-submit:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px #3bffff; 
+}
+
+/* --- ESTILOS PARA LA INFORMACIÓN DE UBICACIÓN (crearevento.html) --- */
+.prov-ubicacion-detalles {
+    background-color: rgba(0, 0, 0, 0.5); 
+    border: 1px solid #00c1c1; 
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 10px; 
+    margin-bottom: 20px; 
+    color: #f5f5f5;
+    font-size: 0.95em;
+    line-height: 1.6;
+    box-shadow: 0 0 10px rgba(0, 193, 193, 0.4);
+}
+
+.prov-ubicacion-detalles .prov-ubicacion-titulo {
+    font-weight: bold;
+    color: #00ffff; 
+    margin-bottom: 8px;
+    font-size: 1.1em;
+}
+
+.prov-ubicacion-detalles .prov-ubicacion-subtitulo {
+    font-weight: 700; 
+    color: #f5f5f5; 
+    margin-top: 5px;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+    text-align: center;
+}
+
+.prov-ubicacion-detalles ul {
+    list-style: none; 
+    padding: 0;
+    margin-top: 10px;
+}
+
+.prov-ubicacion-detalles ul li {
+    margin-bottom: 5px;
+    padding-left: 15px; 
+    position: relative;
+}
+
+.prov-ubicacion-detalles ul li::before {
+    content: "•"; 
+    color: #00c1c1; 
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+/* Estilo para mensajes informativos dentro de ubicacion-detalles */
+.prov-ubicacion-info {
+    font-style: italic;
+    color: #ccc;
+    text-align: center;
+    padding: 10px;
+}
+
+
+/* Modal Styles */
+.prov-modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1001; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.7); 
+    justify-content: center; 
+    align-items: center; 
+}
+.prov-modal-content {
+    background-color: #1a1a1a;
+    margin: auto;
+    padding: 30px;
+    border: 1px solid #00c1c1; 
+    border-radius: 10px;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 0 20px rgba(0, 193, 193, 0.5); 
+    color: #f0f0f0;
+}
+.prov-close-button {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.prov-close-button:hover,
+.prov-close-button:focus {
+    color: #00ffff; 
+    text-decoration: none;
+    cursor: pointer;
+}
+.prov-modal-btn {
+    background-color: #00c1c1; 
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px;
+    transition: background-color 0.3s ease;
+}
+.prov-modal-btn.prov-modal-confirm {
+    background-color: #28a741; 
+}
+.prov-modal-btn.prov-modal-confirm:hover {
+    background-color: #218838;
+}
+.prov-modal-btn.prov-modal-cancel {
+    background-color: #555; 
+}
+.prov-modal-btn.prov-modal-cancel:hover {
+    background-color: #666;
+}
+.prov-modal p {
+    margin-bottom: 20px;
+    font-size: 1.1em;
+}
+
+/* Mensajes de feedback en modales */
+.prov-message-text {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.prov-message-text.prov-message-error {
+    color: #ff4d4d; 
+}
+
+.prov-message-text.prov-message-success {
+    color: #4CAF50; 
+}
+
+.prov-message-text.prov-message-info {
+    color: #66b3ff; 
+}
+
+/* Mensajes de carga/no datos en la tabla */
+.prov-loading-message, .prov-no-data-message {
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+    color: #f5f5f5; /* Changed to match theme */
+    background-color: rgba(10, 10, 10, 0.9); /* Dark background */
+    border-radius: 8px;
+    margin-top: 20px;
+    border: 1px solid #00c1c1; /* Theme border */
+    box-shadow: 0 0 10px rgba(0, 193, 193, 0.4); /* Theme shadow */
+}
+
+.prov-error-text {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+
+/* --- ESTILOS ADICIONALES PARA DETALLES DEL EVENTO --- */
+.prov-details-row {
+    /* Es importante que esto no tenga un 'display' aquí, lo maneja JS */
+    background-color: rgba(30, 30, 30, 0.9); /* Fondo ligeramente diferente para detalles */
+    border-top: 1px dashed #00c1c1; /* Línea discontinua que separa de la fila principal */
+    transition: all 0.3s ease-out; /* Suaviza la transición de aparición/desaparición */
+}
+
+.prov-details-content {
+    padding: 20px;
+    background-color: rgba(30, 30, 30, 0.9); /* Mismo fondo para el contenido del detalle */
+    color: #f5f5f5; /* Color de texto que coincide con el tema */
+    font-size: 0.95em;
+    line-height: 1.6;
+    border-radius: 0 0 10px 10px; /* Redondear solo las esquinas inferiores del contenido si es la última fila visible */
+}
+
+.prov-details-content h3 {
+    color: #00ffff; /* Un cian más brillante para el título de las estadísticas */
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+    border-bottom: 1px solid #666; /* Un separador más oscuro */
+    padding-bottom: 10px;
+}
+
+.prov-details-content h4 {
+    color: #00c1c1; /* El color principal de tu tema para subtítulos */
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.prov-details-content p {
+    margin-bottom: 5px;
+}
+
+.prov-details-content strong {
+    color: #fff; /* Blanco puro para la información destacada */
+}
+
+/* Animación de expansión */
+.prov-details-row.show-details {
+    animation: fadeInDown 0.3s ease-out forwards; /* 'forwards' para mantener el estado final */
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+
+    .prov-sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        position: relative;
+        padding: 10px;
+        border-right: none;
+        border-bottom: 2px solid #00c1c1;
+        justify-content: space-around;
+        align-items: center;
+    }
+    .prov-sidebar .prov-barra-logo {
+        margin-bottom: 0;
+        margin-right: 20px;
+    }
+    .prov-sidebar .prov-nav-list {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        flex-grow: 1;
+    }
+    .prov-nav-list li {
+        margin-bottom: 0;
+    }
+    .prov-nav-item {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+    .prov-nav-item i {
+        font-size: 1em;
+        min-width: unset;
+    }
+    .prov-nav-item span {
+        display: none;
+    }
+    .prov-nav-item:hover span, .prov-nav-item.active span {
+        display: inline-block;
+    }
+
+    .prov-main-content {
+        margin-left: 0;
+        width: 100%;
+        padding-top: 10px;
+    }
+    .prov-topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 15px 20px;
+    }
+    .prov-acciones {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    .prov-contenido {
+        padding: 20px;
+    }
+    .prov-bienvenida {
+        font-size: 20px;
+        padding: 15px;
+    }
+    .prov-info-cards-grid {
+        grid-template-columns: 1fr;
+    }
+    .prov-info-card {
+        width: 100%;
+        padding: 20px;
+    }
+
+    /* Table responsive for mobile */
+    .prov-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    .prov-table thead, .prov-table tbody, .prov-table th, .prov-table td, .prov-table tr {
+        display: block;
+    }
+    /* Specific adjustment for main event row (tr.event-main-row) */
+    .prov-table tr.event-main-row {
+        margin-bottom: 15px;
+        border: 1px solid #00c1c1; /* Consistent border for rows */
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 0 10px rgba(0, 193, 193, 0.4);
+    }
+    .prov-table td {
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+        border: none;
+        border-bottom: 1px dotted #444; /* Darker dotted line */
+        white-space: normal; /* Allow text to wrap */
+    }
+    .prov-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 6px;
+        width: 45%; /* Adjusted width */
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: bold;
+        color: #00ffff; /* Brighter cyan for labels */
+    }
+    .prov-event-image-thumbnail {
+        float: left;
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+    .prov-actions-cell {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding-top: 15px;
+        border-top: 1px solid #444; /* Darker border for actions */
+    }
+    .prov-actions-cell button {
+        width: auto;
+        margin-right: 0;
+        justify-content: center;
+    }
+
+    /* Form responsive */
+    .prov-form {
+        padding: 20px;
+    }
+
+    /* Detalles en móvil */
+    .prov-details-row td {
+        padding: 0; /* Eliminar padding de la celda que contiene los detalles */
+        border-bottom: none;
+    }
+    .prov-details-content {
+        border-radius: 0; /* No redondear en móvil si la tabla está en bloques */
+        padding: 15px;
+    }
+    .prov-details-content h3 {
+        font-size: 1.1em;
+    }
+    .prov-details-content h4 {
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 480px) {
+    .prov-sidebar .prov-nav-list {
+        justify-content: flex-start;
+    }
+    .prov-nav-item span {
+        display: none;
+    }
+    .prov-topbar .prov-titulo-seccion {
+        font-size: 20px;
+    }
+    .prov-notif-btn {
+        font-size: 18px;
+    }
+    .prov-btn-logout {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+    .prov-bienvenida {
+        font-size: 18px;
+    }
+}

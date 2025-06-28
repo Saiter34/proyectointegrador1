@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Proveedor - TEYCKETAN</title>
+    <!-- Usar el nuevo archivo CSS específico para el panel de proveedor -->
+    <link rel="stylesheet" href="proveedor.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="prov-sidebar">
+        <div class="prov-barra-logo">
+            <!-- RUTA CORREGIDA: Acceso absoluto desde la raíz del servidor estático o subiendo un nivel -->
+            <img src="../img/logo.png" alt="Logo Teycketan" class="prov-logo-img" />
+        </div>
+        <ul class="prov-nav-list">
+            <li><a href="proveedorPanel.html" class="prov-nav-item active"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
+            <li><a href="crearevento.html" class="prov-nav-item"><i class="fas fa-plus-circle"></i><span>Crear evento</span></a></li>
+            <li><a href="verEvento.html" class="prov-nav-item"><i class="fas fa-calendar-alt"></i><span>Ver eventos</span></a></li>
+            <!-- Opciones extra para el proveedor -->
+            <li class="prov-extra-option"><a href="#" class="prov-nav-item"><i class="fas fa-envelope"></i><span>Contactar empresa</span></a></li>
+        </ul>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="prov-main-content">
+        <header class="prov-topbar">
+            <h1 class="prov-titulo-seccion">Panel del Proveedor</h1>
+            <div class="prov-acciones">
+                <div class="prov-notif-wrapper">
+                    <button class="prov-notif-btn" id="provNotifToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="prov-notif-dot"></span>
+                    </button>
+                    <div class="prov-notif-dropdown" id="provNotifDropdown">
+                        <p class="prov-notif-title">Notificaciones</p>
+                        <ul>
+                            <li>Tu evento “Damiano David” fue aprobado</li>
+                            <li>Nuevo mensaje de TEYCKETAN</li>
+                            <li>Revisa el estado de tu evento</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Este botón podría redirigir a crear evento o ser solo estético si ya hay un link en el sidebar -->
+                <!-- <button class="prov-btn-crear-evento">+ Nuevo evento</button> -->
+                <button id="provLogoutButton" class="prov-btn-logout">Cerrar Sesión</button>
+            </div>
+        </header>
+
+        <section class="prov-contenido">
+            <div class="prov-bienvenida">Bienvenido a TEYCKETAN, aquí puedes gestionar tus eventos.</div>
+
+            <!-- Puedes añadir aquí tarjetas o resúmenes si los necesitas en la página de inicio del proveedor -->
+            <!-- Ejemplo de tarjeta de información -->
+            <div class="prov-info-cards-grid">
+                <div class="prov-info-card">
+                    <h4>Eventos Pendientes</h4>
+                    <p id="pendingEventsCount">0</p>
+                    <small>Eventos esperando aprobación.</small>
+                </div>
+                <div class="prov-info-card">
+                    <h4>Eventos Aprobados</h4>
+                    <p id="approvedEventsCount">0</p>
+                    <small>Eventos listos para publicar/celebrarse.</small>
+                </div>
+                <div class="prov-info-card">
+                    <h4>Eventos Rechazados</h4>
+                    <p id="rejectedEventsCount">0</p>
+                    <small>Eventos que necesitan revisión.</small>
+                </div>
+            </div>
+
+            <!-- Contenedor para mensajes (para modales) -->
+            <div id="provMessageContainer" class="prov-message-container"></div>
+        </section>
+    </div>
+
+    <!-- Modales (copiados de admin.html/eventoApro.html, pero con prefijo prov-) -->
+    <div id="provConfirmationModal" class="prov-modal">
+        <div class="prov-modal-content">
+            <span class="prov-close-button">&times;</span>
+            <p id="provModalMessage">¿Estás seguro de realizar esta acción?</p>
+            <button id="provModalConfirmBtn" class="prov-modal-btn prov-modal-confirm">Confirmar</button>
+            <button id="provModalCancelBtn" class="prov-modal-btn prov-modal-cancel">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="provMessageModal" class="prov-modal">
+        <div class="prov-modal-content">
+            <span class="prov-close-button">&times;</span>
+            <p id="provMessageModalText"></p>
+            <button id="provMessageModalCloseBtn" class="prov-modal-btn prov-modal-confirm">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta
+
+            // Elementos DOM principales
+            const provLogoutButton = document.getElementById('provLogoutButton');
+            const provNotifToggle = document.getElementById('provNotifToggle');
+            const provNotifDropdown = document.getElementById('provNotifDropdown');
+            const provMessageContainer = document.getElementById('provMessageContainer');
+            
+            // Elementos para los contadores de eventos
+            const pendingEventsCount = document.getElementById('pendingEventsCount');
+            const approvedEventsCount = document.getElementById('approvedEventsCount');
+            const rejectedEventsCount = document.getElementById('rejectedEventsCount');
+
+            // Referencias a los IDs de modales
+            const provConfirmationModal = document.getElementById('provConfirmationModal');
+            const provModalMessage = document.getElementById('provModalMessage');
+            const provModalConfirmBtn = document.getElementById('provModalConfirmBtn');
+            const provModalCancelBtn = document.getElementById('provModalCancelBtn');
+            const provMessageModal = document.getElementById('provMessageModal');
+            const provMessageModalText = document.getElementById('provMessageModalText');
+            const provMessageModalCloseBtn = document.getElementById('provMessageModalCloseBtn');
+
+            // --- Funciones para Modales (adaptadas para proveedor) ---
+
+            /**
+             * @brief Muestra un modal de confirmación al usuario (específico para Proveedor).
+             * @param {string} message - El mensaje a mostrar en el modal.
+             * @returns {Promise<boolean>} Una promesa que se resuelve a `true` si el usuario confirma, `false` si cancela.
+             */
+            function showProvConfirmationModal(message) {
+                return new Promise((resolve) => {
+                    provModalMessage.textContent = message;
+                    provConfirmationModal.style.display = 'flex'; // Usar flex para centrar
+                    
+                    const confirmHandler = () => {
+                        provConfirmationModal.style.display = 'none';
+                        provModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        provModalCancelBtn.removeEventListener('click', cancelHandler);
+                        provConfirmationModal.querySelector('.prov-close-button').removeEventListener('click', cancelHandler);
+                        resolve(true);
+                    };
+
+                    const cancelHandler = () => {
+                        provConfirmationModal.style.display = 'none';
+                        provModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        provModalCancelBtn.removeEventListener('click', cancelHandler);
+                        provConfirmationModal.querySelector('.prov-close-button').removeEventListener('click', cancelHandler);
+                        resolve(false);
+                    };
+
+                    provModalConfirmBtn.addEventListener('click', confirmHandler);
+                    provModalCancelBtn.addEventListener('click', cancelHandler);
+                    provConfirmationModal.querySelector('.prov-close-button').addEventListener('click', cancelHandler);
+                });
+            }
+
+            /**
+             * @brief Muestra un modal de mensaje informativo al usuario (específico para Proveedor).
+             * @param {string} message - El mensaje a mostrar en el modal.
+             * @param {string} type - Tipo de mensaje ('success' o 'error') para estilos. Opcional.
+             */
+            function showProvMessageModal(message, type = '') {
+                provMessageModalText.textContent = message;
+                provMessageModalText.className = `prov-message-text ${type ? 'prov-message-' + type : ''}`; // Añadir clase para estilo
+                provMessageModal.style.display = 'flex'; // Usar flex para centrar
+                
+                provMessageModalCloseBtn.onclick = () => {
+                    provMessageModal.style.display = 'none';
+                };
+                provMessageModal.querySelector('.prov-close-button').onclick = () => {
+                    provMessageModal.style.display = 'none';
+                };
+            }
+
+            // --- Lógica de Autenticación al cargar la página ---
+            const token = localStorage.getItem('jwtToken');
+            const userRole = localStorage.getItem('userRole');
+            const userId = localStorage.getItem('userId'); // Necesitarás el userId para las solicitudes de eventos del proveedor
+
+            console.log('Proveedor Panel Page Loaded.'); 
+            console.log('JWT Token:', token ? 'Exists' : 'Missing'); 
+            console.log('User Role from localStorage:', userRole); 
+
+            // Seguridad: Redirige si no hay token o el rol no es 'organizador'
+            if (!token || userRole !== 'organizador' || !userId) {
+                showProvMessageModal('Acceso denegado. Debes ser un proveedor autenticado para ver esta página.', 'error'); 
+                setTimeout(() => {
+                    window.location.replace('../login.html'); // Redirige al login.html (un nivel arriba de Proveedor/)
+                }, 2000); 
+                return; 
+            }
+
+            // --- Event Listener para Cerrar Sesión ---
+            provLogoutButton.addEventListener('click', async () => {
+                const confirmLogout = await showProvConfirmationModal('¿Estás seguro de que quieres cerrar sesión?');
+                if (confirmLogout) {
+                    localStorage.removeItem('jwtToken');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('isOrganizer');
+                    localStorage.removeItem('userId'); 
+                    showProvMessageModal('Sesión cerrada correctamente.', 'success');
+                    setTimeout(() => {
+                        window.location.replace('../login.html'); 
+                    }, 500); 
+                }
+            });
+
+            // --- Lógica para Notificaciones (Dropdown) ---
+            provNotifToggle.addEventListener('click', (event) => {
+                event.stopPropagation(); 
+                provNotifDropdown.style.display = provNotifDropdown.style.display === 'block' ? 'none' : 'block';
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!provNotifDropdown.contains(event.target) && !provNotifToggle.contains(event.target)) {
+                    provNotifDropdown.style.display = 'none';
+                }
+            });
+
+            // Añadir clase 'active' al enlace de la página actual en el sidebar
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.prov-nav-item').forEach(link => {
+                if (link.href.includes('proveedorPanel.html')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active'); // Remover de otros enlaces por si acaso
+                }
+            });
+
+            // --- Funcionalidad para cargar estadísticas de eventos del proveedor ---
+            async function fetchEventStatistics() {
+                try {
+                    // Endpoint para obtener los eventos del organizador autenticado
+                    const response = await fetch(`${API_URL}/api/proveedor/eventos`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok && data.events) {
+                        const events = data.events;
+                        let pending = 0;
+                        let approved = 0;
+                        let rejected = 0;
+
+                        events.forEach(event => {
+                            if (event.Estado === 'pendiente') {
+                                pending++;
+                            } else if (event.Estado === 'aprobado') {
+                                approved++;
+                            } else if (event.Estado === 'rechazado') {
+                                rejected++;
+                            }
+                        });
+
+                        pendingEventsCount.textContent = pending;
+                        approvedEventsCount.textContent = approved;
+                        rejectedEventsCount.textContent = rejected;
+
+                    } else {
+                        showProvMessageModal(`Error al cargar estadísticas de eventos: ${data.message || 'Desconocido'}`, 'error');
+                        pendingEventsCount.textContent = 'N/A';
+                        approvedEventsCount.textContent = 'N/A';
+                        rejectedEventsCount.textContent = 'N/A';
+                    }
+                } catch (error) {
+                    console.error('Error al cargar estadísticas de eventos:', error);
+                    showProvMessageModal('Error de red al cargar estadísticas de eventos.', 'error');
+                    pendingEventsCount.textContent = 'N/A';
+                    approvedEventsCount.textContent = 'N/A';
+                    rejectedEventsCount.textContent = 'N/A';
+                }
+            }
+
+            // Llamar a la función para cargar estadísticas al cargar la página
+            fetchEventStatistics();
+        });
+    </script>
+</body>
+</html>

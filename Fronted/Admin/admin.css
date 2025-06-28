@@ -1,0 +1,656 @@
+/*nuevo admin panel*/
+
+
+/* Importación de fuentes de Google Fonts (mantener al inicio) */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
+
+/* Estilos generales para el documento y el sidebar */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Orbitron', sans-serif;
+    /* RUTA CORRECTA: Desde Fronted/Admin/, sube un nivel (../) para ir a Fronted/, luego entra a img/ */
+    background: url('../img/reja.jpg') repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    color: #f5f5f5;
+    display: flex; /* Para que sidebar y main-content se coloquen lado a lado */
+    min-height: 100vh;
+}
+
+/* SIDEBAR STYLES */
+.admin-sidebar {
+    width: 230px;
+    height: 100vh;
+    background-color: rgba(10, 10, 10, 0.95);
+    border-right: 2px solid #c10000;
+    box-shadow: 2px 0 10px rgba(193, 0, 0, 0.5); /* Sombra ajustada con alpha */
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    position: fixed; /* Hace que el sidebar sea fijo */
+    left: 0;
+    top: 0;
+    z-index: 1000;
+}
+
+.admin-barra-logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.admin-logo-img {
+    height: 60px;
+    max-width: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px #c10000);
+}
+
+.admin-nav-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Espacio entre los elementos de la lista */
+}
+
+.admin-nav-list li {
+    margin-bottom: 10px; /* Espacio adicional entre ítems de menú */
+}
+
+.admin-nav-item {
+    text-decoration: none;
+    color: #f5f5f5;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px; /* Más padding para hacerlos más clickeables */
+    border-radius: 8px; /* Bordes redondeados */
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    font-weight: bold; /* Hacer el texto más legible */
+}
+
+.admin-nav-item:hover,
+.admin-nav-item.active { /* Clase active para el elemento de menú actual */
+    background-color: #c10000;
+    color: #fff;
+    box-shadow: 0 0 12px rgba(255, 59, 59, 0.6); /* Sombra en hover/activo */
+}
+
+.admin-nav-item i {
+    font-size: 18px; /* Iconos un poco más grandes */
+    min-width: 20px; /* Asegura que los iconos tengan un ancho mínimo para alineación */
+    text-align: center;
+}
+
+/* MAIN CONTENT STYLES */
+.admin-main-content {
+    margin-left: 230px; /* Deja espacio para el sidebar fijo */
+    width: calc(100% - 230px);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.6); /* Fondo semi-transparente para el contenido principal */
+}
+
+.admin-topbar {
+    background-color: rgba(20, 20, 20, 0.95);
+    padding: 15px 25px;
+    border-bottom: 2px solid #c10000;
+    box-shadow: 0 0 10px rgba(193, 0, 0, 0.5); /* Sombra ajustada con alpha */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky; /* Sticky topbar */
+    top: 0;
+    z-index: 999;
+}
+
+.admin-titulo-seccion {
+    font-size: 24px; /* Título un poco más grande */
+    color: #c10000;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+}
+
+.admin-acciones {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+/* NOTIFICATION STYLES */
+.admin-notif-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.admin-notif-btn {
+    background: transparent;
+    border: none;
+    color: #f5f5f5;
+    font-size: 22px; /* Icono de campana más grande */
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.admin-notif-btn:hover {
+    color: #ff3b3b;
+}
+
+.admin-notif-dot {
+    position: absolute;
+    top: 0px; /* Ajustado para mejor posicionamiento */
+    right: 0px; /* Ajustado para mejor posicionamiento */
+    width: 10px; /* Punto más grande */
+    height: 10px; /* Punto más grande */
+    background-color: #ff0000; /* Rojo vivo */
+    border-radius: 50%;
+    border: 1px solid #f5f5f5; /* Borde para el punto */
+}
+
+.admin-notif-dropdown {
+    position: absolute;
+    top: 45px; /* Espacio debajo del botón de notificación */
+    right: 0;
+    background-color: rgba(20, 20, 20, 0.98); /* Fondo más opaco */
+    border: 1px solid #c10000;
+    box-shadow: 0 0 20px rgba(193, 0, 0, 0.7); /* Sombra más pronunciada */
+    border-radius: 8px;
+    width: 280px; /* Ancho un poco mayor */
+    display: none; /* Controlado por JS */
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
+    padding: 15px;
+    color: #f5f5f5;
+}
+
+.admin-notif-dropdown .admin-notif-title {
+    font-weight: bold;
+    color: #c10000;
+    margin-bottom: 12px;
+    font-size: 18px; /* Título de notificación más grande */
+    border-bottom: 1px solid #444;
+    padding-bottom: 8px;
+}
+
+.admin-notif-dropdown ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.admin-notif-dropdown ul li {
+    padding: 8px 0;
+    border-bottom: 1px solid #333;
+    color: #f5f5f5;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.admin-notif-dropdown ul li:last-child {
+    border-bottom: none;
+}
+
+/* GENERAL BUTTON STYLES (for logout and other primary actions) */
+.admin-btn-logout { /* Clase específica para el botón de cerrar sesión */
+    background-color: #dc3545; /* Rojo fuerte */
+    color: #fff;
+    border: none;
+    padding: 10px 18px; /* Más padding */
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.3s, background-color 0.3s;
+    font-size: 1em; /* Ajuste de tamaño de fuente */
+}
+
+.admin-btn-logout:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 12px rgba(220, 53, 69, 0.7); /* Sombra roja para el logout */
+    background-color: #c82333; /* Rojo más oscuro al pasar el ratón */
+}
+
+/* MAIN CONTENT SECTIONS */
+.admin-contenido {
+    padding: 30px 40px;
+    flex-grow: 1; /* Permite que el contenido ocupe el espacio restante */
+}
+
+.admin-bienvenida {
+    font-size: 24px; /* Un poco más grande para bienvenida */
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: #fff;
+    background-color: rgba(10, 10, 10, 0.9);
+    padding: 25px 30px; /* Más padding */
+    border-left: 6px solid #c10000; /* Borde más grueso */
+    box-shadow: 0 0 15px rgba(193, 0, 0, 0.7); /* Sombra más pronunciada */
+    text-align: center;
+    border-radius: 8px; /* Bordes redondeados */
+}
+
+/* GENERAL CARD/TABLE STYLES (FROM OLD ADMIN.CSS, ADAPTED FOR NEW DESIGN) */
+
+/* Panel Options (if you decide to use cards in main content) */
+.admin-panel-grid { /* Un nombre más específico si el contenido principal usa grid de tarjetas */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Más ancho para tarjetas */
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.admin-card {
+    background-color: rgba(10, 10, 10, 0.95);
+    border: 1px solid #c10000;
+    box-shadow: 0 0 15px rgba(193, 0, 0, 0.7);
+    padding: 25px; /* Más padding */
+    border-radius: 12px;
+    text-align: center;
+    color: #fff;
+    font-weight: bold;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    display: flex; /* Para centrar contenido si es necesario */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 25px rgba(255, 59, 59, 0.8);
+}
+
+.admin-card h4 {
+    font-size: 1.5em; /* Título de tarjeta más grande */
+    color: #ff2c2c;
+    margin-bottom: 10px;
+}
+
+.admin-card p {
+    font-size: 2em; /* Números más grandes */
+    font-weight: 700;
+    color: #f5f5f5;
+}
+
+
+/* Table styles (for requests, approved, events) */
+.admin-table,
+.admin-table-solicitudes { /* Nombres más específicos para las tablas */
+    width: 100%;
+    border-collapse: collapse;
+    background-color: rgba(20, 20, 20, 0.95);
+    color: #f5f5f5;
+    box-shadow: 0 0 15px rgba(193, 0, 0, 0.7);
+    border: 1px solid #c10000;
+    border-radius: 10px;
+    overflow: hidden; /* Para las esquinas redondeadas */
+    margin-top: 20px;
+}
+
+.admin-table th, .admin-table td,
+.admin-table-solicitudes th, .admin-table-solicitudes td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid #444; /* Bordes internos más suaves */
+}
+
+.admin-table th,
+.admin-table-solicitudes th {
+    background-color: #c10000;
+    color: #fff;
+    font-size: 1em;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.admin-table tr:hover,
+.admin-table-solicitudes tr:hover {
+    background-color: rgba(255, 59, 59, 0.15);
+    transition: background 0.3s;
+}
+
+/* Button styles for tables */
+.admin-btn-table, /* Clase genérica para botones dentro de tablas */
+.admin-btn-approve, .admin-btn-reject, .admin-btn-edit, .admin-btn-delete, .admin-btn-details { /* Clases específicas */
+    padding: 8px 14px; /* Más padding para botones */
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9em; /* Tamaño de fuente ligeramente más grande */
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 4px; /* Más margen entre botones */
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+    font-weight: bold;
+    text-decoration: none; /* Asegura que los enlaces se vean como botones */
+    display: inline-block; /* Para padding y margen */
+}
+
+.admin-btn-approve {
+    background-color: #28a745; /* Verde */
+    color: white;
+}
+.admin-btn-approve:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(40, 167, 69, 0.7);
+    background-color: #218838;
+}
+
+.admin-btn-reject {
+    background-color: #dc3545; /* Rojo */
+    color: white;
+}
+.admin-btn-reject:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.7);
+    background-color: #c82333;
+}
+
+.admin-btn-edit {
+    background-color: #ff8800; /* Naranja */
+    color: #fff;
+}
+.admin-btn-edit:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255, 136, 0, 0.7);
+    background-color: #e67300;
+}
+
+.admin-btn-delete {
+    background-color: #c10000; /* Rojo oscuro */
+    color: #fff;
+}
+.admin-btn-delete:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(193, 0, 0, 0.7);
+    background-color: #a00000;
+}
+
+.admin-btn-details {
+    background-color: #007bff; /* Azul */
+    color: white;
+}
+.admin-btn-details:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.7);
+    background-color: #0056b3;
+}
+
+/* Form Styles */
+.admin-form { /* Clase genérica para formularios en admin */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-color: rgba(10, 10, 10, 0.95);
+    padding: 25px 30px;
+    border: 1px solid #c10000;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(193, 0, 0, 0.7);
+    max-width: 500px;
+    margin: 30px auto; /* Centrado con margen superior */
+    color: #f5f5f5;
+}
+
+.admin-form label {
+    font-weight: bold;
+    color: #f5f5f5;
+}
+
+.admin-form input,
+.admin-form textarea,
+.admin-form select { /* Añadido select */
+    padding: 10px;
+    background-color: #1a1a1a;
+    color: #f5f5f5;
+    border: 1px solid #c10000;
+    border-radius: 6px;
+    font-family: 'Orbitron', sans-serif;
+    resize: none;
+    width: 100%; /* Ocupa todo el ancho disponible */
+}
+
+.admin-form input:focus,
+.admin-form textarea:focus,
+.admin-form select:focus {
+    outline: none;
+    box-shadow: 0 0 10px #ff3b3b;
+    border-color: #ff3b3b;
+}
+
+.admin-btn-submit { /* Clase para botones de submit en formularios */
+    display: inline-block;
+    margin-top: 20px;
+    background-color: #c10000;
+    color: #fff;
+    padding: 10px 16px;
+    font-family: 'Orbitron', sans-serif;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-align: center; /* Centrar texto del botón */
+    cursor: pointer;
+}
+
+.admin-btn-submit:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px #ff3b3b;
+}
+
+/* Modal Styles - Prefixed for uniqueness */
+.admin-modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1001; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.7); /* Black w/ opacity */
+    justify-content: center; /* Centrar contenido horizontalmente */
+    align-items: center; /* Centrar contenido verticalmente */
+}
+.admin-modal-content {
+    background-color: #1a1a1a;
+    margin: auto;
+    padding: 30px;
+    border: 1px solid #c10000;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 0 20px rgba(193, 0, 0, 0.5);
+    color: #f0f0f0;
+}
+.admin-close-button {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.admin-close-button:hover,
+.admin-close-button:focus {
+    color: #ff2c2c;
+    text-decoration: none;
+    cursor: pointer;
+}
+.admin-modal-btn {
+    background-color: #c10000;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px;
+    transition: background-color 0.3s ease;
+}
+.admin-modal-btn.admin-modal-confirm { /* Clase específica para el botón de confirmar */
+    background-color: #28a741;
+}
+.admin-modal-btn.admin-modal-confirm:hover {
+    background-color: #218838;
+}
+.admin-modal-btn.admin-modal-cancel { /* Clase específica para el botón de cancelar */
+    background-color: #555;
+}
+.admin-modal-btn.admin-modal-cancel:hover {
+    background-color: #666;
+}
+.admin-modal p {
+    margin-bottom: 20px;
+    font-size: 1.1em;
+}
+
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    body {
+        flex-direction: column; /* Sidebar se apila sobre el contenido */
+    }
+
+    .admin-sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row; /* Elementos del sidebar en fila */
+        position: relative; /* Ya no es fijo, se desplaza con el contenido */
+        padding: 10px;
+        border-right: none;
+        border-bottom: 2px solid #c10000;
+        justify-content: space-around; /* Distribuye elementos del sidebar */
+        align-items: center;
+    }
+    .admin-sidebar .admin-barra-logo {
+        margin-bottom: 0;
+        margin-right: 20px; /* Espacio entre logo y nav-list */
+    }
+    .admin-sidebar .admin-nav-list {
+        flex-direction: row; /* Items de navegación horizontal */
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        flex-grow: 1; /* Permite que la lista ocupe espacio */
+    }
+    .admin-nav-list li {
+        margin-bottom: 0;
+    }
+    .admin-nav-item {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+    .admin-nav-item i {
+        font-size: 1em;
+        min-width: unset;
+    }
+    .admin-nav-item span {
+        display: none; /* Oculta el texto en pantallas pequeñas para iconos */
+    }
+    .admin-nav-item:hover span, .admin-nav-item.active span {
+        display: inline-block; /* Muestra el texto al hacer hover o si está activo */
+    }
+
+    .admin-main-content {
+        margin-left: 0; /* No hay margen izquierdo con sidebar horizontal */
+        width: 100%;
+        padding-top: 10px; /* Pequeño ajuste de padding superior si topbar es sticky */
+    }
+    .admin-topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 15px 20px;
+    }
+    .admin-acciones {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    .admin-contenido {
+        padding: 20px;
+    }
+    .admin-bienvenida {
+        font-size: 20px;
+        padding: 15px;
+    }
+    .admin-panel-grid { /* Si usas este grid en el contenido */
+        grid-template-columns: 1fr; /* Una columna para las tarjetas */
+    }
+    .admin-card { /* Si usas estas tarjetas en el contenido */
+        width: 100%;
+        padding: 20px;
+    }
+
+    /* Tabla responsiva - stack headers and data */
+    .admin-table, .admin-table-solicitudes {
+        display: block;
+        overflow-x: auto; /* Permite scroll horizontal si la tabla es muy ancha */
+        white-space: nowrap; /* Evita que el contenido de las celdas se rompa en varias líneas */
+    }
+    .admin-table thead, .admin-table tbody, .admin-table th, .admin-table td, .admin-table tr,
+    .admin-table-solicitudes thead, .admin-table-solicitudes tbody, .admin-table-solicitudes th, .admin-table-solicitudes td, .admin-table-solicitudes tr {
+        display: block; /* Cada elemento de la tabla se convierte en un bloque */
+    }
+    .admin-table th, .admin-table td,
+    .admin-table-solicitudes th, .admin-table-solicitudes td {
+        padding: 10px;
+        text-align: right; /* Alinea el contenido a la derecha */
+        position: relative;
+    }
+    .admin-table td::before,
+    .admin-table-solicitudes td::before {
+        content: attr(data-label); /* Usa el atributo data-label para el encabezado */
+        position: absolute;
+        left: 6px;
+        width: 50%;
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: bold;
+        color: #c10000; /* Color para el label */
+    }
+    .admin-btn-table, /* Clase genérica para botones dentro de tablas */
+    .admin-btn-approve, .admin-btn-reject, .admin-btn-edit, .admin-btn-delete, .admin-btn-details {
+        width: calc(100% - 8px); /* Ocupa casi todo el ancho de la celda */
+        margin: 4px 0; /* Margen vertical */
+    }
+    .admin-form {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-sidebar .admin-nav-list {
+        justify-content: flex-start;
+    }
+    .admin-nav-item span {
+        display: none;
+    }
+    .admin-topbar .admin-titulo-seccion {
+        font-size: 20px;
+    }
+    .admin-notif-btn {
+        font-size: 18px;
+    }
+    .admin-btn-logout {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+    .admin-bienvenida {
+        font-size: 18px;
+    }
+}
+/* NUEVO ESTILO PARA MINIATURA DE IMAGEN DE EVENTO */
+.admin-event-image-thumbnail {
+  width: 60px; /* Ancho fijo para la miniatura */
+  height: 60px; /* Alto fijo para la miniatura */
+  object-fit: cover; /* Asegura que la imagen cubra el área sin distorsionarse */
+  border-radius: 5px; /* Ligeros bordes redondeados */
+  border: 1px solid #444; /* Borde sutil */
+  vertical-align: middle; /* Alinea la imagen verticalmente en la celda de la tabla */
+}

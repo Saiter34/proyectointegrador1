@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teycketan</title>
-    <link rel="stylesheet" href="principal.css">
+    <title>Teycketan - Mi Perfil</title>
+    <link rel="stylesheet" href="cliente.css"> 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -18,41 +18,39 @@
                 <img src="/img/logo.png" alt="Logo de Teycketan">
             </div>
             <nav>
-                <div class="nav-box" id="organizerLinkContainer">
+                <div class="nav-box" id="organizerLinkContainer" style="display: none;">
                     <!-- Ruta ABSOLUTA -->
-                    <a href="/registroorgani.html" id="organizerLink">¿Quieres ser organizador?</a>
+                    <a href="/Cliente/bienvenidoprov.html" id="organizerLink">¿Quieres ser organizador?</a>
                 </div>
                 <div class="nav-box dropdown">
                     <button>Categorías</button>
                     <div class="dropdown-content">
-                        <!-- Rutas ABSOLUTAS -->
-                        <a href="/Cliente/concierto.html">Conciertos</a>
-                        <a href="/Cliente/teatro.html">Teatro</a>
-                        <a href="/Cliente/deportes.html">Deportes</a>
+                        <!-- Rutas RELATIVAS a Cliente/ -->
+                        <a href="concierto.html">Conciertos</a>
+                        <a href="teatro.html">Teatro</a>
+                        <a href="deportes.html">Deportes</a>
                     </div>
                 </div>
-                <!-- ESTRUCTURA PARA "MI CUENTA" COMO DROPDOWN (para usuarios no logueados inicialmente) -->
                 <div class="nav-box dropdown" id="miCuentaContainer"> 
                     <button id="miCuentaButton">Mi Cuenta</button>
                     <div class="dropdown-content" id="miCuentaDropdownContent">
-                        <!-- Rutas ABSOLUTAS -->
-                        <a href="/login.html" id="loginLink">Iniciar Sesión</a>
-                        <a href="/registro.html" id="registerLink">Registrarse</a>
+                        <a href="#" id="viewProfileLink">Ver Perfil</a>
+                        <a href="#" id="logoutLink">Cerrar Sesión</a>
                     </div>
                 </div>
 
                 <!-- NOTIFICACIONES -->
-                <div class="public-notif-wrapper">
-                    <button class="public-notif-btn" id="publicNotifToggle">
+                <div class="client-notif-wrapper">
+                    <button class="client-notif-btn" id="clientNotifToggle">
                         <i class="fas fa-bell"></i>
-                        <span class="public-notif-dot"></span>
+                        <span class="client-notif-dot"></span>
                     </button>
-                    <div class="public-notif-dropdown" id="publicNotifDropdown">
-                        <p class="public-notif-title">Notificaciones</p>
+                    <div class="client-notif-dropdown" id="clientNotifDropdown">
+                        <p class="client-notif-title">Notificaciones</p>
                         <ul>
-                            <li>Bienvenido a Teycketan!</li>
-                            <li>Descubre nuevos eventos hoy.</li>
-                            <li>Regístrate para recibir ofertas especiales.</li>
+                            <li>Tu compra de "Concierto XYZ" fue exitosa!</li>
+                            <li>Recordatorio: "Evento ABC" es mañana.</li>
+                            <li>Nuevo evento "Festival de Verano" disponible.</li>
                         </ul>
                     </div>
                 </div>
@@ -66,7 +64,7 @@
                     <p><strong>Música</strong> / Presencial</p>
                     <p>Damiano David en Lima</p>
                     <p>14 al 18 mayo 2025</p>
-                    <a href="/Cliente/detalles.html" class="btn-vermas">Ver más</a> <!-- Ruta ABSOLUTA -->
+                    <a href="detalles.html" class="btn-vermas">Ver más</a> <!-- Ruta RELATIVA -->
                 </div>
                 <!-- Ruta ABSOLUTA -->
                 <img src="/img/damiano.jpg" alt="Damiano David">
@@ -75,15 +73,15 @@
             <aside class="destacados contenedor-estilo">
                 <h3>Destacados</h3>
                 <div class="circulos">
-                    <a href="/Cliente/sanmarcos.html" class="circulo"> <!-- Ruta ABSOLUTA -->
+                    <a href="sanmarcos.html" class="circulo"> <!-- Ruta RELATIVA -->
                         <img src="/img/sanmarcos.png" alt="Estadio San Marcos"> <!-- Ruta ABSOLUTA -->
                         <span>San Marcos</span>
                     </a>
-                    <a href="/Cliente/teatrocanut.html" class="circulo"> <!-- Ruta ABSOLUTA -->
+                    <a href="teatrocanut.html" class="circulo"> <!-- Ruta RELATIVA -->
                         <img src="/img/teatrocanout.jpg" alt="Teatro Canut"> <!-- Ruta ABSOLUTA -->
                         <span>Teatro Canut</span>
                     </a>
-                    <a href="/Cliente/teatronacional.html" class="circulo"> <!-- Ruta ABSOLUTA -->
+                    <a href="teatronacional.html" class="circulo"> <!-- Ruta RELATIVA -->
                         <img src="/img/teatronacional.jpg" alt="Teatro Nacional"> <!-- Ruta ABSOLUTA -->
                         <span>Teatro Nacional</span>
                     </a>
@@ -147,37 +145,45 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const userName = localStorage.getItem('userName');
-            const userRole = localStorage.getItem('userRole');
-
+            const API_URL = 'http://localhost:3000'; 
             const miCuentaButton = document.getElementById('miCuentaButton');
             const organizerLinkContainer = document.getElementById('organizerLinkContainer');
             const proximosEventosGrid = document.getElementById('proximos-eventos-grid');
-            const API_URL = 'http://localhost:3000'; 
+            const logoutLink = document.getElementById('logoutLink');
+            const viewProfileLink = document.getElementById('viewProfileLink');
 
-            // Elementos de la notificación
-            const publicNotifToggle = document.getElementById('publicNotifToggle');
-            const publicNotifDropdown = document.getElementById('publicNotifDropdown');
+            // Elementos de la notificación para cliente.html
+            const clientNotifToggle = document.getElementById('clientNotifToggle');
+            const clientNotifDropdown = document.getElementById('clientNotifDropdown');
 
-            // Lógica para "Mi Cuenta" en principal.html (solo si no hay sesión activa)
-            if (userName) {
-                // Si el usuario está logueado, redirigir a cliente.html (dashboard del cliente)
-                window.location.replace('/Cliente/cliente.html'); // Ruta ABSOLUTA
-                return; // Detiene la ejecución del script aquí
-            } else {
-                miCuentaButton.textContent = 'Mi Cuenta';
+            // --- Lógica de Redirección y Control de Sesión ---
+            const token = localStorage.getItem('jwtToken');
+            const userName = localStorage.getItem('userName');
+            const userRole = localStorage.getItem('userRole');
+
+            if (!token || !userName || !userRole) {
+                // Si NO hay token, o falta información vital, redirige a la página principal (pública).
+                // Esto es crucial: cliente.html solo debe ser accesible si hay una sesión activa.
+                console.warn('No hay sesión activa en cliente.html. Redirigiendo a la página principal pública.');
+                window.location.replace('/principal.html'); // Ruta ABSOLUTA
+                return; 
             }
 
-            // Ocultar "¿Quieres ser organizador?" si el usuario ya es organizador o admin
+            // Si hay token y userName, el usuario está logueado.
+            miCuentaButton.textContent = `Hola, ${userName}`;
+
+            // Mostrar u ocultar "¿Quieres ser organizador?" según el rol
             if (userRole === 'organizador' || userRole === 'admin') {
                 if (organizerLinkContainer) {
                     organizerLinkContainer.style.display = 'none';
                 }
+            } else {
+                if (organizerLinkContainer) {
+                    organizerLinkContainer.style.display = 'block';
+                }
             }
 
-            /**
-             * @brief Carga los eventos aprobados desde el backend y los muestra en la página.
-             */
+            // --- Lógica para cargar eventos (similar a principal.html) ---
             async function fetchApprovedEvents() {
                 proximosEventosGrid.innerHTML = '<p class="loading-events-message">Cargando próximos eventos...</p>';
                 try {
@@ -201,19 +207,14 @@
                 }
             }
 
-            /**
-             * @brief Renderiza una lista de eventos en el grid.
-             * @param {Array<Object>} events - Un array de objetos de evento.
-             */
             function renderEvents(events) {
                 let eventsHtml = '';
                 events.forEach(event => {
                     const formattedDate = new Date(event.Fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
-                    // Asegúrate de que event.URL_Imagen contiene la ruta completa o relativa al servidor
                     const imageUrl = event.URL_Imagen ? `${API_URL}${event.URL_Imagen}` : 'https://placehold.co/150x100/cccccc/000000?text=No+Img';
 
                     eventsHtml += `
-                        <a href="/Cliente/detalles.html?eventId=${event.Id_Evento}" class="evento-link"> <!-- Ruta ABSOLUTA -->
+                        <a href="detalles.html?eventId=${event.Id_Evento}" class="evento-link"> <!-- Ruta RELATIVA -->
                             <div class="evento">
                                 <img src="${imageUrl}" alt="${event.Nom_Evento}">
                                 <div class="evento-info">
@@ -228,19 +229,37 @@
                 proximosEventosGrid.innerHTML = eventsHtml;
             }
 
-            // Iniciar la carga de eventos aprobados
             fetchApprovedEvents();
 
-            // --- Lógica para el dropdown de notificaciones ---
-            publicNotifToggle.addEventListener('click', (event) => {
-                event.stopPropagation(); // Evita que el clic en el botón cierre el dropdown inmediatamente
-                publicNotifDropdown.style.display = publicNotifDropdown.style.display === 'block' ? 'none' : 'block';
+            // --- Event Listeners para la navegación de usuario logueado ---
+            viewProfileLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Redirige al dashboard/perfil del cliente
+                window.location.href = '/Cliente/cliente.html'; // Ruta ABSOLUTA para la propia página cliente.html
             });
 
-            // Cierra el dropdown si se hace clic fuera de él
+            logoutLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Considera usar un modal personalizado en lugar de `confirm`
+                if (confirm('¿Estás seguro de que quieres cerrar sesión?')) { // SI ESTO ES UN PROBLEMA, DEBERÍAS IMPLEMENTAR UN MODAL PERSONALIZADO
+                    localStorage.removeItem('jwtToken');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userEmail');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('userId'); 
+                    window.location.replace('/principal.html'); // Ruta ABSOLUTA
+                }
+            });
+
+            // --- Lógica para el dropdown de notificaciones (cliente.html) ---
+            clientNotifToggle.addEventListener('click', (event) => {
+                event.stopPropagation();
+                clientNotifDropdown.style.display = clientNotifDropdown.style.display === 'block' ? 'none' : 'block';
+            });
+
             document.addEventListener('click', (event) => {
-                if (!publicNotifDropdown.contains(event.target) && !publicNotifToggle.contains(event.target)) {
-                    publicNotifDropdown.style.display = 'none';
+                if (!clientNotifDropdown.contains(event.target) && !clientNotifToggle.contains(event.target)) {
+                    clientNotifDropdown.style.display = 'none';
                 }
             });
         });
