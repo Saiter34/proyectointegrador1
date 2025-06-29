@@ -24,6 +24,7 @@
             <li><a href="eventos.html" class="admin-nav-item"><i class="fas fa-tasks"></i><span>Solicitud de eventos</span></a></li>
             <li><a href="eventoApro.html" class="admin-nav-item"><i class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
             <li><a href="categorias.html" class="admin-nav-item active"><i class="fas fa-tags"></i><span>Eventos por categorias</span></a></li>
+            <li><a href="eventoDestacado.html" class="admin-nav-item"><i class="fas fa-star"></i><span>Eventos por categorias</span></a></li>
         </ul>
     </div>
     
@@ -54,34 +55,66 @@
 
   <div class="admin-categorias-acordeon">
 
-    <!-- Categorias-->
-    <div class="admin-categoria-item">
-      <button class="admin-categoria-titulo">Conciertos</button>
-      <div class="admin-categoria-contenido">
-        <ul>
-          <li>Damiano David - En Vivo</li>
-        </ul>
+<div class="admin-categoria-item">
+  <button class="admin-categoria-titulo">Conciertos</button>
+  <div class="admin-categoria-contenido">
+    <div class="admin-card-evento">
+      <img src="../img/imagen.jpg" alt="imagen de evento" class="admin-card-img">
+      <div class="admin-card-body">
+        <h3 class="admin-card-title">Evento destacado</h3>
+        <p class="admin-card-desc">lugar</p>
+        <button onclick="toggleDetalles(this)" class="admin-btn-details">Detalles</button>
+        <div class="admin-evento-detalles" style="display: none;">
+          <p>Detalles de evento</p>
+        </div>
       </div>
     </div>
-    <div class="admin-categoria-item">
-      <button class="admin-categoria-titulo">Teatro</button>
-      <div class="admin-categoria-contenido">
-        <ul>
-          <li>teatro</li>
-        </ul>
+  </div>
+</div>
+<div class="admin-categoria-item">
+  <button class="admin-categoria-titulo">Teatro</button>
+  <div class="admin-categoria-contenido">
+    <div class="admin-card-evento">
+      <img src="../img/imagen.jpg" alt="imagen de evento" class="admin-card-img">
+      <div class="admin-card-body">
+        <h3 class="admin-card-title">Evento destacado</h3>
+        <p class="admin-card-desc">lugar</p>
+        <button onclick="toggleDetalles(this)" class="admin-btn-details">Detalles</button>
+        <div class="admin-evento-detalles" style="display: none;">
+          <p>Detalles de evento</p>
+        </div>
       </div>
     </div>
-    <div class="admin-categoria-item">
-      <button class="admin-categoria-titulo">Deportes</button>
-      <div class="admin-categoria-contenido">
-        <ul>
-          <li>deportes</li>
-        </ul>
+  </div>
+</div>
+<div class="admin-categoria-item">
+  <button class="admin-categoria-titulo">Deporte</button>
+  <div class="admin-categoria-contenido">
+    <div class="admin-card-evento">
+      <img src="../img/imagen.jpg" alt="imagen de evento" class="admin-card-img">
+      <div class="admin-card-body">
+        <h3 class="admin-card-title">Evento destacado</h3>
+        <p class="admin-card-desc">lugar</p>
+        <button onclick="toggleDetalles(this)" class="admin-btn-details">Detalles</button>
+        <div class="admin-evento-detalles" style="display: none;">
+          <p>Detalles de evento</p>
+        </div>
       </div>
     </div>
-
+  </div>
+</div>
   </div>
 </section>
+<script>
+  function toggleDetalles(boton) {
+    const card = boton.closest('.admin-card-body');
+    const detalles = card.querySelector('.admin-evento-detalles');
+    const visible = detalles.style.display === 'block';
+
+    detalles.style.display = visible ? 'none' : 'block';
+  }
+</script>
+
 <script>
   document.querySelectorAll('.admin-categoria-titulo').forEach(boton => {
     boton.addEventListener('click', () => {
