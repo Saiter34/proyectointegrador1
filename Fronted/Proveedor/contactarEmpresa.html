@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Evento - TEYCKETAN</title>
+    <!-- Usar el archivo CSS específico para el panel de proveedor -->
+    <link rel="stylesheet" href="proveedor.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="prov-sidebar">
+        <div class="prov-barra-logo">
+            <img src="../img/logo.png" alt="Logo Teycketan" class="prov-logo-img" />
+        </div>
+        <ul class="prov-nav-list">
+            <li><a href="proveedorPanel.html" class="prov-nav-item"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
+            <li><a href="crearevento.html" class="prov-nav-item"><i class="fas fa-plus-circle"></i><span>Crear evento</span></a></li>
+            <li><a href="verEvento.html" class="prov-nav-item"><i class="fas fa-calendar-alt"></i><span>Ver eventos</span></a></li>
+            <li><a href="contactarEmpresa.html" class="prov-nav-item active"><i  class="fas fa-envelope"></i><span>Contactar empresa</span></a></li>
+        </ul>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="prov-main-content">
+        <header class="prov-topbar">
+            <h1 class="prov-titulo-seccion">Contactar empresa</h1>
+            <div class="prov-acciones">
+                <div class="prov-notif-wrapper">
+                    <button class="prov-notif-btn" id="provNotifToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="prov-notif-dot"></span>
+                    </button>
+                    <div class="prov-notif-dropdown" id="provNotifDropdown">
+                        <p class="prov-notif-title">Notificaciones</p>
+                        <ul>
+                            <li>Tu evento “Damiano David” fue aprobado</li>
+                            <li>Nuevo mensaje de TEYCKETAN</li>
+                            <li>Revisa el estado de tu evento</li>
+                        </ul>
+                    </div>
+                </div>
+                <button id="provLogoutButton" class="prov-btn-logout">Cerrar Sesión</button>
+            </div>
+        </header>
+
+        <section class="prov-contenido">
+            <div class="prov-bienvenida">Aqui puedes enviarles un mensaje o reclamo al administrador</div>
+           <form class="prov-formulario-contacto">
+   
+
+    <div class="prov-form-group">
+        <label for="problema">Tipo de problema:</label>
+        <select id="problema" name="problema" required>
+            <option value="">-- Selecciona una opción --</option>
+            <option value="aprobacion">Mi evento no ha sido aprobado</option>
+            <option value="imagen">Mi imagen no se carga correctamente</option>
+            <option value="datos">Error en los datos mostrados del evento</option>
+            <option value="inaccesible">No puedo ingresar a mi cuenta</option>
+            <option value="otro">Otro problema</option>
+        </select>
+    </div>
+    <div class="prov-form-group">
+        <label for="asunto">Describa su problema con precision</label>
+        <textarea type="text" id="asunto" name="asunto" placeholder="Explicacion de problema"></textarea>
+    </div>
+
+    <div class="prov-form-group">
+        <label for="archivo">Adjuntar evidencia (opcional):</label>
+        <input type="file" id="archivo" name="archivo" accept="image/*,application/pdf">
+    </div>
+
+    <button type="submit" class="prov-btn-enviar">Enviar mensaje</button>
+</form>
+
+<script>
+document.querySelector('.prov-formulario-contacto').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const asunto = document.getElementById('asunto').value;
+    const problema = document.getElementById('problema').value;
+    const archivo = document.getElementById('archivo').files[0];
+
+    if (!problema) {
+        alert('Por favor, selecciona un tipo de problema.');
+        return;
+    }
+
+    alert(`Mensaje enviado:\nAsunto: ${asunto}\nProblema: ${problema}\nArchivo adjunto: ${archivo ? archivo.name : 'Ninguno'}`);
+    this.reset();
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const textarea = document.querySelector('.prov-formulario-contacto textarea');
+    if (textarea) {
+        textarea.addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    }
+});
+</script>
+
+

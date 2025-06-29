@@ -19,7 +19,7 @@
             <li><a href="proveedorPanel.html" class="prov-nav-item"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
             <li><a href="crearevento.html" class="prov-nav-item"><i class="fas fa-plus-circle"></i><span>Crear evento</span></a></li>
             <li><a href="verEvento.html" class="prov-nav-item active"><i class="fas fa-calendar-alt"></i><span>Ver eventos</span></a></li>
-            <li class="prov-extra-option"><a href="#" class="prov-nav-item"><i class="fas fa-envelope"></i><span>Contactar empresa</span></a></li>
+            <li><a href="contactarEmpresa.html" class="prov-nav-item"><i  class="fas fa-envelope"></i><span>Contactar empresa</span></a></li>
         </ul>
     </div>
 
@@ -167,7 +167,7 @@
                 };
             }
 
-            // --- Lógica de Autenticación al cargar la página ---
+     /*       // --- Lógica de Autenticación al cargar la página ---
             const token = localStorage.getItem('jwtToken');
             const userRole = localStorage.getItem('userRole');
             const userId = localStorage.getItem('userId');
@@ -183,7 +183,7 @@
                     window.location.replace('../login.html'); 
                 }, 2000); 
                 return; 
-            }
+            }*/
 
             // --- Event Listener para Cerrar Sesión ---
             provLogoutButton.addEventListener('click', async () => {
