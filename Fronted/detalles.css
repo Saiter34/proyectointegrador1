@@ -1,332 +1,294 @@
+/*DETALLES CSS*/
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background-color: black;
-  color: white;
-  overflow-x: hidden;
-}
-
 .encabezado {
+  background: #4c0000; 
+  padding: 1rem 2rem;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  background-color: #7c0000;
-  border-bottom: 4px solid #b30000;
-  padding: 10px 30px;
-  position: relative;
-  z-index: 2;
+  align-items: center;
+  color: #f00;
+  font-weight: bold;
 }
 
 .barra-logo .logo {
-  height: 45px;
+  height: 50px;
 }
-
-.barra-pasos {
-  display: flex;
-  gap: 40px;
-}
-
-.paso {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.barra-pasos .paso {
   color: #fff;
+  text-decoration: none;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+body {
   font-family: 'Orbitron', sans-serif;
-  opacity: 0.5;
+  background: url("img/fondometal.jpg") no-repeat center center fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-color: #000;
+  color: #eee;
 }
-
-.paso.activo {
-  opacity: 1;
-  color: #ff3b3b;
-}
-
-.circulo {
-  width: 30px;
-  height: 30px;
-  background-color: #400000;
-  border-radius: 50%;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  margin-bottom: 5px;
-  border: 2px solid #ff0000;
-}
-
-.hero {
-  position: relative;
-  height: 200vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  overflow: hidden;
-}
-
-.fondo-mapa {
-  position: absolute;
+.fondo-overlay-extra {
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: url("img/fondodetalles.jpg") center center no-repeat;
-  background-size: cover;
+  background: url("img/fondodetalles.jpg") repeat; /* o puede ser un gradiente */
+  opacity: 0.3; 
+  z-index: -1;
+  pointer-events: none;
+}
+
+
+/* PRECIOS BOX */
+.precios-box {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+  background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(20,20,20,1));
   z-index: 0;
 }
 
-/* Imagen de Damiano semi-transparente */
-.damiano-img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.85;
-  z-index: 1;
-}
-.damiano-img::after{
+.precios-box::after {
   content: "";
   position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.7), tgba(0,0,0,0));
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  background: linear-gradient(to top, #0c0c0c, transparent);
   z-index: 2;
   pointer-events: none;
 }
 
-/* Contenido encima */
-.contenido {
-  position: relative;
-  z-index: 2;
-  padding: 2rem;
-  background-color: rgba(0, 0, 0, 0.65);
-  border-radius: 1rem;
-  max-width: 500px;
-  margin: auto;
-}
 
-h1 {
-  font-size: 2.5rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
 
-.subtitulo {
-  font-size: 1.2rem;
-  margin-bottom: 1.5rem;
+.lado-imagen {
+  flex: 1;
 }
-.botones-zonas{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.botones-zonas button {
-  padding: 1rem 2rem;
-  font-size: 1.2rem;
-  border-radius: 10px;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
+.lado-imagen img {
   width: 100%;
-  max-width: 300px;
+  height: auto;
+  display: block;
 }
 
-button.vip {
-  background-color: #4c0000;
-  color: white;
+.lado-imagen {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
 }
 
-button.general {
-  background-color: white;
+.lado-imagen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.lado-imagen::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0; 
+  width: 80%; 
+  height: 100%;
+  background: linear-gradient(to left, rgba(20, 20, 20, 0.95), rgba(0, 0, 0, 0));
+  z-index: 1;
+  pointer-events: none;
+}
+
+.lado-precios {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.2); 
+  backdrop-filter: blur(4px); 
+}
+
+.precios {
+  padding: 0;
+  margin: 0;
+}
+.precios-box {
+  display: flex;
+  width: 100vw;
+  background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(20,20,20,1));
+  align-items: stretch;
+   height: auto;
+  height: 700px; 
+}
+
+.tabla-encabezado {
+  background-color: rgba(42, 42, 42, 0.6); /* semitransparente */
+  color: #4c0000;
+  font-weight: bold;
+  backdrop-filter: blur(2px);
+}
+
+.fila {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.8rem 1rem;
+  background-color: rgba(26, 26, 26, 0.3); /* ahora es translúcido */
+  border-radius: 6px;
+  backdrop-filter: blur(2px);
+}
+
+.mapa-mini {
+  max-height: 300px;
+  width: 100%;
+  height: auto; 
+  object-fit: contain;
+  display: block;
+  margin-bottom: 1rem;
+}
+.btn-comprar {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.8rem 2rem;
+  background: linear-gradient(90deg, #4c0000, #900000);
+  color: #fff;
+  text-decoration: none;
+  border: none;
+  font-weight: bold;
+  text-align: center;
+  animation: shimmer 3s infinite linear;
+  border-radius: 4px;
+}
+@keyframes shimmer {
+  0% { box-shadow: 0 0 5px #f00; }
+  50% { box-shadow: 0 0 15px #f00; }
+  100% { box-shadow: 0 0 5px #f00; }
+}
+.nota-conadis {
+  font-size: 0.8rem;
+  color: #bbb;
+  margin-top: 0.5rem;
+}
+
+/* HISTORIA */
+.historia {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+.historia-box {
+  width: 80%;
+  height: 400px;
+  background-image: url("img/imagen.jpg");
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  border: 2px solid #333;
+  overflow: hidden;
+}
+.historia-overlay {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+.historia-contenido {
+  color: #fff;
+  font-size: 1.2rem;
+  max-width: 700px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 1.5rem;
+  border: 1px solid white;
+  backdrop-filter: blur(2px);
+}
+
+/* REGLAS CON BOX Y DEGRADADO */
+.reglas {
+  padding: 3rem 1rem;
+  display: flex;
+  justify-content: center;
+}
+.reglas-box {
+  background: #1a1a1a;
+  width: 100%;
+  padding: 2rem;
+  border: 1px solid #333;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+}
+.reglas-box h2 {
+  color: #4c0000;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.reglas-box ul {
+  list-style: none;
+}
+.reglas-box li {
+  margin-bottom: 0.7rem;
+  position: relative;
+  padding-left: 1.5rem;
+}
+.reglas-box li::before {
+  content: "★";
+  position: absolute;
+  left: 0;
   color: #4c0000;
 }
 
-.tabla-precios {
-  margin-top: 1rem;
-  font-size: 0.95rem;
+/*FOOTER*/
+
+footer{
+    background: radial-gradient(circle at center, #1a1a1a 0%, #0d0d0d 100%);
+    color: #ccc;
+    padding: 2rem;
+    border-top: 1 px solid #520000;
+    box-shadow: 0 -2px 10px rgba(255, 0, 0, 0.2);
+    position: relative;
+    z-index: 10;
+}    
+.footer-completo {
+    width: 100%;
+    background-color: #0b2f43;
+    color: white;
+    padding: 60px 0 30px 0;
+    font-family: sans-serif;
 }
 
-.tabla-precios .fila {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.3rem 0;
-  border-bottom: 1px dotted #aaa;
+.footer-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.precio,
-.precio-conadis {
-  width: 100px;
-  text-align: right;
+.footer-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
 }
-
-.botones-precio {
-  margin-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  align-items: center;
+.logo-footer {
+  height: 60px;
+  margin-bottom: 0.5rem;
 }
-
-.botones-precio button {
-  padding: 0.8rem 1.5rem;
-  font-size: 1rem;
-  background-color: #990000;
-  color: white;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-  max-width: 250px;
-}
-.historia {
-  background: none; 
-  padding: 6rem 2rem 3rem 2rem;
-  display: flex;
-  justify-content: center;
-}
-
-.historia-contenido {
-  position: relative;
-  border-radius: 30px;
-  padding: 3rem 2rem;
-  max-width: 900px;
-  width: 100%;
-  color: white;
-  display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-  box-shadow: 0 0 60px rgba(0, 0, 0, 0.6);
-  justify-content: center;
-  text-align: left;
-  overflow: hidden;
-  z-index: 1;
-}
-.historia-contenido::before{
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(145deg, rgba(60,0,0,0.85), rgba(0,0,0,0.85));
-  z-index: 1;
-}
-.historia-overlay {
-  display: none; 
-}
-
-.damiano-mini {
-  width: 300px;
-  border-radius: 10px;
-  flex-shrink: 0;
-}
-
-.historia-contenido {
-  position: relative;
-  background: none;
-  overflow: hidden;
-}
-
-.historia-fondo {
-  position: absolute;
+.fondo-overlay {
+  position: fixed;
   top: 0;
   left: 0;
-  width: 110%;
-  height: 110%;
-  object-fit: cover;
-  z-index: 0;
-  filter: brightness(40%) blur(1px); 
-}
-
-.damiano-mini {
-  position: relative;
-  z-index: 1;
-}
-
-.historia-texto {
-  position: relative;
-  z-index: 2;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-
-.historia-texto {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.historia-texto p {
-  line-height: 1.6;
-  font-size: 1rem;
-  margin-top: 1rem;
-}
-
-.info-detalles{
-    background: linear-gradient(to bottom, rgba(0,0,0,0.85), #2e0000);
-    padding: 4rem 2rem;
-    color: #fdd;
-    font-size: 1rem;
-    text-align: center;
-}
-.info-contenido{
-    max-width: 800px;
-    margin: 0 auto;
-    line-height: 1.6;
-}
-.botones-precio {
-  margin-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.btn-precio {
-  display: inline-block;
-  text-decoration: none;
-  padding: 0.8rem 1.5rem;
-  font-size: 1rem;
-  font-weight: bold;
-  border-radius: 8px;
   width: 100%;
-  max-width: 250px;
-  text-align: center;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.btn-precio.regular {
-  background-color: #990000;
-  color: white;
-}
-
-.btn-precio.conadis {
-  background-color: white;
-  color: #990000;
-  border: 2px solid #990000;
-}
-
-.btn-precio:hover {
-  transform: scale(1.05);
-  filter: brightness(1.1);
-}
-
-footer {
-  text-align: center;
-  padding: 20px;
-  background-color: #2e0000;
-}
-
-.logo-footer {
-  height: 50px;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: -1;
 }

@@ -2,107 +2,112 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teycketan</title>
     <link rel="stylesheet" href="principal.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 </head>
 <body>
-    <div class="overlay"></div>
+<div class="fondo-overlay-extra"></div>
+<div class="fondo-overlay"></div>
+
     <main>
         <header class="encabezado">
-            <div class="logo">
-                <!-- Ruta ABSOLUTA desde la raíz servida por Express (Fronted/) -->
-                <img src="/img/logo.png" alt="Logo de Teycketan">
-            </div>
+            <div class="logo"><img src="img/logo.png" alt="Logo"></div>
             <nav>
-                <div class="nav-box" id="organizerLinkContainer">
-                    <!-- Ruta ABSOLUTA -->
-                    <a href="/registroorgani.html" id="organizerLink">¿Quieres ser organizador?</a>
-                </div>
                 <div class="nav-box dropdown">
                     <button>Categorías</button>
                     <div class="dropdown-content">
-                        <!-- Rutas ABSOLUTAS -->
-                        <a href="/Cliente/concierto.html">Conciertos</a>
-                        <a href="/Cliente/teatro.html">Teatro</a>
-                        <a href="/Cliente/deportes.html">Deportes</a>
+                        <a href="concierto.html">Conciertos</a>
+                        <a href="teatro.html">Teatro</a>
+                        <a href="deportes.html">Deportes</a>
                     </div>
                 </div>
-                <!-- ESTRUCTURA PARA "MI CUENTA" COMO DROPDOWN (para usuarios no logueados inicialmente) -->
-                <div class="nav-box dropdown" id="miCuentaContainer"> 
-                    <button id="miCuentaButton">Mi Cuenta</button>
-                    <div class="dropdown-content" id="miCuentaDropdownContent">
-                        <!-- Rutas ABSOLUTAS -->
-                        <a href="/login.html" id="loginLink">Iniciar Sesión</a>
-                        <a href="/registro.html" id="registerLink">Registrarse</a>
-                    </div>
-                </div>
-
-                <!-- NOTIFICACIONES -->
-                <div class="public-notif-wrapper">
-                    <button class="public-notif-btn" id="publicNotifToggle">
-                        <i class="fas fa-bell"></i>
-                        <span class="public-notif-dot"></span>
-                    </button>
-                    <div class="public-notif-dropdown" id="publicNotifDropdown">
-                        <p class="public-notif-title">Notificaciones</p>
-                        <ul>
-                            <li>Bienvenido a Teycketan!</li>
-                            <li>Descubre nuevos eventos hoy.</li>
-                            <li>Regístrate para recibir ofertas especiales.</li>
-                        </ul>
-                    </div>
-                </div>
+                <div class="nav-box"><a href="login.html">Mi cuenta</a></div>
             </nav>
-        </header>
-
-        <div class="contenido-principal">
-            <section class="damiano contenedor-estilo">
-                <div class="info">
-                    <h2>Your Damiano David</h2>
-                    <p><strong>Música</strong> / Presencial</p>
-                    <p>Damiano David en Lima</p>
-                    <p>14 al 18 mayo 2025</p>
-                    <a href="/Cliente/detalles.html" class="btn-vermas">Ver más</a> <!-- Ruta ABSOLUTA -->
+        </header>>
+<section class="carrusel">
+    <div class="slide activo">
+        <div class="info">
+            <h2>Nombre del evento paga</h2>
+            <p><strong>categoria</strong>
+            <p>Especificacion del evento</p>
+            <p>fecha del evento</p>
+            <a href="detalles.html" class="btn-vermas">Ver más</a>
+        </div>
+        <img src="img/imagen.jpg" alt="Imgen de referencia del evento">
+    </div>
+    <div class="slide">
+        <div class="info">
+            <h2>nombre del evento paga 2</h2>
+            <p><strong>categoria</strong>
+            <p>especificacion del evento</p>
+            <p>fecha del evento</p>
+            <a href="detalles.html" class="btn-vermas">Ver más</a>
+        </div>
+        <img src="img/imagen.jpg" alt="Damiano 2">
+    </div>
+</section>
+<div class="contenido-principal-doscolumnas">
+    <section class="eventos contenedor-estilo">
+        <div class="eventos-grid">
+            <h3>Próximos eventos</h3>
+    <div class="eventos-grid">
+        <a href="detalles.html" target="_blank" class="evento-link">
+            <div class="evento">
+                <img src="img/imagen.jpg" alt="Imgen de evento">
+                <div class="evento-info">
+                    <h4>nombre del evento</h4>
+                    <p>Lugar del evento</p>
+                    <p>fecha del evento</p>
                 </div>
-                <!-- Ruta ABSOLUTA -->
-                <img src="/img/damiano.jpg" alt="Damiano David">
-            </section>
+            </div>
+        </a>
 
-            <aside class="destacados contenedor-estilo">
-                <h3>Destacados</h3>
+        <a href="detalles.html" target="_blank" class="evento-link">
+            <div class="evento">
+                <img src="img/imagen.jpg" alt="iamgen de evento">
+                <div class="evento-info">
+                    <h4>nombre del evento</h4>
+                    <p>lugar del evento</p>
+                    <p>fecha del evento</p>
+                </div>
+            </div>
+        </a>
+    </div>
+        </div>
+    </section>
+
+    <aside class="destacados">
+                <h3>Ubicaciones destacadas</h3>
                 <div class="circulos">
-                    <a href="/Cliente/sanmarcos.html" class="circulo"> <!-- Ruta ABSOLUTA -->
-                        <img src="/img/sanmarcos.png" alt="Estadio San Marcos"> <!-- Ruta ABSOLUTA -->
+                    <a href="sanmarcos.html" class="circulo">
+                        <img src="img/sanmarcos.png" alt="San Marcos">
                         <span>San Marcos</span>
                     </a>
-                    <a href="/Cliente/teatrocanut.html" class="circulo"> <!-- Ruta ABSOLUTA -->
-                        <img src="/img/teatrocanout.jpg" alt="Teatro Canut"> <!-- Ruta ABSOLUTA -->
-                        <span>Teatro Canut</span>
+                    <a href="teatrocanut.html" class="circulo">
+                        <img src="img/teatrocanout.jpg" alt="Canut">
+                        <span>Parque de la exposicion</span>
                     </a>
-                    <a href="/Cliente/teatronacional.html" class="circulo"> <!-- Ruta ABSOLUTA -->
-                        <img src="/img/teatronacional.jpg" alt="Teatro Nacional"> <!-- Ruta ABSOLUTA -->
+                    <a href="teatronacional.html" class="circulo">
+                        <img src="img/teatronacional.jpg" alt="Nacional">
                         <span>Teatro Nacional</span>
                     </a>
                 </div>
             </aside>
-        </div>
+</div>
 
-        <section class="eventos contenedor-estilo">
-            <h3>Próximos eventos</h3>
-            <div class="eventos-grid" id="proximos-eventos-grid">
-                <p class="loading-events-message">Cargando próximos eventos...</p>
-            </div>
-        </section>
+       
 
     </main>
-
+ 
     <footer class="footer-completo">
         <div class="container-footer">
             <div class="footer-row">
+    
+                <!-- Redes sociales -->
                 <div class="footer-col">
                     <h4>Síguenos</h4>
                     <div class="social-links">
@@ -112,6 +117,8 @@
                         <a href="#"><i class="fab fa-linkedin"></i></a>
                     </div>
                 </div>
+    
+                <!-- Enlaces de compañía -->
                 <div class="footer-col">
                     <h4>Compañía</h4>
                     <ul>
@@ -121,6 +128,8 @@
                         <li><a href="#">Califícanos</a></li>
                     </ul>
                 </div>
+    
+                <!-- Ayuda -->
                 <div class="footer-col">
                     <h4>Ayuda</h4>
                     <ul>
@@ -128,122 +137,45 @@
                         <li><a href="#">Correo: Teycketan@gmail.com</a></li>
                     </ul>
                 </div>
+    
+                <!-- Métodos de pago -->
                 <div class="footer-col">
                     <h4>Métodos de pago</h4>
                     <div class="payment-methods">
-                        <!-- Rutas ABSOLUTAS -->
-                        <img src="/img/logo-yape.jpg" alt="Logo Yape">
-                        <img src="/img/logo-plin.jpg" alt="Logo Plin">
+                        <img src="img/logo-yape.jpg" alt="Yape">
+                        <img src="img/logo-plin.jpg" alt="Plin">
                     </div>
                 </div>
             </div>
+            <!-- Derechos de autor -->
             <div class="footer-bottom">
                 <small>&copy; 2024 <b>SLee Dw</b> - Todos los Derechos Reservados.</small>
             </div>
         </div>
-        <!-- Ruta ABSOLUTA -->
-        <img src="/img/logo.png" alt="Logo Teycketan" class="logo-footer"/>
-    </footer>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const userName = localStorage.getItem('userName');
-            const userRole = localStorage.getItem('userRole');
-
-            const miCuentaButton = document.getElementById('miCuentaButton');
-            const organizerLinkContainer = document.getElementById('organizerLinkContainer');
-            const proximosEventosGrid = document.getElementById('proximos-eventos-grid');
-            const API_URL = 'http://localhost:3000'; 
-
-            // Elementos de la notificación
-            const publicNotifToggle = document.getElementById('publicNotifToggle');
-            const publicNotifDropdown = document.getElementById('publicNotifDropdown');
-
-            // Lógica para "Mi Cuenta" en principal.html (solo si no hay sesión activa)
-            if (userName) {
-                // Si el usuario está logueado, redirigir a cliente.html (dashboard del cliente)
-                window.location.replace('/Cliente/cliente.html'); // Ruta ABSOLUTA
-                return; // Detiene la ejecución del script aquí
-            } else {
-                miCuentaButton.textContent = 'Mi Cuenta';
-            }
-
-            // Ocultar "¿Quieres ser organizador?" si el usuario ya es organizador o admin
-            if (userRole === 'organizador' || userRole === 'admin') {
-                if (organizerLinkContainer) {
-                    organizerLinkContainer.style.display = 'none';
-                }
-            }
-
-            /**
-             * @brief Carga los eventos aprobados desde el backend y los muestra en la página.
-             */
-            async function fetchApprovedEvents() {
-                proximosEventosGrid.innerHTML = '<p class="loading-events-message">Cargando próximos eventos...</p>';
-                try {
-                    const response = await fetch(`${API_URL}/api/eventos/aprobados-para-cliente`);
-                    const events = await response.json();
-
-                    if (response.ok) {
-                        if (events.length === 0) {
-                            proximosEventosGrid.innerHTML = '<p class="no-events-found-message">No hay eventos disponibles en este momento. ¡Vuelve pronto!</p>';
-                        } else {
-                            renderEvents(events);
-                        }
-                    } else {
-                        proximosEventosGrid.innerHTML = `<p class="error-message">Error al cargar eventos: ${events.message || 'Error desconocido'}</p>`;
-                        console.error('Error fetching approved events:', events);
-                    }
-                }
-                catch (error) {
-                    proximosEventosGrid.innerHTML = '<p class="error-message">Error de conexión con el servidor. No se pudieron cargar los eventos.</p>';
-                    console.error('Network error fetching approved events:', error);
-                }
-            }
-
-            /**
-             * @brief Renderiza una lista de eventos en el grid.
-             * @param {Array<Object>} events - Un array de objetos de evento.
-             */
-            function renderEvents(events) {
-                let eventsHtml = '';
-                events.forEach(event => {
-                    const formattedDate = new Date(event.Fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
-                    // Asegúrate de que event.URL_Imagen contiene la ruta completa o relativa al servidor
-                    const imageUrl = event.URL_Imagen ? `${API_URL}${event.URL_Imagen}` : 'https://placehold.co/150x100/cccccc/000000?text=No+Img';
-
-                    eventsHtml += `
-                        <a href="/Cliente/detalles.html?eventId=${event.Id_Evento}" class="evento-link"> <!-- Ruta ABSOLUTA -->
-                            <div class="evento">
-                                <img src="${imageUrl}" alt="${event.Nom_Evento}">
-                                <div class="evento-info">
-                                    <h4>${event.Nom_Evento}</h4>
-                                    <p>${event.Ubicacion}</p>
-                                    <p>${formattedDate}</p>
-                                </div>
-                            </div>
-                        </a>
-                    `;
-                });
-                proximosEventosGrid.innerHTML = eventsHtml;
-            }
-
-            // Iniciar la carga de eventos aprobados
-            fetchApprovedEvents();
-
-            // --- Lógica para el dropdown de notificaciones ---
-            publicNotifToggle.addEventListener('click', (event) => {
-                event.stopPropagation(); // Evita que el clic en el botón cierre el dropdown inmediatamente
-                publicNotifDropdown.style.display = publicNotifDropdown.style.display === 'block' ? 'none' : 'block';
-            });
-
-            // Cierra el dropdown si se hace clic fuera de él
-            document.addEventListener('click', (event) => {
-                if (!publicNotifDropdown.contains(event.target) && !publicNotifToggle.contains(event.target)) {
-                    publicNotifDropdown.style.display = 'none';
-                }
-            });
-        });
-    </script>
+    <img src="img/logo.png" alt="Logo Footer" class="logo-footer"/>
+  </footer>
 </body>
+<script>
+  let index = 0;
+  const slides = document.querySelectorAll('.slide');
+
+  function mostrarSiguienteSlide() {
+    slides.forEach((slide, i) => {
+      slide.classList.remove('activo');
+      slide.style.left = '100%';
+    });
+
+    index = (index + 1) % slides.length;
+    slides[index].classList.add('activo');
+    slides[index].style.left = '0';
+  }
+
+  // Inicia el primer slide visible
+  slides[0].classList.add('activo');
+  slides[0].style.left = '0';
+
+  setInterval(mostrarSiguienteSlide, 10000);
+</script>
+
 </html>
+

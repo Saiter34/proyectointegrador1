@@ -1,95 +1,90 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Your Damiano David | En Vivo</title>
-  <link rel="stylesheet" href="detalles.css" />
+  <meta charset="UTF-8">
+  <title>Venta de Tickets</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="detalles.css">
 </head>
- <header class="encabezado">
+<body>
+<div class="fondo-overlay-extra"></div>
+ 
+  <header class="encabezado">
     <div class="barra-logo">
       <img src="img/logo.png" alt="Logo Teycketan" class="logo" />
     </div>
     <div class="barra-pasos">
-      <a href="principal.HTML" class="paso activo">
-        <div class="circulo">1</div>
+      <a href="principal.html" class="paso activo no-subrayado">
         <span>INICIO</span>
       </a>
     </div>
   </header>
-<body>
-
-  <section class="hero">
-    <!-- Imagen de fondo -->
-    <div class="fondo-mapa"></div>
-
-    <!-- Imagen de Damiano encima -->
-    <img src="img/damianodetalles.png" alt="Damiano David" class="damiano-img"/>
-
-    <!-- Contenido -->
-    <div class="contenido">
-      <h1>Your Damiano David</h1>
-      <p class="subtitulo">EN VIVO</p>
-
-      <div class="botones-zonas">
-        <button class="vip">VIP</button>
-        <button class="general">GENERAL</button>
-      </div>
-
+<section class="precios">
+  <div class="precios-box">
+    <div class="lado-imagen">
+      <img src="img/imagen.jpg" alt="Imagen del Evento" />
+    </div>
+    <div class="lado-precios">
+      <img src="img/imagen.jpg" alt="Mapa del Recinto" class="mapa-mini" />
       <div class="tabla-precios">
-        <div class="fila">
-          <span>ZONA VIP</span>
-          <span class="precio">S/129.00</span>
-          <span class="precio-conadis">S/105.00</span>
+        <div class="fila tabla-encabezado">
+          <div>Zona</div>
+          <div>Regular</div>
+          <div>Conadis</div>
+          <div>Preventa</div>
         </div>
         <div class="fila">
-          <span>ZONA GENERAL</span>
-          <span class="precio">S/70.00</span>
-          <span class="precio-conadis">S/ - </span>
+          <div>VIP</div>
+          <div>S/. 250</div>
+          <div>S/. 125</div>
+          <div>S/. 200</div>
+        </div>
+        <div class="fila">
+          <div>General</div>
+          <div>S/. 150</div>
+          <div>S/. 75</div>
+          <div>S/. 120</div>
         </div>
       </div>
+      <a href="pago1.html" class="btn-comprar">COMPRAR ENTRADAS</a>
+      <p class="nota-conadis">* Descuento CONADIS válido con carné vigente. Cupos limitados.</p>
+    </div>
+  </div>
+</section>
+<section class="degradado-bottom"></section>
 
-      <div class="botones-precio">
-        <a href="pago1.html" class="btn-precio regular">Tarifa Regular</a>
-        <a href="pago1.html" class="btn-precio conadis">Tarifa Conadis</a>
+<section class="historia">
+  <div class="historia-box">
+    <div class="historia-overlay">
+      <div class="historia-contenido">
+        <p>
+          Descripcion de evento o historia del artista
+        </p>
       </div>
     </div>
-  </section>
-
-  <section class="historia">
-  <div class="historia-overlay"></div>
-  <div class="historia-contenido">
-  <!-- Fondo visual grande -->
-  <img src="img/historia.jpg" class="historia-fondo" alt="Fondo historia" />
-
-  <!-- Imagen de Damiano pequeña -->
-  <img src="img/damianomini.jpg" class="damiano-mini" alt="Damiano pequeño"/>
-
-  <!-- Texto encima -->
-  <div class="historia-texto">
-    <h2>Your Damiano David</h2>
-    <p class="subtitulo">EN VIVO</p>
-    <p>
-      Damiano David como solista es la encarnación de la intensidad sin filtro. Con su voz rasgada, mirada feroz y presencia magnética, deja atrás el rugido de Måneskin para explorar territorios más personales y viscerales...
-    </p>
-  </div>
-</div>
-
-  </div>
-</section> 
-<section class="info-detalles">
-  <div class="info-contenido">
-    <p>
-      <strong>Fecha del evento:</strong> Del 14 al 18 de mayo del 2025<br>
-      <strong>Inicio del show:</strong> 9:00 PM<br>
-      <strong>Recinto:</strong> Estadio Arena Sur – Av. Música Urbana #123 – Lima<br>
-      <strong>Duración estimada:</strong> 3 horas<br><br>
-      <strong>CONADIS:</strong> De acuerdo a la Ley General de la Persona con Discapacidad, las personas registradas tienen derecho a una tarifa con descuento. Deberán presentar su carné CONADIS al momento de ingresar. Cupos limitados.
-    </p>
   </div>
 </section>
 
- <footer>
-    <img src="img/logo.png" alt="Logo Footer" class="logo-footer"/>
+<section class="degradado-top reglas-gradiente"></section>
+<section class="reglas">
+  <div class="reglas-box">
+    <h2>Reglas del Evento</h2>
+    <ul>
+      <li>Prohibido el ingreso con objetos punzocortantes.</li>
+      <li>Menores deben estar acompañados por un adulto.</li>
+      <li>No se permite el ingreso con alimentos ni bebidas.</li>
+    </ul>
+  </div>
+</section>
+<section class="degradado-bottom"></section>
+
+  <footer class="footer">
+    <img src="img/logo.png" alt="Logo Footer" class="logo-footer" />
   </footer>
 
+</body>
+<div class="fondo-overlay"></div>
+
+</html>
