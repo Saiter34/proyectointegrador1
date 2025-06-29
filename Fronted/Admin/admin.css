@@ -352,6 +352,27 @@ body {
     background-color: rgba(255, 59, 59, 0.15);
     transition: background 0.3s;
 }
+/* Centrado vertical de todas las celdas */
+.admin-table td, .admin-table th,
+.admin-table-solicitudes td, .admin-table-solicitudes th {
+    vertical-align: middle;
+}
+
+/* Asegurar que las celdas no crezcan demasiado si hay botones */
+.admin-table td:last-child,
+.admin-table-solicitudes td:last-child {
+    max-width: 220px;
+}
+
+/* Mejor presentación de los botones dentro de una celda */
+.admin-actions-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap; 
+}
+
 
 /* Button styles for tables */
 .admin-btn-table, /* Clase genérica para botones dentro de tablas */
@@ -807,4 +828,114 @@ body {
     color: #ccc;
     margin-top: 10px;
     padding: 10px;
+}
+/*SOLICITU PARA DESTACAR*/
+/* Imagen miniatura de evento */
+.admin-event-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+}
+
+/* Estado Pendiente */
+.admin-status-pendiente {
+  background-color: #ffcc00;
+  color: #000;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+/* Botones de acción */
+.admin-actions-cell {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.admin-btn-aprobar {
+  background-color: #00c853;
+  border: none;
+  padding: 6px 12px;
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.admin-btn-aprobar:hover {
+  background-color: #00e676;
+}
+
+.admin-btn-rechazar {
+  background-color: #d50000;
+  border: none;
+  padding: 6px 12px;
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.admin-btn-rechazar:hover {
+  background-color: #ff1744;
+}
+
+/* Mensaje cuando no hay solicitudes */
+.admin-no-data-message {
+  color: #999;
+  text-align: center;
+  margin-top: 15px;
+  font-style: italic;
+}
+/* ANIMACIÓN SHIMMER */
+@keyframes shimmer {
+  0% {
+    background-position: -300px 0;
+  }
+  100% {
+    background-position: 300px 0;
+  }
+}
+
+/* Base para todos los botones con shimmer */
+.btn-shimmer {
+  position: relative;
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  color: #fff;
+  padding: 6px 14px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  border: none;
+  border-radius: 6px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+}
+.btn-shimmer:hover {
+  transform: scale(1.05);
+}
+
+/* Botón aprobar */
+.admin-btn-aprobar {
+  background-color: #00c853;
+}
+.admin-btn-aprobar:hover {
+  background-color: #00e676;
+}
+
+/* Botón rechazar */
+.admin-btn-rechazar {
+  background-color: #d50000;
+}
+.admin-btn-rechazar:hover {
+  background-color: #ff1744;
 }

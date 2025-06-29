@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitudes de Eventos - TEYCKETAN</title>
+    <title>TEYCKETAN</title>
     <!-- Usar el nuevo archivo CSS del panel de administración -->
     <link rel="stylesheet" href="admin.css"> 
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
@@ -23,15 +23,14 @@
             <li><a href="eventos.html" class="admin-nav-item"><i class="fas fa-tasks"></i><span>Solicitud de eventos</span></a></li>
             <li><a href="eventoApro.html" class="admin-nav-item"><i class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
             <li><a href="categorias.html" class="admin-nav-item"><i class="fas fa-tags"></i><span>Eventos por categorias</span></a></li>
-            <li><a href="eventoDestacado.html" class="admin-nav-item active"><i class="fas fa-star"></i><span>Eventos destacados</span></a></li>
-            <li><a href="solicitudDestacar.html" class="admin-nav-item"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
+            <li><a href="eventoDestacado.html" class="admin-nav-item"><i class="fas fa-star"></i><span>Eventos por categorias</span></a></li>
+            <li><a href="solicitudDestacar.html" class="admin-nav-item active"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
         </ul>
     </div>
 
-        <!-- MAIN CONTENT - Reutilizando la estructura del admin.html -->
     <div class="admin-main-content">
         <header class="admin-topbar">
-            <h1 class="admin-titulo-seccion">Eventos destacados</h1>
+            <h1 class="admin-titulo-seccion">Solicitudes de eventos destacados</h1>
             <div class="admin-acciones">
                 <div class="admin-notif-wrapper">
                     <button class="admin-notif-btn" id="adminNotifToggle">
@@ -52,29 +51,65 @@
         </header>
 
         <section class="admin-contenido">
-            <div class="admin-bienvenida">Aquí puedes ver los eventos destacados y eliminarlos si ya no deben de estar destacado</div>
-<!-- Continúa dentro del <section class="admin-contenido"> -->
+            <div class="admin-bienvenida">Aquí puedes aprobar o rechazar las solicitudes de eventos destacados.</div>
 
-           <div class="admin-panel-grid">
-    <div class="admin-card">
-    <img src="../img/imagen.jpg" alt="Evento 1" class="admin-event-image-thumbnail">
-    <h4>Evento destacado</h4>
-    <div>
-        <button class="admin-btn-details" onclick="toggleDetalles(this)">Detalles</button>
-        <button class="admin-btn-delete" onclick="quitarDestacado('Concierto Damiano')">Quitar destacado</button>
+            <div id="adminMessageContainer" class="admin-message-container"></div>
+
+            <!-- Tabla de solicitudes para destacar -->
+<div class="admin-tabla-contenedor">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Imagen</th>
+        <th>Nombre del Evento</th>
+        <th>Proveedor</th>
+        <th>Fecha</th>
+        <th>Ubicación</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="solicitudesDestacarBody">
+      <tr>
+        <td><img src="../img/imagen.jpg" alt="Evento 1" class="admin-event-img"></td>
+        <td>Nombe de evento</td>
+        <td>empresa</td>
+        <td>fecha</td>
+        <td>lugar</td>
+        <td><span class="admin-status-pendiente">Pendiente</span></td>
+        <td class="admin-actions-cell">
+<button class="admin-btn-aprobar btn-shimmer">Aprobar</button>
+<button class="admin-btn-rechazar btn-shimmer">Rechazar</button>
+
+        </td>
+      </tr>
+      <tr>
+        <td><img src="../img/imagen.jpg" alt="Evento 2" class="admin-event-img"></td>
+        <td>nombre de evento</td>
+        <td>empresa</td>
+        <td>fecha</td>
+        <td>lugar</td>
+        <td><span class="admin-status-pendiente">Pendiente</span></td>
+        <td class="admin-actions-cell">
+<button class="admin-btn-aprobar btn-shimmer">Aprobar</button>
+<button class="admin-btn-rechazar btn-shimmer">Rechazar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <p id="noRequestsMessage" class="admin-no-data-message" style="display: none;">No hay solicitudes pendientes.</p>
+</div>
+
+        </section>
+    </div>
+    <div id="adminMessageModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="admin-close-button">&times;</span>
+            <p id="adminMessageModalText"></p>
+            <button id="adminMessageModalCloseBtn" class="admin-modal-btn admin-modal-confirm">Aceptar</button>
+        </div>
     </div>
     
-<div class="admin-evento-detalles" style="font-size: 10px;">
-    <p>destalles de  evento</p>
 
-
-</div>
-<script>
-function toggleDetalles(boton) {
-    const card = boton.closest('.admin-card');
-    const detalles = card.querySelector('.admin-evento-detalles');
-    const visible = detalles.style.display === 'block';
-
-    detalles.style.display = visible ? 'none' : 'block';
-}
-</script>
+</body>
+</html>

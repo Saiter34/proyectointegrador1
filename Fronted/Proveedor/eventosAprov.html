@@ -16,11 +16,11 @@
             <img src="../img/logo.png" alt="Logo Teycketan" class="prov-logo-img" />
         </div>
         <ul class="prov-nav-list">
-            <li><a href="proveedorPanel.html" class="prov-nav-item"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
+<li><a href="proveedorPanel.html" class="prov-nav-item"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
             <li><a href="crearevento.html" class="prov-nav-item"><i class="fas fa-plus-circle"></i><span>Crear evento</span></a></li>
-            <li><a href="verEvento.html" class="prov-nav-item active"><i class="fas fa-calendar-alt"></i><span>Ver eventos</span></a></li>
+            <li><a href="verEvento.html" class="prov-nav-item"><i class="fas fa-calendar-alt"></i><span>Ver eventos</span></a></li>
             <li><a href="contactarEmpresa.html" class="prov-nav-item"><i  class="fas fa-envelope"></i><span>Contactar empresa</span></a></li>
-            <li><a href="eventosAprov.html" class="prov-nav-item"><i  class="fas fa-envelope"></i><span>Eventos aprobados</span></a></li>
+            <li><a href="eventosAprov.html" class="prov-nav-item active"><i  class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
         </ul>
     </div>
 
@@ -53,8 +53,8 @@
 
             <!-- Contenedor para mensajes (para modales) -->
             <div id="provMessageContainer" class="prov-message-container"></div>
-            
             <div class="prov-tabla-contenedor">
+                
                 <table class="prov-table">
                     <thead>
                         <tr>
@@ -63,7 +63,7 @@
                             <th>Fecha</th>
                             <th>Horario</th>
                             <th>Ubicación</th>
-                            <th>Estado</th>
+                            <th>Solicitar destacar</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -217,7 +217,7 @@
             // Añadir clase 'active' al enlace de la página actual en el sidebar
             const currentPath = window.location.pathname;
             document.querySelectorAll('.prov-nav-item').forEach(link => {
-                if (link.href.includes('verEvento.html')) {
+                if (link.href.includes('eventosAprov.html')) {
                     link.classList.add('active');
                 } else {
                     link.classList.remove('active');
@@ -234,7 +234,7 @@
                 noEventsMessage.style.display = 'none';
 
                 try {
-                    const response = await fetch(`${API_URL}/api/proveedor/eventos`, {
+                    const response = await fetch(`${API_URL}/api/proveedor/eventos-aprobados`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -285,8 +285,12 @@
                             <td data-label="Horario">${event.Horario_Inicio || 'N/A'} - ${event.Horario_Fin || 'N/A'}</td>
                             <td data-label="Ubicación">${event.Ubicacion}</td>
                             <td data-label="Solicitar destacar">
-                                <span class="event-status event-status-${event.Estado.toLowerCase()}">${event.Estado}</span>
+                                ${event.SolicitudDestacar === 'pendiente'
+                                    ? '<span class="event-status event-status-pendiente">Pendiente</span>'
+                                    : `<button class="prov-btn-solicitar" data-id="${event.Id_Evento}"><i class="fas fa-star"></i> Solicitar destacar</button>`
+                                }
                             </td>
+
                             <td class="prov-actions-cell">
                                 <button class="prov-btn-details" data-id="${event.Id_Evento}" data-name="${event.Nom_Evento}"><i class="fas fa-info-circle"></i> Detalles</button>
                                 <button class="prov-btn-edit" data-id="${event.Id_Evento}" data-name="${event.Nom_Evento}"><i class="fas fa-edit"></i> Editar</button>
@@ -316,6 +320,35 @@
                     `;
                 });
                 eventsListBody.innerHTML = tableRowsHtml;
+                eventsListBody.querySelectorAll('.prov-btn-solicitar').forEach(button => {
+    button.addEventListener('click', async (e) => {
+        const eventId = e.target.dataset.id || e.target.closest('button').dataset.id;
+        const confirm = await showProvConfirmationModal('¿Deseas enviar una solicitud para destacar este evento?');
+        if (!confirm) return;
+
+        try {
+            const response = await fetch(`${API_URL}/api/proveedor/eventos/${eventId}/solicitar-destacar`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                showProvMessageModal('Solicitud enviada correctamente.', 'success');
+                fetchProviderEvents(); // Recargar tabla
+            } else {
+                showProvMessageModal(data.message || 'Error al solicitar destacar.', 'error');
+            }
+        } catch (err) {
+            console.error(err);
+            showProvMessageModal('Error de red al enviar solicitud.', 'error');
+        }
+    });
+});
+
 
                 // Añadir event listeners a los botones de acción
                 eventsListBody.querySelectorAll('.prov-btn-details').forEach(button => {
