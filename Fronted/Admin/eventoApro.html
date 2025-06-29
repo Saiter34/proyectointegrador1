@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eventos Aprobados - TEYCKETAN</title>
     <!-- Usar el archivo CSS del panel de administración -->
-    <link rel="stylesheet" href="admin.css"> 
+    <link rel="stylesheet" href="admin.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
-    <!-- SIDEBAR - Reutilizando la estructura del admin.html -->
+    <!-- SIDEBAR -->
     <div class="admin-sidebar">
         <div class="admin-barra-logo">
             <img src="../img/logo.png" alt="Logo Teycketan" class="admin-logo-img" />
@@ -27,7 +27,7 @@
         </ul>
     </div>
 
-    <!-- MAIN CONTENT - Reutilizando la estructura del admin.html -->
+    <!-- MAIN CONTENT -->
     <div class="admin-main-content">
         <header class="admin-topbar">
             <h1 class="admin-titulo-seccion">Eventos Aprobados</h1>
@@ -55,10 +55,9 @@
 
             <!-- Contenedor para mensajes -->
             <div id="adminMessageContainer" class="admin-message-container"></div>
-            
+
             <div class="admin-tabla-contenedor">
                 <table class="admin-table">
-                 <table class="admin-table">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -74,14 +73,6 @@
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
-                        <tr class="admin-detalles-row" style="display: none;">
-                            <td colspan="12">
-                                <div class="admin-detalles-box">
-                                    <p>Entradas vendidas</p>
-                                </div>
-                            </td>
-                        </tr>
-
                     </thead>
                     <tbody id="approvedEventsListBody">
                         <!-- Los eventos aprobados se cargarán aquí dinámicamente -->
@@ -93,7 +84,7 @@
         </section>
     </div>
 
-    <!-- Modales (copiados de admin.html para auto-contención) -->
+    <!-- Modales -->
     <div id="adminConfirmationModal" class="admin-modal">
         <div class="admin-modal-content">
             <span class="admin-close-button">&times;</span>
@@ -115,11 +106,28 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta
 
+            // --- Lógica de Autenticación al cargar la página ---
+            const token = localStorage.getItem('jwtToken');
+            const userRole = localStorage.getItem('userRole');
+
+            console.log('Approved Events Page Loaded.');
+            console.log('JWT Token:', token ? 'Exists' : 'Missing');
+            console.log('User Role from localStorage:', userRole);
+
+            // Seguridad: Redirige si no hay token o el rol no es 'admin'
+            if (!token || userRole !== 'admin') {
+                showAdminMessageModal('Acceso denegado. Debes ser un administrador para ver esta página.', 'error');
+                setTimeout(() => {
+                    window.location.replace('../login.html');
+                }, 2000);
+                return;
+            }
+
             // Elementos DOM principales
             const adminLogoutButton = document.getElementById('adminLogoutButton');
             const adminNotifToggle = document.getElementById('adminNotifToggle');
             const adminNotifDropdown = document.getElementById('adminNotifDropdown');
-            const approvedEventsListBody = document.getElementById('approvedEventsListBody'); // Usar tbody directamente
+            const approvedEventsListBody = document.getElementById('approvedEventsListBody');
             const adminMessageContainer = document.getElementById('adminMessageContainer');
             const noApprovedEventsMessage = document.getElementById('noApprovedEventsMessage');
 
@@ -132,7 +140,7 @@
             const adminMessageModalText = document.getElementById('adminMessageModalText');
             const adminMessageModalCloseBtn = document.getElementById('adminMessageModalCloseBtn');
 
-            // --- Funciones para Modales (copiadas de admin.html para auto-contención) ---
+            // --- Funciones para Modales ---
 
             /**
              * @brief Muestra un modal de confirmación al usuario (específico para Admin).
@@ -143,7 +151,7 @@
                 return new Promise((resolve) => {
                     adminModalMessage.textContent = message;
                     adminConfirmationModal.style.display = 'flex'; // Usar flex para centrar
-                    
+
                     const confirmHandler = () => {
                         adminConfirmationModal.style.display = 'none';
                         adminModalConfirmBtn.removeEventListener('click', confirmHandler);
@@ -169,13 +177,13 @@
             /**
              * @brief Muestra un modal de mensaje informativo al usuario (específico para Admin).
              * @param {string} message - El mensaje a mostrar en el modal.
-             * @param {string} type - Tipo de mensaje ('success' o 'error') para estilos. Opcional, si no se usa para estilos.
+             * @param {string} type - Tipo de mensaje ('success' o 'error') para estilos. Opcional.
              */
             function showAdminMessageModal(message, type = '') {
                 adminMessageModalText.textContent = message;
                 adminMessageModalText.className = `admin-message-text ${type ? 'admin-message-' + type : ''}`; // Añadir clase para estilo
                 adminMessageModal.style.display = 'flex'; // Usar flex para centrar
-                
+
                 adminMessageModalCloseBtn.onclick = () => {
                     adminMessageModal.style.display = 'none';
                 };
@@ -183,23 +191,6 @@
                     adminMessageModal.style.display = 'none';
                 };
             }
-
-    /*        // --- Lógica de Autenticación al cargar la página ---
-            const token = localStorage.getItem('jwtToken');
-            const userRole = localStorage.getItem('userRole');
-
-            console.log('Approved Events Page Loaded.'); 
-            console.log('JWT Token:', token ? 'Exists' : 'Missing'); 
-            console.log('User Role from localStorage:', userRole); 
-
-            // Seguridad: Redirige si no hay token o el rol no es 'admin'
-            if (!token || userRole !== 'admin') {
-                showAdminMessageModal('Acceso denegado. Debes ser un administrador para ver esta página.', 'error'); 
-                setTimeout(() => {
-                    window.location.replace('../login.html'); 
-                }, 2000); 
-                return; 
-            }*/
 
             // --- Event Listener para Cerrar Sesión ---
             adminLogoutButton.addEventListener('click', async () => {
@@ -209,17 +200,17 @@
                     localStorage.removeItem('userName');
                     localStorage.removeItem('userRole');
                     localStorage.removeItem('isOrganizer');
-                    localStorage.removeItem('userId'); 
+                    localStorage.removeItem('userId');
                     showAdminMessageModal('Sesión cerrada correctamente.', 'success');
                     setTimeout(() => {
-                        window.location.replace('../login.html'); 
-                    }, 500); 
+                        window.location.replace('../login.html');
+                    }, 500);
                 }
             });
 
             // --- Lógica para Notificaciones (Dropdown) ---
             adminNotifToggle.addEventListener('click', (event) => {
-                event.stopPropagation(); 
+                event.stopPropagation();
                 adminNotifDropdown.style.display = adminNotifDropdown.style.display === 'block' ? 'none' : 'block';
             });
 
@@ -267,7 +258,7 @@
                             renderApprovedEvents(data.events);
                         } else {
                             // Fallback si el backend responde con un array directo
-                            renderApprovedEvents(data); 
+                            renderApprovedEvents(data);
                         }
                     } else {
                         showAdminMessageModal(`Error al cargar eventos aprobados: ${data.message || 'Error desconocido'}`, 'error');
@@ -287,7 +278,7 @@
              */
             async function handleDeleteEvent(eventId, eventName) {
                 const confirmDelete = await showAdminConfirmationModal(`¿Estás seguro de que quieres ELIMINAR el evento "${eventName}" (ID: ${eventId})? Esta acción no se puede deshacer.`);
-                
+
                 if (!confirmDelete) {
                     return; // Usuario canceló la acción
                 }
@@ -296,6 +287,7 @@
                     const response = await fetch(`${API_URL}/api/admin/eventos/eliminar/${eventId}`, {
                         method: 'DELETE', // Usar DELETE para eliminar el recurso
                         headers: {
+                            'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`
                         }
                     });
@@ -340,7 +332,7 @@
 
                     // Asegurarse de que la URL de la imagen sea absoluta si viene de la raíz del servidor
                     const imageUrl = event.URL_Imagen ? `${API_URL}${event.URL_Imagen}` : 'https://placehold.co/80x80/cccccc/000000?text=No+Img';
-                    
+
                     tableRowsHtml += `
                         <tr>
                             <td data-label="ID">${event.Id_Evento}</td>
@@ -356,7 +348,7 @@
                             <td data-label="Estado">${event.Estado}</td>
                             <td class="admin-actions-cell">
                                 <button class="admin-btn-details" data-id="${event.Id_Evento}" data-name="${event.Nom_Evento}"><i class="fas fa-info-circle"></i> Detalles</button>
-                                <button class="admin-btn-hightlight" data-id="${event.Id_Evento}" data-name="${event.Nom_Evento}"><i class="fas fa-info-star"></i> Destacar</button>
+                                <button class="admin-btn-highlight" data-id="${event.Id_Evento}" data-name="${event.Nom_Evento}"><i class="fas fa-star"></i> Destacar</button>
                                 <button class="admin-btn-delete" data-id="${event.Id_Evento}" data-name="${event.Nom_Evento}"><i class="fas fa-trash-alt"></i> Eliminar</button>
                             </td>
                         </tr>
@@ -379,17 +371,55 @@
                         handleDeleteEvent(eventId, eventName);
                     });
                 });
+                // Event listener para el botón "Destacar" (admin-btn-highlight)
+                approvedEventsListBody.querySelectorAll('.admin-btn-highlight').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        const eventId = e.target.dataset.id || e.target.closest('button').dataset.id;
+                        const eventName = e.target.dataset.name || e.target.closest('button').dataset.name;
+                        await handleHighlightEvent(eventId, eventName);
+                    });
+                });
             }
+
+            /**
+             * @brief Maneja la acción de destacar un evento (cambiando su estado de SolicitudDestacar a 'aprobado').
+             * @param {number} eventId - El ID del evento a destacar.
+             * @param {string} eventName - El nombre del evento para el mensaje de confirmación.
+             */
+            async function handleHighlightEvent(eventId, eventName) {
+                const confirmHighlight = await showAdminConfirmationModal(`¿Estás seguro de DESTACAR el evento "${eventName}" (ID: ${eventId})?`);
+
+                if (!confirmHighlight) {
+                    return; // Usuario canceló la acción
+                }
+
+                try {
+                    // Endpoint para destacar un evento. Este se encargaría de cambiar 'SolicitudDestacar' a 'aprobado'
+                    const response = await fetch(`${API_URL}/api/admin/eventos/${eventId}/destacar`, {
+                        method: 'PUT', // O POST, según cómo lo tengas en el backend
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showAdminMessageModal(data.message, 'success');
+                        fetchApprovedEvents(); // Recargar datos para ver el cambio de estado
+                    } else {
+                        showAdminMessageModal(`Error al destacar el evento: ${data.message || data.error || 'Error desconocido'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error(`Error al destacar el evento:`, error);
+                    showAdminMessageModal(`Error de conexión con el servidor al destacar evento.`, 'error');
+                }
+            }
+
 
             fetchApprovedEvents(); // Cargar eventos aprobados al cargar la página
         });
     </script>
-    <script>
-  function toggleDetalles(btn) {
-    const fila = btn.closest("tr").nextElementSibling;
-    fila.style.display = (fila.style.display === "none" || fila.style.display === "") ? "table-row" : "none";
-  }
-</script>
-
 </body>
 </html>
