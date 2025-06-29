@@ -2,112 +2,91 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teycketan</title>
     <link rel="stylesheet" href="principal.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
 </head>
 <body>
-<div class="fondo-overlay-extra"></div>
-<div class="fondo-overlay"></div>
+    <!-- Capas de fondo para un diseño más rico y un efecto visual atractivo -->
+    <div class="fondo-overlay-extra"></div>
+    <div class="fondo-overlay"></div>
 
     <main>
         <header class="encabezado">
-            <div class="logo"><img src="img/logo.png" alt="Logo"></div>
+            <div class="logo">
+                <img src="img/logo.png" alt="Logo de Teycketan">
+            </div>
             <nav>
+                <!-- Dropdown de Categorías -->
                 <div class="nav-box dropdown">
                     <button>Categorías</button>
                     <div class="dropdown-content">
-                        <a href="concierto.html">Conciertos</a>
-                        <a href="teatro.html">Teatro</a>
-                        <a href="deportes.html">Deportes</a>
+                        <!-- Rutas relativas desde la raíz (Fronted/) -->
+                        <a href="Cliente/concierto.html">Conciertos</a>
+                        <a href="Cliente/teatro.html">Teatro</a>
+                        <a href="Cliente/deportes.html">Deportes</a>
                     </div>
                 </div>
-                <div class="nav-box"><a href="login.html">Mi cuenta</a></div>
+                
+                <!-- Dropdown de Mi Cuenta (para manejar sesión) -->
+                <div class="nav-box dropdown" id="miCuentaContainer"> 
+                    <button id="miCuentaButton">Mi Cuenta</button>
+                    <div class="dropdown-content" id="miCuentaDropdownContent">
+                        <!-- Estos enlaces serán dinámicos según el estado de la sesión -->
+                        <a href="login.html" id="loginLink">Iniciar Sesión</a>
+                        <a href="registro.html" id="registerLink">Registrarse</a>
+                        <!-- Opciones para usuario logueado (añadidas por JS) -->
+                        <!-- <a href="Cliente/cliente.html" id="viewProfileLink">Ver Perfil</a> -->
+                        <!-- <a href="#" id="logoutLink">Cerrar Sesión</a> -->
+                    </div>
+                </div>
             </nav>
-        </header>>
-<section class="carrusel">
-    <div class="slide activo">
-        <div class="info">
-            <h2>Nombre del evento paga</h2>
-            <p><strong>categoria</strong>
-            <p>Especificacion del evento</p>
-            <p>fecha del evento</p>
-            <a href="detalles.html" class="btn-vermas">Ver más</a>
-        </div>
-        <img src="img/imagen.jpg" alt="Imgen de referencia del evento">
-    </div>
-    <div class="slide">
-        <div class="info">
-            <h2>nombre del evento paga 2</h2>
-            <p><strong>categoria</strong>
-            <p>especificacion del evento</p>
-            <p>fecha del evento</p>
-            <a href="detalles.html" class="btn-vermas">Ver más</a>
-        </div>
-        <img src="img/imagen.jpg" alt="Damiano 2">
-    </div>
-</section>
-<div class="contenido-principal-doscolumnas">
-    <section class="eventos contenedor-estilo">
-        <div class="eventos-grid">
-            <h3>Próximos eventos</h3>
-    <div class="eventos-grid">
-        <a href="detalles.html" target="_blank" class="evento-link">
-            <div class="evento">
-                <img src="img/imagen.jpg" alt="Imgen de evento">
-                <div class="evento-info">
-                    <h4>nombre del evento</h4>
-                    <p>Lugar del evento</p>
-                    <p>fecha del evento</p>
-                </div>
-            </div>
-        </a>
+        </header>
 
-        <a href="detalles.html" target="_blank" class="evento-link">
-            <div class="evento">
-                <img src="img/imagen.jpg" alt="iamgen de evento">
-                <div class="evento-info">
-                    <h4>nombre del evento</h4>
-                    <p>lugar del evento</p>
-                    <p>fecha del evento</p>
-                </div>
-            </div>
-        </a>
-    </div>
-        </div>
-    </section>
+        <!-- Sección del Carrusel (Eventos Destacados - Carga Dinámica) -->
+        <section class="carrusel" id="carrusel-eventos-destacados">
+            <!-- Los slides del carrusel se cargarán dinámicamente aquí -->
+            <p class="loading-carousel-message">Cargando eventos destacados...</p>
+        </section>
 
-    <aside class="destacados">
+        <div class="contenido-principal-doscolumnas">
+            <!-- Sección de Próximos Eventos (Carga Dinámica) -->
+            <section class="eventos contenedor-estilo">
+                <h3>Próximos eventos</h3>
+                <!-- Este div se llenará dinámicamente con los eventos desde el backend -->
+                <div class="eventos-grid" id="proximos-eventos-grid">
+                    <p class="loading-events-message">Cargando próximos eventos...</p>
+                </div>
+            </section>
+
+            <!-- Barra lateral de Ubicaciones Destacadas -->
+            <aside class="destacados contenedor-estilo">
                 <h3>Ubicaciones destacadas</h3>
                 <div class="circulos">
-                    <a href="sanmarcos.html" class="circulo">
-                        <img src="img/sanmarcos.png" alt="San Marcos">
+                    <!-- Rutas relativas desde la raíz (Fronted/) -->
+                    <a href="Cliente/sanmarcos.html" class="circulo">
+                        <img src="img/sanmarcos.png" alt="Estadio San Marcos">
                         <span>San Marcos</span>
                     </a>
-                    <a href="teatrocanut.html" class="circulo">
-                        <img src="img/teatrocanout.jpg" alt="Canut">
-                        <span>Parque de la exposicion</span>
+                    <a href="Cliente/teatrocanut.html" class="circulo">
+                        <img src="img/teatrocanout.jpg" alt="Teatro Canut">
+                        <span>Teatro Canut</span>
                     </a>
-                    <a href="teatronacional.html" class="circulo">
-                        <img src="img/teatronacional.jpg" alt="Nacional">
+                    <a href="Cliente/teatronacional.html" class="circulo">
+                        <img src="img/teatronacional.jpg" alt="Teatro Nacional">
                         <span>Teatro Nacional</span>
                     </a>
                 </div>
             </aside>
-</div>
-
-       
-
+        </div>
     </main>
- 
+
     <footer class="footer-completo">
         <div class="container-footer">
             <div class="footer-row">
-    
-                <!-- Redes sociales -->
                 <div class="footer-col">
                     <h4>Síguenos</h4>
                     <div class="social-links">
@@ -117,8 +96,6 @@
                         <a href="#"><i class="fab fa-linkedin"></i></a>
                     </div>
                 </div>
-    
-                <!-- Enlaces de compañía -->
                 <div class="footer-col">
                     <h4>Compañía</h4>
                     <ul>
@@ -128,8 +105,6 @@
                         <li><a href="#">Califícanos</a></li>
                     </ul>
                 </div>
-    
-                <!-- Ayuda -->
                 <div class="footer-col">
                     <h4>Ayuda</h4>
                     <ul>
@@ -137,45 +112,219 @@
                         <li><a href="#">Correo: Teycketan@gmail.com</a></li>
                     </ul>
                 </div>
-    
-                <!-- Métodos de pago -->
                 <div class="footer-col">
                     <h4>Métodos de pago</h4>
                     <div class="payment-methods">
-                        <img src="img/logo-yape.jpg" alt="Yape">
-                        <img src="img/logo-plin.jpg" alt="Plin">
+                        <!-- Rutas relativas desde la raíz (Fronted/) -->
+                        <img src="img/logo-yape.jpg" alt="Logo Yape">
+                        <img src="img/logo-plin.jpg" alt="Logo Plin">
                     </div>
                 </div>
             </div>
-            <!-- Derechos de autor -->
             <div class="footer-bottom">
                 <small>&copy; 2024 <b>SLee Dw</b> - Todos los Derechos Reservados.</small>
             </div>
         </div>
-    <img src="img/logo.png" alt="Logo Footer" class="logo-footer"/>
-  </footer>
+        <!-- Ruta relativa desde la raíz (Fronted/) -->
+        <img src="img/logo.png" alt="Logo Teycketan" class="logo-footer"/>
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta para tu backend
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const miCuentaContainer = document.getElementById('miCuentaContainer');
+            const miCuentaButton = document.getElementById('miCuentaButton');
+            const miCuentaDropdownContent = document.getElementById('miCuentaDropdownContent');
+
+            const carruselEventosDestacados = document.getElementById('carrusel-eventos-destacados');
+            const proximosEventosGrid = document.getElementById('proximos-eventos-grid');
+
+            // --- Lógica de Manejo de Sesión y Redirección ---
+            const token = localStorage.getItem('jwtToken');
+            const userName = localStorage.getItem('userName');
+            const userRole = localStorage.getItem('userRole');
+
+            if (token && userName && userRole) {
+                // Usuario logueado: Actualizar "Mi cuenta" y redirigir
+                miCuentaButton.textContent = `Hola, ${userName}`;
+                miCuentaDropdownContent.innerHTML = `
+                    <a href="Cliente/cliente.html" id="viewProfileLink">Ver Perfil</a>
+                    <a href="#" id="logoutLink">Cerrar Sesión</a>
+                `;
+
+                // Añadir listener para cerrar sesión
+                document.getElementById('logoutLink').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('jwtToken');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userEmail');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('userId'); 
+                    window.location.reload(); // Recargar la página para reflejar el estado de no logueado
+                });
+
+                // Si está en principal.html y ya está logueado, redirigir a cliente.html
+                window.location.replace('Cliente/cliente.html'); 
+                return; // Detener la ejecución del script aquí después de la redirección
+            } else {
+                // Usuario no logueado: Asegurarse de que los enlaces de login/registro estén visibles
+                miCuentaButton.textContent = 'Mi Cuenta';
+                miCuentaDropdownContent.innerHTML = `
+                    <a href="login.html" id="loginLink">Iniciar Sesión</a>
+                    <a href="registro.html" id="registerLink">Registrarse</a>
+                `;
+            }
+
+            // --- Lógica para Cargar y Renderizar Eventos Destacados (Carrusel) ---
+            async function fetchFeaturedEvents() {
+                carruselEventosDestacados.innerHTML = '<p class="loading-carousel-message">Cargando eventos destacados...</p>';
+                try {
+                    const response = await fetch(`${API_URL}/api/eventos/destacados`);
+                    const events = await response.json();
+
+                    if (response.ok) {
+                        if (events.length === 0) {
+                            carruselEventosDestacados.innerHTML = '<p class="no-events-found-message">No hay eventos destacados por el momento.</p>';
+                        } else {
+                            renderFeaturedEvents(events);
+                            initCarousel(); // Inicializar carrusel después de renderizar
+                        }
+                    } else {
+                        carruselEventosDestacados.innerHTML = `<p class="error-message">Error al cargar eventos destacados: ${events.message || 'Error desconocido'}</p>`;
+                        console.error('Error fetching featured events:', events);
+                    }
+                }
+                catch (error) {
+                    carruselEventosDestacados.innerHTML = '<p class="error-message">Error de conexión con el servidor. No se pueden cargar los eventos destacados.</p>';
+                    console.error('Network error fetching featured events:', error);
+                }
+            }
+
+            /**
+             * @brief Renderiza los eventos destacados en el carrusel.
+             * @param {Array<Object>} events - Un array de objetos de eventos.
+             */
+            function renderFeaturedEvents(events) {
+                let carouselHtml = '';
+                events.forEach((event, index) => {
+                    const formattedDate = new Date(event.Fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
+                    // Construye la URL de la imagen. Usa una imagen de placeholder si no hay URL_Imagen.
+                    // Asume que URL_Imagen es una ruta relativa que debe ser prefijada por API_URL
+                    const imageUrl = event.URL_Imagen ? `${API_URL}${event.URL_Imagen}` : 'https://placehold.co/800x450/cccccc/000000?text=No+Img';
+
+                    carouselHtml += `
+                        <div class="slide ${index === 0 ? 'activo' : ''}">
+                            <div class="info">
+                                <h2>${event.Nom_Evento}</h2>
+                                <p><strong>${event.Categoria || 'Categoría'}</strong> / Presencial</p>
+                                <p>${event.Descripcion || 'Especificación del evento'}</p>
+                                <p>${formattedDate}</p>
+                                <a href="detalles.html?eventId=${event.Id_Evento}" class="btn-vermas">Ver más</a>
+                            </div>
+                            <img src="${imageUrl}" alt="${event.Nom_Evento}">
+                        </div>
+                    `;
+                });
+                carruselEventosDestacados.innerHTML = carouselHtml;
+            }
+
+            /**
+             * @brief Inicializa la lógica del carrusel una vez que los slides han sido renderizados.
+             */
+            function initCarousel() {
+                let slideIndex = 0;
+                const slides = document.querySelectorAll('.carrusel .slide');
+
+                if (slides.length === 0) {
+                    return; // No hay slides para inicializar
+                }
+
+                // Asegurarse de que solo el primer slide esté activo inicialmente
+                slides.forEach((slide, i) => {
+                    if (i === 0) {
+                        slide.classList.add('activo');
+                        slide.style.left = '0';
+                    } else {
+                        slide.classList.remove('activo');
+                        slide.style.left = '100%';
+                    }
+                });
+
+                function showNextSlide() {
+                    slides[slideIndex].classList.remove('activo');
+                    slides[slideIndex].style.left = '-100%'; // Mover el slide saliente a la izquierda
+                    
+                    slideIndex = (slideIndex + 1) % slides.length;
+                    
+                    slides[slideIndex].classList.add('activo');
+                    slides[slideIndex].style.left = '0'; // Mover el nuevo slide a la posición central
+                }
+
+                // Iniciar carrusel solo si hay más de un slide
+                if (slides.length > 1) {
+                    setInterval(showNextSlide, 10000); // Cambiar slide cada 10 segundos
+                }
+            }
+
+            // --- Lógica para Cargar y Renderizar Próximos Eventos ---
+            async function fetchApprovedEvents() {
+                proximosEventosGrid.innerHTML = '<p class="loading-events-message">Cargando próximos eventos...</p>';
+                try {
+                    const response = await fetch(`${API_URL}/api/eventos/aprobados-para-cliente`);
+                    const events = await response.json();
+
+                    if (response.ok) {
+                        if (events.length === 0) {
+                            proximosEventosGrid.innerHTML = '<p class="no-events-found-message">No hay eventos disponibles en este momento. ¡Vuelve pronto!</p>';
+                        } else {
+                            renderEvents(events); // Llama a la función para renderizar los eventos
+                        }
+                    } else {
+                        // Manejo de errores si la respuesta de la API no es exitosa
+                        proximosEventosGrid.innerHTML = `<p class="error-message">Error al cargar eventos: ${events.message || 'Error desconocido'}</p>`;
+                        console.error('Error fetching approved events:', events);
+                    }
+                }
+                catch (error) {
+                    // Manejo de errores de red o conexión
+                    proximosEventosGrid.innerHTML = '<p class="error-message">Error de conexión con el servidor. No se pudieron cargar los eventos.</p>';
+                    console.error('Network error fetching approved events:', error);
+                }
+            }
+
+            /**
+             * @brief Renderiza una lista de eventos en el grid 'proximos-eventos-grid'.
+             * @param {Array<Object>} events - Un array de objetos de evento.
+             */
+            function renderEvents(events) {
+                let eventsHtml = '';
+                events.forEach(event => {
+                    // Formatea la fecha a un formato legible en español
+                    const formattedDate = new Date(event.Fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
+                    // Construye la URL de la imagen. Usa una imagen de placeholder si no hay URL_Imagen.
+                    const imageUrl = event.URL_Imagen ? `${API_URL}${event.URL_Imagen}` : 'https://placehold.co/150x100/cccccc/000000?text=No+Img';
+
+                    eventsHtml += `
+                        <a href="detalles.html?eventId=${event.Id_Evento}" target="_blank" class="evento-link">
+                            <div class="evento">
+                                <img src="${imageUrl}" alt="${event.Nom_Evento}">
+                                <div class="evento-info">
+                                    <h4>${event.Nom_Evento}</h4>
+                                    <p>${event.Ubicacion}</p>
+                                    <p>${formattedDate}</p>
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                });
+                proximosEventosGrid.innerHTML = eventsHtml; // Inserta el HTML generado en el grid
+            }
+
+            // Iniciar la carga de eventos destacados y aprobados al cargar la página
+            fetchFeaturedEvents();
+            fetchApprovedEvents();
+        });
+    </script>
 </body>
-<script>
-  let index = 0;
-  const slides = document.querySelectorAll('.slide');
-
-  function mostrarSiguienteSlide() {
-    slides.forEach((slide, i) => {
-      slide.classList.remove('activo');
-      slide.style.left = '100%';
-    });
-
-    index = (index + 1) % slides.length;
-    slides[index].classList.add('activo');
-    slides[index].style.left = '0';
-  }
-
-  // Inicia el primer slide visible
-  slides[0].classList.add('activo');
-  slides[0].style.left = '0';
-
-  setInterval(mostrarSiguienteSlide, 10000);
-</script>
-
 </html>
-

@@ -1,0 +1,820 @@
+/* Importación de fuentes de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap');
+
+/* Estilos generales para el documento */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    font-family: 'Poppins', sans-serif; /* Usamos Poppins como fuente principal para el cuerpo */
+    background-color: #000; /* Fondo base negro */
+    color: #eee; /* Color de texto general */
+    overflow-x: hidden; /* Previene el scroll horizontal */
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    /* Configuración de la imagen de fondo principal con no-repeat y attachment fijo */
+    background: url("../img/fmetal.jpg") no-repeat center center fixed; /* Ruta relativa desde 'Fronted/Cliente/' */
+    background-size: cover;
+    position: relative;
+    z-index: 1; /* Asegura que el contenido del body esté sobre los overlays */
+}
+
+h1, h2, h3, h4 {
+    font-family: 'Orbitron', sans-serif; /* Orbitron para los títulos */
+    color: #ff3333; /* Rojo brillante para los títulos */
+}
+
+/* --- CAPAS DE FONDO --- */
+/* Esta capa añade una textura o patrón de fondo que se repite */
+.fondo-overlay-extra {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("../img/fondodetalles.jpg") repeat; /* Ruta relativa desde 'Fronted/Cliente/' */
+    opacity: 0.5; /* Ligeramente transparente para que se vea el fondo principal */
+    z-index: -2; /* Se coloca detrás de la capa de overlay principal */
+    pointer-events: none; /* No interactúa con el cursor */
+}
+
+/* Esta capa es un overlay oscuro semi-transparente sobre la imagen de fondo principal */
+.fondo-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4); /* Capa oscura semi-transparente */
+    z-index: -1; /* Se coloca entre la imagen de fondo principal y el contenido */
+    pointer-events: none; /* No interactúa con el cursor */
+}
+
+/* --- ENCABEZADO ---*/
+header.encabezado {
+    background-color: #4c0000; /* Rojo oscuro como base del encabezado */
+    border-bottom: 4px solid #b30000; /* Borde inferior más oscuro */
+    padding: 10px 30px;
+    display: flex;
+    justify-content: flex-start; /* Alinea los elementos a la izquierda */
+    align-items: center;
+    height: 70px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 100; /* Siempre visible por encima de otros elementos */
+    backdrop-filter: blur(6px); /* Efecto de desenfoque detrás del encabezado */
+    transition: all 0.3s ease-in-out;
+    gap: 30px; /* Espacio entre el logo y los pasos */
+}
+
+.encabezado .barra-logo img.logo {
+    height: 48px; /* Ajusta el tamaño del logo en el encabezado */
+}
+
+.encabezado .barra-pasos {
+    display: flex;
+    align-items: center;
+}
+
+.encabezado .barra-pasos .paso {
+    color: #fff; /* Color blanco para el texto del paso */
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    font-size: 1rem;
+    padding: 8px 15px;
+    border-radius: 8px;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.encabezado .barra-pasos .paso:hover {
+    background-color: rgba(255, 0, 0, 0.2); /* Efecto hover para el fondo del paso */
+}
+
+.encabezado .barra-pasos .paso.activo {
+    background-color: #ff3333; /* Fondo rojo brillante para el paso activo */
+    box-shadow: 0 0 10px rgba(255, 51, 51, 0.5); /* Sombra brillante */
+    color: #fff;
+}
+
+.encabezado .barra-pasos .no-subrayado {
+    text-decoration: none; /* Asegura que no haya subrayado en este enlace */
+}
+
+/* --- CONTENIDO PRINCIPAL (Sección principal que envuelve las secciones) --- */
+.main-content {
+    flex: 1;
+    position: relative;
+    z-index: 2;
+    padding: 20px;
+    max-width: 1200px; /* Ancho máximo para el contenido principal */
+    margin: 90px auto 20px auto; /* Margen superior para el header fijo, centrado horizontalmente */
+}
+
+/* Estilos para mensajes de carga, error, sin datos */
+.loading-message, .error-message, .no-data-message {
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+    color: #f5f5f5;
+    background-color: rgba(10, 10, 10, 0.9);
+    border-radius: 8px;
+    margin-top: 20px;
+    border: 1px solid #ff3333;
+    box-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
+}
+
+.error-message {
+    color: #dc3545; /* Rojo para mensajes de error */
+    font-weight: bold;
+}
+
+/* --- SECCIÓN PRECIOS --- */
+.precios {
+    padding: 0; /* Elimina el padding de la sección precios */
+    margin: 0; /* Elimina el margen de la sección precios */
+}
+
+.precios-box {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap; /* Permite que los lados se apilen en pantallas pequeñas */
+    width: 100%;
+    min-height: 500px; /* Altura mínima para asegurar que se vea bien */
+    overflow: hidden;
+    background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(20,20,20,1));
+    z-index: 0;
+    border-radius: 15px; /* Bordes redondeados para la caja principal */
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); /* Sombra destacada */
+}
+
+.precios-box::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 80px; /* Altura del degradado inferior */
+    background: linear-gradient(to top, #0c0c0c, transparent); /* Degradado oscuro hacia arriba */
+    z-index: 2; /* Por encima de la imagen, pero debajo del contenido principal */
+    pointer-events: none;
+}
+
+.lado-imagen {
+    position: relative;
+    flex: 1; /* Ocupa el espacio disponible */
+    min-width: 300px; /* Ancho mínimo para la imagen */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.2); /* Fondo de fallback */
+}
+
+.lado-imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* La imagen cubrirá el área, puede recortarse */
+    display: block;
+    border-radius: 12px; /* Bordes redondeados para la imagen */
+}
+
+.lado-imagen::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0; 
+    width: 80%; /* Ancho del degradado lateral */
+    height: 100%;
+    background: linear-gradient(to left, rgba(20, 20, 20, 0.95), rgba(0, 0, 0, 0)); /* Degradado de derecha a izquierda */
+    z-index: 1; /* Por encima de la imagen */
+    pointer-events: none;
+}
+
+.lado-precios {
+    flex: 1; /* Ocupa el espacio disponible */
+    min-width: 320px; /* Ancho mínimo para la sección de precios */
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.4); /* Fondo semi-transparente para la información de precios */
+    backdrop-filter: blur(4px); /* Efecto de desenfoque */
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    box-shadow: inset 5px 0 10px rgba(255, 0, 0, 0.1); /* Sombra interna para separar visualmente */
+}
+
+.lado-precios .event-title {
+    font-size: 2.2rem; /* Título del evento */
+    color: #ffcc00; /* Dorado para el título */
+    margin-bottom: 10px;
+    text-align: center;
+    text-shadow: 0 0 8px rgba(255, 204, 0, 0.5);
+}
+
+.lado-precios .event-subtitle,
+.lado-precios .event-date {
+    font-size: 1.1rem;
+    color: #ccc;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.mapa-mini {
+    max-height: 250px; /* Altura máxima para el mapa */
+    width: 100%;
+    height: auto; 
+    object-fit: contain; /* Ajusta el mapa sin recortar */
+    display: block;
+    margin: 0 auto 1.5rem auto; /* Centra el mapa */
+    border-radius: 8px;
+    border: 1px solid #5c0d0d;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+}
+
+.tabla-precios {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 8px;
+    overflow: hidden; /* Para que los bordes redondeados se apliquen al contenido */
+    border: 1px solid #ff3333; /* Borde rojo para la tabla */
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+}
+
+.tabla-precios .fila {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columnas para Zona, Regular, Conadis, Preventa */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px 5px;
+    align-items: center;
+}
+
+.tabla-precios .fila:last-child {
+    border-bottom: none;
+}
+
+.tabla-precios .fila div {
+    text-align: center;
+    padding: 5px;
+    color: #f0f0f0;
+}
+
+.tabla-precios .tabla-encabezado {
+    background-color: #330000; /* Fondo más oscuro para el encabezado de la tabla */
+    font-weight: bold;
+    color: #ff3333;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tabla-precios .fila:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.2); /* Fondo rayado para filas pares */
+}
+
+.btn-comprar {
+    display: block;
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(90deg, #ff3333, #e60000); /* Degradado rojo para el botón */
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 1.4rem;
+    font-weight: bold;
+    border-radius: 10px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    margin-top: 25px;
+    box-shadow: 0 0 15px rgba(255, 51, 51, 0.6); /* Sombra intensa */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    animation: shimmer 3s infinite linear; /* Añadida animación */
+}
+
+@keyframes shimmer {
+    0% { box-shadow: 0 0 5px #f00; }
+    50% { box-shadow: 0 0 15px #f00; }
+    100% { box-shadow: 0 0 5px #f00; }
+}
+
+.btn-comprar:hover {
+    background: linear-gradient(90deg, #e60000, #b30000);
+    box-shadow: 0 0 20px rgba(255, 51, 51, 0.9);
+    transform: translateY(-3px); /* Efecto de elevación */
+}
+
+.nota-conadis {
+    font-size: 0.85rem;
+    color: #ccc;
+    margin-top: 10px;
+    text-align: center;
+    line-height: 1.4;
+}
+
+/* --- SECCIÓN HISTORIA/DESCRIPCIÓN --- */
+.historia {
+    display: flex;
+    justify-content: center;
+    margin: 30px auto; /* Centrado y margen */
+    padding: 0 20px; /* Padding lateral */
+}
+
+.historia-box {
+    width: 100%;
+    max-width: 1000px; /* Ancho máximo */
+    min-height: 400px; /* Altura mínima para la caja de historia */
+    background-image: url("https://placehold.co/1000x400/333333/FFFFFF?text=Imagen+de+Fondo+Historia"); /* Placeholder para la imagen de fondo */
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    border: 2px solid #5c0d0d;
+    overflow: hidden;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+    display: flex; /* Para centrar el overlay */
+    align-items: center;
+    justify-content: center;
+}
+
+.historia-overlay {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7); /* Overlay más oscuro para el texto */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    border-radius: 15px; /* Hereda el borde de la caja */
+}
+
+.historia-contenido {
+    color: #fff;
+    font-size: 1.2rem;
+    max-width: 800px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.5); /* Fondo para el contenido de texto */
+    padding: 1.5rem;
+    border: 1px solid #ffcc00; /* Borde dorado */
+    backdrop-filter: blur(4px);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
+}
+
+.historia-contenido .section-title {
+    font-size: 2rem;
+    color: #ffcc00; /* Título dorado */
+    margin-bottom: 15px;
+    text-shadow: 0 0 8px rgba(255, 204, 0, 0.5);
+}
+
+.historia-contenido p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #f0f0f0;
+}
+
+/* --- REGLAS DEL EVENTO --- */
+.reglas {
+    padding: 30px 20px; /* Padding para la sección */
+    display: flex;
+    justify-content: center;
+    margin: 30px auto; /* Centrado y margen */
+}
+
+.reglas-box {
+    background-color: rgba(50, 0, 0, 0.7); /* Fondo semi-transparente */
+    width: 100%;
+    max-width: 900px; /* Ancho máximo */
+    padding: 2rem;
+    border: 2px solid #5c0d0d;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+}
+
+.reglas-box h2 {
+    font-size: 2rem;
+    color: #ffcc00; /* Título dorado */
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: 0 0 8px rgba(255, 204, 0, 0.5);
+}
+
+.reglas-box ul {
+    list-style: none; /* Eliminar viñetas predeterminadas */
+    padding: 0;
+}
+
+.reglas-box li {
+    font-size: 1.1rem;
+    color: #f0f0f0;
+    margin-bottom: 12px;
+    padding-left: 40px; /* Espacio para el icono personalizado */
+    position: relative;
+    line-height: 1.5;
+}
+
+.reglas-box li::before {
+    content: "\f06a"; /* Icono de exclamación de Font Awesome (fa-exclamation-triangle) */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    color: #ff3333; /* Color rojo brillante para el icono */
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 1.3em;
+}
+
+/* Degradados para secciones (para transiciones visuales entre secciones) */
+.degradado-top {
+    height: 50px;
+    background: linear-gradient(to top, rgba(50, 0, 0, 0.7), transparent);
+    width: 100%;
+    margin-top: -50px; /* Superponer ligeramente la sección anterior */
+    position: relative;
+    z-index: 0; /* Asegura que esté detrás del contenido principal */
+}
+
+.degradado-bottom {
+    height: 50px;
+    background: linear-gradient(to bottom, rgba(50, 0, 0, 0.7), transparent);
+    width: 100%;
+    margin-bottom: -50px; /* Superponer ligeramente la sección siguiente */
+    position: relative;
+    z-index: 0;
+}
+.reglas-gradiente { /* Para el degradado específico encima de las reglas */
+    background: linear-gradient(to top, transparent, rgba(50, 0, 0, 0.7)); /* Cambiado a top para que el oscuro esté arriba */
+}
+
+
+/* --- PIE DE PÁGINA (FOOTER) --- */
+.footer-completo {
+    width: 100%;
+    background: radial-gradient(circle at center, #1a1a1a 0%, #0d0d0d 100%);
+    color: #ccc;
+    padding: 60px 0 30px 0; /* Ajustado el padding */
+    font-family: 'Poppins', sans-serif;
+    border-top: 2px solid #520000; /* Borde superior más grueso */
+    box-shadow: 0 -4px 15px rgba(255, 0, 0, 0.3); /* Sombra temática */
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px; /* Margen superior para separarlo del contenido */
+}
+
+.container-footer { /* Este parece ser el contenedor interno del footer */
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.footer-col {
+    flex: 1 1 200px; /* Permite que las columnas se ajusten y crezcan */
+    min-width: 180px; /* Ancho mínimo para las columnas del footer */
+    text-align: left;
+}
+
+.footer-col h4 {
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: #fff; /* Color blanco para los títulos del footer */
+    border-bottom: 2px solid #ff3333; /* Borde rojo para los títulos */
+    display: inline-block;
+    padding-bottom: 8px;
+}
+
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-col ul li a {
+    color: #ccc; /* Color de texto para los enlaces */
+    text-decoration: none;
+    margin-bottom: 10px;
+    display: block;
+    transition: 0.3s ease;
+}
+
+.footer-col ul li a:hover {
+    padding-left: 6px;
+    color: #ffcc00; /* Dorado en hover */
+}
+
+.social-links a {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1); /* Fondo semi-transparente */
+    color: white;
+    line-height: 40px; /* Centra el icono verticalmente */
+    text-align: center;
+    margin-right: 10px;
+    border-radius: 50%;
+    transition: 0.3s ease;
+}
+.social-links a:hover {
+    background: #ff3333; /* Rojo en hover */
+    transform: scale(1.1);
+}
+
+
+.payment-methods img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+    transition: transform 0.3s ease;
+    border: 1px solid #555; /* Borde sutil para imágenes de pago */
+}
+
+.payment-methods img:hover {
+    transform: scale(1.1);
+}
+
+.logo-footer { /* Logo al final del footer */
+    height: 50px; /* Ajusta la altura */
+    max-width: 200px;
+    object-fit: contain;
+    margin-top: 20px;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3)); /* Sombra para el logo */
+}
+
+.footer-bottom { /* Derechos de autor */
+    width: 100%;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 15px;
+    font-size: 0.85em; /* Tamaño de fuente razonable */
+    color: #aaa;
+}
+.footer-bottom small {
+    font-size: 1em;
+    color: inherit;
+}
+
+/* --- ESTILOS DEL MODAL PERSONALIZADO --- */
+.client-modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 200; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.7); /* Black w/ opacity */
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+}
+
+.client-modal-content {
+    background-color: #1a1a1a;
+    margin: auto;
+    padding: 30px;
+    border: 2px solid #ff3333;
+    border-radius: 15px;
+    width: 80%;
+    max-width: 500px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(255, 51, 51, 0.5);
+    animation: fadeInScale 0.3s ease-out; /* Animación de aparición */
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.client-close-button {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.client-close-button:hover,
+.client-close-button:focus {
+    color: #ff3333;
+    text-decoration: none;
+}
+
+.client-message-text {
+    font-size: 1.2em;
+    margin-bottom: 25px;
+    color: #f0f0f0;
+}
+
+.client-message-info {
+    color: #f0f0f0;
+}
+.client-message-success {
+    color: #4CAF50; /* Verde */
+}
+.client-message-error {
+    color: #f44336; /* Rojo */
+}
+
+.client-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.client-modal-btn {
+    background-color: #ff3333;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.client-modal-btn:hover {
+    background-color: #e60000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(255, 51, 51, 0.4);
+}
+
+.client-modal-confirm {
+    background-color: #4CAF50; /* Verde para confirmación */
+}
+.client-modal-confirm:hover {
+    background-color: #45a049;
+    box-shadow: 0 4px 10px rgba(76, 175, 80, 0.4);
+}
+
+.client-modal-cancel {
+    background-color: #555; /* Gris para cancelar */
+}
+.client-modal-cancel:hover {
+    background-color: #777;
+    box-shadow: 0 4px 10px rgba(85, 85, 85, 0.4);
+}
+
+
+/* --- MEDIA QUERIES (DISEÑO RESPONSIVO) --- */
+@media (max-width: 1024px) {
+    .precios-box {
+        flex-direction: column; /* Apila la imagen y los precios */
+        align-items: center;
+    }
+    .lado-imagen, .lado-precios {
+        flex: auto; /* Ocupan todo el ancho */
+        width: 100%;
+        max-width: 500px; /* Limita el ancho en pantallas medianas */
+        border-radius: 15px; /* Asegura los bordes redondeados al apilar */
+    }
+    .lado-imagen img {
+        max-height: 350px;
+    }
+    .main-content {
+        padding: 15px;
+    }
+    .historia-box {
+        min-height: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    header.encabezado {
+        flex-direction: column; /* La navegación se apila */
+        height: auto;
+        padding: 10px;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .barra-logo {
+        width: 100%;
+        text-align: center;
+    }
+    .barra-pasos {
+        width: 100%;
+        justify-content: center;
+        display: flex;
+    }
+    .barra-pasos .paso {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+    }
+
+    .precios, .historia, .reglas {
+        padding: 20px;
+    }
+    .lado-precios .event-title {
+        font-size: 1.8rem;
+    }
+    .lado-precios .event-subtitle,
+    .lado-precios .event-date {
+        font-size: 1rem;
+    }
+    .tabla-precios .fila div {
+        font-size: 0.9em;
+        padding: 3px;
+    }
+    .btn-comprar {
+        font-size: 1rem;
+        padding: 12px;
+    }
+    .historia-contenido .section-title, .reglas-box h2 {
+        font-size: 1.8rem;
+    }
+    .historia-contenido p, .reglas-box ul li {
+        font-size: 1em;
+    }
+    .reglas-box ul li::before {
+        font-size: 0.9em;
+    }
+    .client-modal-content {
+        width: 90%;
+        padding: 20px;
+    }
+    .historia-box {
+        min-height: 250px; /* Reducir altura en móviles */
+    }
+}
+
+@media (max-width: 480px) {
+    header.encabezado {
+        padding: 8px 10px;
+    }
+    .barra-logo img.logo {
+        height: 40px;
+    }
+    .lado-imagen img {
+        max-height: 250px;
+    }
+    .lado-precios .event-title {
+        font-size: 1.5rem;
+    }
+    .lado-precios .event-subtitle,
+    .lado-precios .event-date {
+        font-size: 0.9rem;
+    }
+    .tabla-precios .fila {
+        grid-template-columns: 1fr 1fr; /* 2 columnas en móviles pequeños */
+        gap: 5px;
+        padding: 8px 0;
+    }
+    .tabla-precios .fila div {
+        font-size: 0.8em;
+    }
+    .btn-comprar {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+    .historia-contenido .section-title, .reglas-box h2 {
+        font-size: 1.5rem;
+    }
+    .historia-contenido p, .reglas-box ul li {
+        font-size: 0.9em;
+        padding-left: 25px;
+    }
+    .reglas-box ul li::before {
+        font-size: 0.9em;
+    }
+    .client-modal-btn {
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+    .historia-overlay {
+        padding: 1rem;
+    }
+}
