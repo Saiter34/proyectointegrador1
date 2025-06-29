@@ -22,6 +22,7 @@
             <li><a href="aprobados.html" class="admin-nav-item"><i class="fas fa-user-check"></i><span>Proveedores aprobados</span></a></li>
             <li><a href="eventos.html" class="admin-nav-item"><i class="fas fa-tasks"></i><span>Solicitud de eventos</span></a></li>
             <li><a href="eventoApro.html" class="admin-nav-item active"><i class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
+            <li><a href="categorias.html" class="admin-nav-item"><i class="fas fa-tags"></i><span>Eventos por categorias</span></a></li>
         </ul>
     </div>
 
@@ -56,6 +57,7 @@
             
             <div class="admin-tabla-contenedor">
                 <table class="admin-table">
+                 <table class="admin-table">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -71,6 +73,14 @@
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
+                        <tr class="admin-detalles-row" style="display: none;">
+                            <td colspan="12">
+                                <div class="admin-detalles-box">
+                                    <p>Entradas vendidas</p>
+                                </div>
+                            </td>
+                        </tr>
+
                     </thead>
                     <tbody id="approvedEventsListBody">
                         <!-- Los eventos aprobados se cargarán aquí dinámicamente -->
@@ -173,7 +183,7 @@
                 };
             }
 
-            // --- Lógica de Autenticación al cargar la página ---
+    /*        // --- Lógica de Autenticación al cargar la página ---
             const token = localStorage.getItem('jwtToken');
             const userRole = localStorage.getItem('userRole');
 
@@ -188,7 +198,7 @@
                     window.location.replace('../login.html'); 
                 }, 2000); 
                 return; 
-            }
+            }*/
 
             // --- Event Listener para Cerrar Sesión ---
             adminLogoutButton.addEventListener('click', async () => {
@@ -345,6 +355,7 @@
                             <td data-label="Estado">${event.Estado}</td>
                             <td class="admin-actions-cell">
                                 <button class="admin-btn-details" data-id="${event.Id_Evento}" data-name="${event.Nom_Evento}"><i class="fas fa-info-circle"></i> Detalles</button>
+                                <button class="admin-btn-hightlight" data-id="${event.Id_Evento}" data-name="${event.Nom_Evento}"><i class="fas fa-info-star"></i> Destacar</button>
                                 <button class="admin-btn-delete" data-id="${event.Id_Evento}" data-name="${event.Nom_Evento}"><i class="fas fa-trash-alt"></i> Eliminar</button>
                             </td>
                         </tr>
@@ -372,5 +383,12 @@
             fetchApprovedEvents(); // Cargar eventos aprobados al cargar la página
         });
     </script>
+    <script>
+  function toggleDetalles(btn) {
+    const fila = btn.closest("tr").nextElementSibling;
+    fila.style.display = (fila.style.display === "none" || fila.style.display === "") ? "table-row" : "none";
+  }
+</script>
+
 </body>
 </html>

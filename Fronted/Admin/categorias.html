@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proveedores Aprobados - TEYCKETAN</title>
+    <!-- Usar el nuevo archivo CSS del panel de administración -->
+    <link rel="stylesheet" href="admin.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- SIDEBAR - Reutilizando la estructura del admin.html -->
+    <div class="admin-sidebar">
+        <div class="admin-barra-logo">
+            <!-- RUTA CORREGIDA: Acceso absoluto desde la raíz del servidor estático -->
+            <img src="../img/logo.png" alt="Logo Teycketan" class="admin-logo-img" />
+        </div>
+        <ul class="admin-nav-list">
+            <li><a href="admin.html" class="admin-nav-item"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
+            <li><a href="solicitud.html" class="admin-nav-item"><i class="fas fa-user-clock"></i><span>Solicitud de proveedores</span></a></li>
+            <li><a href="aprobados.html" class="admin-nav-item"><i class="fas fa-user-check"></i><span>Proveedores aprobados</span></a></li>
+            <li><a href="eventos.html" class="admin-nav-item"><i class="fas fa-tasks"></i><span>Solicitud de eventos</span></a></li>
+            <li><a href="eventoApro.html" class="admin-nav-item"><i class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
+            <li><a href="categorias.html" class="admin-nav-item active"><i class="fas fa-tags"></i><span>Eventos por categorias</span></a></li>
+        </ul>
+    </div>
+    
+    <!-- MAIN CONTENT - Reutilizando la estructura del admin.html -->
+    <div class="admin-main-content">
+        <header class="admin-topbar">
+            <h1 class="admin-titulo-seccion">Eventos por categorias</h1>
+            <div class="admin-acciones">
+                <div class="admin-notif-wrapper">
+                    <button class="admin-notif-btn" id="adminNotifToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="admin-notif-dot"></span>
+                    </button>
+                    <div class="admin-notif-dropdown" id="adminNotifDropdown">
+                        <p class="admin-notif-title">Notificaciones</p>
+                        <ul>
+                            <li>Evento “Damiano David” fue aprobado</li>
+                            <li>Nuevo mensaje del soporte</li>
+                            <li>Revisa los detalles del evento</li>
+                        </ul>
+                    </div>
+                </div>
+                <button id="adminLogoutButton" class="admin-btn-logout">Cerrar Sesión</button>
+            </div>
+        </header>
+       <section class="admin-contenido">
+  <div class="admin-bienvenida">Haz clic en una categoría para ver sus eventos.</div>
+
+  <div class="admin-categorias-acordeon">
+
+    <!-- Categorias-->
+    <div class="admin-categoria-item">
+      <button class="admin-categoria-titulo">Conciertos</button>
+      <div class="admin-categoria-contenido">
+        <ul>
+          <li>Damiano David - En Vivo</li>
+        </ul>
+      </div>
+    </div>
+    <div class="admin-categoria-item">
+      <button class="admin-categoria-titulo">Teatro</button>
+      <div class="admin-categoria-contenido">
+        <ul>
+          <li>teatro</li>
+        </ul>
+      </div>
+    </div>
+    <div class="admin-categoria-item">
+      <button class="admin-categoria-titulo">Deportes</button>
+      <div class="admin-categoria-contenido">
+        <ul>
+          <li>deportes</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+<script>
+  document.querySelectorAll('.admin-categoria-titulo').forEach(boton => {
+    boton.addEventListener('click', () => {
+      const contenido = boton.nextElementSibling;
+
+      // Cerrar otros
+      document.querySelectorAll('.admin-categoria-contenido').forEach(box => {
+        if (box !== contenido) box.style.display = 'none';
+      });
+
+      // Alternar el actual
+      contenido.style.display = (contenido.style.display === 'block') ? 'none' : 'block';
+    });
+  });
+</script>

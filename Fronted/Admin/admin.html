@@ -17,13 +17,13 @@
             <!-- RUTA CORREGIDA: Acceso absoluto desde la raíz del servidor estático -->
             <img src="../img/logo.png" alt="Logo Teycketan" class="admin-logo-img" />
         </div>
-
         <ul class="admin-nav-list">
             <li><a href="admin.html" class="admin-nav-item active"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
             <li><a href="solicitud.html" class="admin-nav-item"><i class="fas fa-user-clock"></i><span>Solicitud de proveedores</span></a></li>
             <li><a href="aprobados.html" class="admin-nav-item"><i class="fas fa-user-check"></i><span>Proveedores aprobados</span></a></li>
             <li><a href="eventos.html" class="admin-nav-item"><i class="fas fa-tasks"></i><span>Solicitud de eventos</span></a></li>
             <li><a href="eventoApro.html" class="admin-nav-item"><i class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
+            <li><a href="categorias.html" class="admin-nav-item"><i class="fas fa-tags"></i><span>Eventos por categorias</span></a></li>
         </ul>
     </div>
 
@@ -135,7 +135,7 @@
                     adminMessageModal.style.display = 'none';
                 };
             }
-
+/*
             // --- Lógica de Autenticación al cargar la página ---
             const token = localStorage.getItem('jwtToken');
             const userRole = localStorage.getItem('userRole');
@@ -152,8 +152,7 @@
                     window.location.replace('../login.html'); 
                 }, 2000); // Dar 2 segundos para leer el mensaje
                 return; // Detiene la ejecución del script
-            }
-
+            }*/
             // --- Event Listener para Cerrar Sesión ---
             adminLogoutButton.addEventListener('click', async () => {
                 const confirmLogout = await showAdminConfirmationModal('¿Estás seguro de que quieres cerrar sesión?');

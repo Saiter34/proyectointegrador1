@@ -120,7 +120,18 @@ body {
     gap: 15px;
     align-items: center;
 }
-
+.admin-detalles-box{
+    background-color: rgba(10, 10, 10, 0.9);
+    padding: 15px;
+    border-radius: 8px;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(193, 0, 0, 0.5);
+    animation: despliegue 0.3s ease;
+}
+@keyframes despliegue{
+    from{opacity: 0;transform: translateY(-10px);}
+    to{opacity: 1;transform: translateY(0);}
+}
 /* NOTIFICATION STYLES */
 .admin-notif-wrapper {
     position: relative;
@@ -231,6 +242,35 @@ body {
     text-align: center;
     border-radius: 8px; /* Bordes redondeados */
 }
+/*boton destacar*/
+.admin-btn-highlife {
+    font-family: "Orbitron", sans-serif;
+    background-color: #ffcc00;
+    color: white;
+    font-weight: bold;
+    border: none;
+    padding: 8px 14px;
+    margin: 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: transform 0.2s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.admin-btn-highlife:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
+    background-color: #e6b800;
+}
+
+.admin-btn-highlifed {
+    background-color: #888;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
 
 /* GENERAL CARD/TABLE STYLES (FROM OLD ADMIN.CSS, ADAPTED FOR NEW DESIGN) */
 
@@ -246,7 +286,7 @@ body {
     background-color: rgba(10, 10, 10, 0.95);
     border: 1px solid #c10000;
     box-shadow: 0 0 15px rgba(193, 0, 0, 0.7);
-    padding: 25px; /* Más padding */
+    padding: 25px;
     border-radius: 12px;
     text-align: center;
     color: #fff;
@@ -315,7 +355,7 @@ body {
 
 /* Button styles for tables */
 .admin-btn-table, /* Clase genérica para botones dentro de tablas */
-.admin-btn-approve, .admin-btn-reject, .admin-btn-edit, .admin-btn-delete, .admin-btn-details { /* Clases específicas */
+.admin-btn-approve, .admin-btn-reject, .admin-btn-edit, .admin-btn-delete, .admin-btn-details, .admin-btn-highlife{ /* Clases específicas */
     padding: 8px 14px; /* Más padding para botones */
     font-family: 'Orbitron', sans-serif;
     font-size: 0.9em; /* Tamaño de fuente ligeramente más grande */
@@ -645,12 +685,77 @@ body {
         font-size: 18px;
     }
 }
-/* NUEVO ESTILO PARA MINIATURA DE IMAGEN DE EVENTO */
+/*ESTILO PARA MINIATURA DE IMAGEN DE EVENTO */
 .admin-event-image-thumbnail {
-  width: 60px; /* Ancho fijo para la miniatura */
-  height: 60px; /* Alto fijo para la miniatura */
-  object-fit: cover; /* Asegura que la imagen cubra el área sin distorsionarse */
-  border-radius: 5px; /* Ligeros bordes redondeados */
-  border: 1px solid #444; /* Borde sutil */
-  vertical-align: middle; /* Alinea la imagen verticalmente en la celda de la tabla */
+  width: 60px; 
+  height: 60px; 
+  object-fit: cover;
+  border-radius: 5px; 
+  border: 1px solid #444; 
+  vertical-align: middle; 
+}
+/*categorias*/
+
+.admin-categorias-acordeon {
+    width: 100%;
+    padding: 2rem;
+}
+
+.admin-categoria-item {
+    background-color: rgba(10, 10, 10, 0.95);
+    border: 1px solid #c10000;
+    box-shadow: 0 0 15px rgba(193, 0, 0, 0.7);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+
+
+.admin-categoria-titulo {
+    width: 100%;
+    text-align: left;
+    padding: 1rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    color:white;
+    background-color: rgba(10, 10, 10, 0.95);
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.admin-categoria-titulo:hover {
+    background-color: #222;
+}
+
+.admin-categoria-contenido {
+    display: none;
+    padding: 1rem 2rem;
+    animation: fadeIn 0.3s ease;
+}
+
+.admin-categoria-contenido ul {
+    list-style: none;
+    padding: 0;
+    color: #ccc;
+}
+
+.admin-categoria-contenido li {
+    margin-bottom: 0.5rem;
+    padding-left: 1.2rem;
+    position: relative;
+}
+
+.admin-categoria-contenido li::before {
+    content: '🎫';
+    position: absolute;
+    left: 0;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
 }
