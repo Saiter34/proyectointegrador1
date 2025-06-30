@@ -76,7 +76,6 @@ header.encabezado {
     z-index: 100;
     backdrop-filter: blur(6px); /* Blur que tenías */
     transition: all 0.3s ease-in-out;
-    border-bottom: 4px solid #b30000; /* Borde que se añadió en una versión anterior y es consistente con el diseño */
 }
 
 .logo img {
@@ -94,8 +93,7 @@ nav {
     padding: 6px 12px; /* Padding que tenías */
     border-radius: 12px; /* Border-radius que tenías */
     transition: background 0.3s ease;
-    backdrop-filter: blur(4px); /* Blur que tenías */
-    border: 1px solid #ff3333; /* Borde que es consistente con el diseño */
+    backdrop-filter: blur(4px);
 }
 
 .nav-box:hover {
@@ -228,7 +226,7 @@ main {
 }
 .carrusel .slide .info h2 {
     font-size: 2.5rem; /* Tamaño de fuente para h2 del carrusel */
-    color: #ffcc00; /* Color dorado para el título */
+    color: white; /* Color dorado para el título */
 }
 .carrusel .slide .info p {
     font-size: 1.1rem; /* Tamaño de fuente para p del carrusel */
@@ -343,7 +341,7 @@ main {
 }
 
 .evento-info h4 {
-    color: #ffd700; /* Dorado para el nombre del evento */
+    color: #4c0000; /* Dorado para el nombre del evento */
     margin-bottom: 5px;
 }
 
@@ -402,7 +400,7 @@ main {
     width: 40px; /* Ancho que tenías */
     height: 4px; /* Altura que tenías */
     margin: 0 auto 10px auto;
-    background-color: #ffcc00; /* Dorado para el subrayado del título */
+    background-color: #4c0000; /* Dorado para el subrayado del título */
     border-radius: 10px;
 }
 
@@ -527,7 +525,7 @@ main {
 
 .footer-col ul li a:hover {
     padding-left: 6px;
-    color: #ffcc00;
+    color: #4c0000;
 }
 
 .social-links a {
