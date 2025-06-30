@@ -62,7 +62,6 @@ h1, h2, h3, h4 {
 /* --- ENCABEZADO ---*/
 header.encabezado {
     background-color: #4c0000; /* Rojo oscuro como base del encabezado */
-    border-bottom: 4px solid #b30000; /* Borde inferior más oscuro */
     padding: 10px 30px;
     display: flex;
     justify-content: space-between;
@@ -90,7 +89,7 @@ nav {
 
 .nav-box {
     background-color: rgba(255, 0, 0, 0.1); /* Fondo semi-transparente rojizo */
-    border: 1px solid #ff3333; /* Borde rojo brillante */
+    border: 1px solid #4c0000; /* Borde rojo brillante */
     padding: 6px 12px;
     border-radius: 12px;
     transition: background 0.3s ease;
@@ -197,13 +196,15 @@ main {
     top: 0;
     left: 100%; /* Inicia fuera de la vista */
     display: flex;
-    justify-content: space-around;
-    align-items: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: stretch;
     background-color: rgba(0, 0, 0, 0.4); /* Overlay para la información */
     transition: left 1s ease-in-out; /* Transición suave para el movimiento */
     opacity: 0; /* Oculto por defecto */
     padding: 40px;
     box-sizing: border-box;
+    gap: 2rem;
 }
 
 .carrusel .slide.activo {
@@ -228,7 +229,7 @@ main {
 }
 .carrusel .slide .info h2 {
     font-size: 2.5rem;
-    color: #ffcc00; /* Dorado para el título del carrusel */
+    color: #4c0000 
 }
 .carrusel .slide .info p {
     font-size: 1.1rem;
@@ -243,8 +244,8 @@ main {
 }
 
 .carrusel .slide img {
-    height: 100%; /* La imagen ocupa toda la altura del slide */
-    width: 100%; /* La imagen ocupa todo el ancho del slide */
+    height: 100%; 
+    width: 100%; 
     object-fit: cover; /* Recorta la imagen para que cubra todo el espacio */
     border-radius: 12px;
     display: block;
@@ -346,7 +347,7 @@ main {
 }
 
 .evento-info h4 {
-    color: #ffd700; /* Dorado para el nombre del evento */
+    color: #4c0000; /* Dorado para el nombre del evento */
     margin-bottom: 5px;
 }
 
@@ -522,7 +523,7 @@ main {
 
 .footer-col ul li a:hover {
     padding-left: 6px;
-    color: #ffcc00; /* Dorado en hover */
+    color: #4c0000
 }
 
 .social-links a {
@@ -600,135 +601,249 @@ main {
 }
 
 
-/* --- MEDIA QUERIES (DISEÑO RESPONSIVO) --- */
+/* ----------- CARRUSEL Y SLIDES ----------- */
+.carrusel {
+    width: 100%;
+    height: 500px;
+    position: relative;
+    overflow: hidden;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carrusel .slide {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.4);
+    transition: left 1s ease-in-out;
+    opacity: 0;
+    padding: 40px;
+    box-sizing: border-box;
+    gap: 2rem;
+}
+
+.carrusel .slide.activo {
+    left: 0;
+    opacity: 1;
+}
+
+.carrusel .slide img {
+    width: 45%;
+    height: auto;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+    flex-shrink: 0;
+    z-index: 1;
+    position: relative;
+}
+
+.carrusel .slide .info {
+    max-width: 50%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-family: 'Orbitron', sans-serif;
+    border-radius: 10px;
+    z-index: 2;
+    position: relative;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+}
+
+.carrusel .slide .info h2 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.carrusel .slide .info p {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.carousel-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border: none;
+    padding: 12px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 10;
+    border-radius: 50%;
+}
+.carousel-control.prev { left: 10px; }
+.carousel-control.next { right: 10px; }
+
+/* ----------- CONTENIDO PRINCIPAL ----------- */
+.contenido-principal-doscolumnas {
+    display: flex;
+    gap: 2rem;
+    padding: 2rem;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.eventos {
+    flex: 3;
+}
+
+.eventos h3 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.eventos-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.evento {
+    display: flex;
+    gap: 1rem;
+    background-color: rgba(255,255,255,0.05);
+    padding: 1rem;
+    border: 1px solid #cc1f1a;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+    align-items: center;
+}
+
+.evento:hover {
+    transform: scale(1.03);
+}
+
+.evento img {
+    width: 150px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.evento-info {
+    flex: 1;
+    color: white;
+}
+
+/* ----------- DESTACADOS ----------- */
+.destacados {
+    flex: 1;
+}
+
+.destacados h3 {
+    font-size: 1.5rem; /* más pequeño */
+    margin-bottom: 1rem;
+}
+
+.circulos {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.circulo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: white;
+}
+
+.circulo img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 0.5rem;
+    border: 2px solid #cc1f1a;
+}
+
+.circulo span {
+    font-size: 1rem;
+}
+
+/* ----------- BOTONES ----------- */
+.btn-vermas {
+    background: #cc1f1a;
+    color: white;
+    padding: 0.7rem 1.5rem;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}
+
+.btn-vermas:hover {
+    background: #a61713;
+}
+
+/* ----------- MEDIA QUERIES ----------- */
 @media (max-width: 1024px) {
     .carrusel {
-        height: 350px; /* Altura ajustada para el carrusel en tablets */
-    }
-    .carrusel .slide .info {
-        max-width: 60%; /* Más espacio para la info en tablets */
+        height: 350px;
     }
     .carrusel .slide .info h2 {
         font-size: 2rem;
     }
     .contenido-principal-doscolumnas {
-        padding: 0 1rem; /* Ajusta el padding lateral */
-        flex-direction: column; /* Apila las columnas */
+        flex-direction: column;
+        padding: 1rem;
     }
     .eventos, .destacados {
-        flex: auto; /* Ocupan todo el ancho */
-        max-width: 100%;
-    }
-    .eventos-grid {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Más pequeñas en media */
+        width: 100%;
     }
 }
 
 @media (max-width: 768px) {
-    header.encabezado {
-        flex-direction: column; /* La navegación se apila */
-        height: auto;
-        padding: 10px;
-        align-items: flex-start;
-        gap: 10px;
-    }
-    .logo {
-        width: 100%;
-        text-align: center;
-    }
-    nav {
-        width: 100%;
-        flex-wrap: wrap; /* Los elementos del nav se envuelven */
-        justify-content: center;
-        gap: 10px;
-    }
-    .nav-box {
-        flex-grow: 1; /* Ocupan el espacio disponible */
-        text-align: center;
-    }
-    .nav-box a, .nav-box button {
-        width: 100%;
-        display: block; /* Los enlaces/botones del nav ocupan todo el ancho */
-    }
-    main {
-        margin-top: 120px; /* Ajusta el margen superior para el encabezado apilado */
-    }
     .carrusel {
-        height: 250px; /* Altura aún más reducida para móviles */
-        margin-left: 15px;
-        margin-right: 15px;
+        height: 250px;
     }
+    .carrusel .slide {
+        flex-direction: column;
+        text-align: center;
+    }
+    .carrusel .slide img,
     .carrusel .slide .info {
-        max-width: 90%;
-        font-size: 0.9rem;
+        width: 100%;
+        max-width: 100%;
     }
-    .carrusel .slide .info h2 {
-        font-size: 1.5rem;
+    .carrusel .slide img {
+        max-height: 200px;
     }
-    .carrusel .slide .info p {
-        font-size: 0.9em;
-    }
-    .btn-vermas, .btn-agregar {
-        padding: 8px 15px;
-        font-size: 0.9em;
-    }
-    .eventos h3 {
-        font-size: 1.5rem;
+    .eventos h3, .destacados h3 {
+        font-size: 1.4rem;
     }
     .evento {
-        padding: 10px;
-        gap: 10px;
-    }
-    .evento img {
-        margin-bottom: 10px;
-        width: 100%;
-        max-width: 200px; /* Limitar el tamaño de la imagen del evento */
-        height: 120px;
-    }
-    .destacados h3 {
-        font-size: 1.2rem;
-    }
-    .circulo {
-        width: 80px;
-        height: 80px;
-    }
-    .circulo span {
-        font-size: 0.75rem;
-    }
-    .footer-row {
-        flex-direction: column; /* Columnas del footer se apilan */
+        flex-direction: column;
         align-items: center;
         text-align: center;
     }
-    .footer-col {
-        text-align: center;
+    .evento img {
         width: 100%;
+        height: auto;
     }
-    .footer-col h4 {
-        border-bottom: none; /* Quita el borde inferior en móvil */
-        display: block;
-        padding-bottom: 0;
-    }
-    .social-links, .payment-methods {
-        justify-content: center;
-        display: flex; /* Centra los iconos sociales y de pago */
+    .evento-info {
+        text-align: center;
     }
 }
 
 @media (max-width: 480px) {
-    header.encabezado {
-        padding: 8px 10px;
-    }
-    .logo img {
-        height: 40px;
-    }
-    .nav-box {
-        padding: 5px 8px;
-    }
-    .nav-box a, .nav-box button {
-        font-size: 0.8rem;
-    }
-    /* Eliminado .client-notif-btn y .client-notif-dropdown ya que no están en el HTML */
     .carrusel {
         height: 200px;
     }
@@ -736,41 +851,20 @@ main {
         font-size: 1.2rem;
     }
     .carrusel .slide .info p {
-        font-size: 0.8em;
-    }
-    .btn-vermas, .btn-agregar {
-        padding: 8px 15px;
-        font-size: 0.9em;
-    }
-    .eventos h3 {
-        font-size: 1.5rem;
-    }
-    .evento {
-        padding: 10px;
-        gap: 10px;
+        font-size: 0.8rem;
     }
     .evento img {
-        width: 100px;
-        height: 70px;
+        height: 100px;
+    }
+    .btn-vermas {
+        padding: 8px 12px;
+        font-size: 0.9em;
     }
     .destacados h3 {
         font-size: 1.2rem;
     }
-    .circulo {
-        width: 80px;
-        height: 80px;
-    }
-    .circulo span {
-        font-size: 0.75rem;
-    }
-    .footer-col h4 {
-        font-size: 16px;
-    }
-    .footer-col ul li a {
-        font-size: 0.9em;
-    }
-    .social-links a, .payment-methods img {
-        width: 35px;
-        height: 35px;
+    .circulo img {
+        width: 70px;
+        height: 70px;
     }
 }

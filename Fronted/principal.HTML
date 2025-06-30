@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-    <!-- Capas de fondo para un diseño más rico y un efecto visual atractivo -->
     <div class="fondo-overlay-extra"></div>
     <div class="fondo-overlay"></div>
 
@@ -20,52 +19,39 @@
                 <img src="img/logo.png" alt="Logo de Teycketan">
             </div>
             <nav>
-                <!-- Dropdown de Categorías -->
                 <div class="nav-box dropdown">
                     <button>Categorías</button>
                     <div class="dropdown-content">
-                        <!-- Rutas corregidas para apuntar a categoriasprincipal.html con el parámetro -->
                         <a href="categoriasprincipal.html?categoria=Conciertos">Conciertos</a>
                         <a href="categoriasprincipal.html?categoria=Teatro">Teatro</a>
                         <a href="categoriasprincipal.html?categoria=Deportes">Deportes</a>
                     </div>
                 </div>
-                
-                <!-- Dropdown de Mi Cuenta (para manejar sesión) -->
                 <div class="nav-box dropdown" id="miCuentaContainer"> 
                     <button id="miCuentaButton">Mi Cuenta</button>
                     <div class="dropdown-content" id="miCuentaDropdownContent">
-                        <!-- Estos enlaces serán dinámicos según el estado de la sesión -->
                         <a href="login.html" id="loginLink">Iniciar Sesión</a>
                         <a href="registro.html" id="registerLink">Registrarse</a>
-                        <!-- Opciones para usuario logueado (añadidas por JS) -->
                     </div>
                 </div>
             </nav>
         </header>
 
-        <!-- Sección del Carrusel (Eventos Destacados - Carga Dinámica) -->
         <section class="carrusel" id="carrusel-eventos-destacados">
-            <!-- Los slides del carrusel se cargarán dinámicamente aquí -->
             <p class="loading-carousel-message">Cargando eventos destacados...</p>
-            <!-- Los botones de control se añadirán en JS al renderizar los slides -->
         </section>
 
         <div class="contenido-principal-doscolumnas">
-            <!-- Sección de Próximos Eventos (Carga Dinámica) -->
             <section class="eventos contenedor-estilo">
                 <h3>Próximos eventos</h3>
-                <!-- Este div se llenará dinámicamente con los eventos desde el backend -->
-                <div class="eventos-grid" id="proximos-eventos-grid">
+                <div class="eventos-grid" id="proximos-eventos-grid" style="display: flex; flex-direction: column; gap: 1rem;">
                     <p class="loading-events-message">Cargando próximos eventos...</p>
                 </div>
             </section>
 
-            <!-- Barra lateral de Ubicaciones Destacadas -->
             <aside class="destacados contenedor-estilo">
-                <h3>Ubicaciones destacadas</h3>
+                <h3 style="font-size: 1.2rem;">Ubicaciones destacadas</h3>
                 <div class="circulos">
-                    <!-- Rutas corregidas para apuntar a la carpeta Clientes/ -->
                     <a href="Clientes/sanmarcos.html" class="circulo">
                         <img src="img/sanmarcos.png" alt="Estadio San Marcos">
                         <span>San Marcos</span>
