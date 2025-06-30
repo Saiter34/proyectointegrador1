@@ -983,3 +983,65 @@ body {
     background: linear-gradient(90deg, #007bff, #00c1c1);
     transform: scale(1.05);
 }
+/*CATALOGO DE LUGARES*/
+.catl-container {
+  padding: 2rem;
+  font-family: 'Orbitron', sans-serif;
+  background-color: rgba(10, 10, 10, 0.95);
+  color: #f5f5f5;
+}
+
+.catl-titulo {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #00c1c1;
+  text-shadow: 0 0 8px rgba(0, 193, 193, 0.5);
+  border-bottom: 1px solid #00c1c1;
+  padding-bottom: 10px;
+}
+
+.catl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.catl-card {
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid #00c1c1;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 12px rgba(0, 193, 193, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.catl-card:hover {
+  transform: scale(1.02);
+}
+
+.catl-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-bottom: 2px solid #00c1c1;
+}
+
+.catl-info {
+  padding: 1rem;
+}
+
+.catl-info h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: #00ffff;
+}
+
+.catl-info p {
+  margin: 0.2rem 0;
+  font-size: 0.95rem;
+}
+
+.catl-info strong {
+  color: white;
+}

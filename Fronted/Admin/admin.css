@@ -939,3 +939,113 @@ body {
 .admin-btn-rechazar:hover {
   background-color: #ff1744;
 }
+/*CATALOGO DE LUGARES*/
+.catl-container {
+  padding: 2rem;
+  font-family: 'Orbitron', sans-serif;
+  background-color: #111;
+  color: #fff;
+}
+
+.catl-titulo {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 0 5px red;
+}
+
+.catl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.catl-card {
+  background: #1c1c1c;
+  border: 1px solid #444;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(255,0,0,0.2);
+  transition: transform 0.3s;
+}
+.catl-card:hover {
+  transform: scale(1.03);
+}
+
+.catl-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-bottom: 2px solid #900;
+}
+
+.catl-info {
+  padding: 1rem;
+}
+
+.catl-btn-agregar {
+  margin-top: 2rem;
+  padding: 10px 20px;
+  background: #900;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-family: 'Orbitron', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 0 10px #ff0000;
+  transition: background 0.3s;
+}
+.catl-btn-agregar:hover {
+  background: #c00;
+}
+
+.catl-formulario {
+  margin-top: 1.5rem;
+  background: #222;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #444;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+}
+
+.catl-formulario h3 {
+  margin-bottom: 1rem;
+  color: #ff4444;
+}
+
+.catl-formulario form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.catl-formulario input,
+.catl-formulario select {
+  padding: 8px;
+  font-family: 'Orbitron', sans-serif;
+  border: 1px solid #333;
+  border-radius: 4px;
+  background: #111;
+  color: white;
+}
+
+.catl-btn-guardar {
+  background: #4C0000;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.catl-btn-guardar:hover {
+  background: #4C0000;
+}
+
+.oculto {
+  display: none;
+}
