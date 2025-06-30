@@ -1,7 +1,6 @@
 // Backend/routes/eventos.js
 // Este archivo ahora contiene rutas tanto para proveedores/organizadores como para administradores.
 // Los middlewares de autenticación y autorización se aplicarán en index.js al montar estas rutas.
-
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
@@ -153,11 +152,7 @@ router.get('/eventos/:id', async (req, res) => {
     }
 });
 
-/**
- * @route PUT /eventos/:id
- * @description Actualiza un evento existente del organizador autenticado.
- * @access Privado (Organizador - middleware aplicado en index.js)
- */
+/*@route PUT /eventos/:id --- descripcion: Actualiza un evento existente del organizador autenticado.---acceso Privado (Organizador - middleware aplicado en index.js)*/
 router.put('/eventos/:id', uploadMiddleware, async (req, res) => {
     const { id } = req.params;
     const { Nom_Evento, Fecha, Horario_Inicio, Horario_Fin, Categoria, Ubicacion, Descripcion, PrecioGeneral, PrecioVIP, PrecioConadis } = req.body;
@@ -241,11 +236,7 @@ router.put('/eventos/:id', uploadMiddleware, async (req, res) => {
     }
 });
 
-/**
- * @route DELETE /eventos/:id
- * @description Elimina un evento del organizador autenticado.
- * @access Privado (Organizador - middleware aplicado en index.js)
- */
+/*@route DELETE /eventos/:id---descripcion Elimina un evento del organizador autenticado.---acceso privado (Organizador - middleware aplicado en index.js)*/
 router.delete('/eventos/:id', async (req, res) => {
     const { id } = req.params;
     const Id_Usuario_Organizador = req.user.id;
@@ -296,18 +287,17 @@ router.delete('/eventos/:id', async (req, res) => {
 });
 
 
-// --- RUTAS PARA ADMINISTRADORES ---
-// Estas rutas se montarán en index.js bajo '/api/admin/eventos' con el middleware de rol 'admin'.
+//-"RUTAS PARA ADMINISTRADORES"-Estas rutas se montarán en index.js bajo '/api/admin/eventos' con el middleware de rol 'admin'.
 
 /**
  * @route GET /pendientes
- * @description Obtiene todas las solicitudes de eventos que están en estado 'pendiente'.
- * @access Privado (Administrador - middleware aplicado en index.js)
+ * @description Obtiene todos los eventos con estado 'pendiente' y su información de organizador.
+ * @access Privado (Admin)
  */
 router.get('/pendientes', async (req, res) => {
     try {
-        const result = await pool.query(
-            `SELECT
+        const query = `
+            SELECT
                 e."Id_Evento",
                 e."Nom_Evento",
                 e."Fecha",
@@ -321,6 +311,10 @@ router.get('/pendientes', async (req, res) => {
                 e."PrecioConadis",
                 e."Estado",
                 e."URL_Imagen",
+                e."URL_Mapa",
+                e."Reglas",
+                e."SolicitudDestacar",
+                o."Nom_Empresa" AS "NombreEmpresaOrganizador",
                 u."Nom_Usuario" AS "NombreProveedor",
                 u."Ape_Usuario" AS "ApellidoProveedor",
                 u."Correo_Usuario" AS "EmailProveedor"
@@ -328,11 +322,18 @@ router.get('/pendientes', async (req, res) => {
             JOIN "Organizadores" o ON e."Id_Organizador" = o."Id_Organizador"
             JOIN "Usuarios" u ON o."Id_Usuario" = u.id
             WHERE e."Estado" = 'pendiente'
-            ORDER BY e."Fecha" ASC;`
-        );
-        res.status(200).json({ events: result.rows });
+            ORDER BY e."Fecha" ASC, e."Horario_Inicio" ASC;
+        `;
+        const result = await pool.query(query);
+
+        const eventsWithParsedData = result.rows.map(event => ({
+            ...event,
+            Reglas: event.Reglas || [] // Si es JSONB, node-pg ya lo parsea, solo aseguramos que sea array
+        }));
+
+        res.status(200).json({ events: eventsWithParsedData });
     } catch (error) {
-        console.error('Error al obtener solicitudes de eventos pendientes:', error.message);
+        console.error('Error al obtener eventos pendientes (admin):', error.message);
         res.status(500).json({ message: 'Error interno del servidor al obtener solicitudes de eventos pendientes.' });
     }
 });
@@ -340,12 +341,12 @@ router.get('/pendientes', async (req, res) => {
 /**
  * @route GET /aprobados
  * @description Obtiene todos los eventos que están en estado 'aprobado'.
- * @access Privado (Administrador - middleware aplicado en index.js)
+ * @access Privado (Admin)
  */
 router.get('/aprobados', async (req, res) => {
     try {
-        const result = await pool.query(
-            `SELECT
+        const query = `
+            SELECT
                 e."Id_Evento",
                 e."Nom_Evento",
                 e."Fecha",
@@ -359,6 +360,10 @@ router.get('/aprobados', async (req, res) => {
                 e."PrecioConadis",
                 e."Estado",
                 e."URL_Imagen",
+                e."URL_Mapa",
+                e."Reglas",
+                e."SolicitudDestacar",
+                o."Nom_Empresa" AS "NombreEmpresaOrganizador",
                 u."Nom_Usuario" AS "NombreProveedor",
                 u."Ape_Usuario" AS "ApellidoProveedor",
                 u."Correo_Usuario" AS "EmailProveedor"
@@ -366,9 +371,16 @@ router.get('/aprobados', async (req, res) => {
             JOIN "Organizadores" o ON e."Id_Organizador" = o."Id_Organizador"
             JOIN "Usuarios" u ON o."Id_Usuario" = u.id
             WHERE e."Estado" = 'aprobado'
-            ORDER BY e."Fecha" DESC;`
-        );
-        res.status(200).json({ events: result.rows });
+            ORDER BY e."Fecha" DESC, e."Horario_Inicio" DESC;
+        `;
+        const result = await pool.query(query);
+
+        const eventsWithParsedData = result.rows.map(event => ({
+            ...event,
+            Reglas: event.Reglas || [] // Si es JSONB, node-pg ya lo parsea, solo aseguramos que sea array
+        }));
+
+        res.status(200).json({ events: eventsWithParsedData });
     } catch (error) {
         console.error('Error al obtener eventos aprobados para el administrador:', error.message);
         res.status(500).json({ message: 'Error interno del servidor al obtener eventos aprobados.' });
@@ -377,8 +389,8 @@ router.get('/aprobados', async (req, res) => {
 
 /**
  * @route DELETE /eliminar/:id
- * @description Elimina un evento (sin importar su estado).
- * @access Privado (Administrador - middleware aplicado en index.js)
+ * @description Elimina un evento (sin importar su estado). Elimina también la imagen asociada.
+ * @access Privado (Admin)
  */
 router.delete('/eliminar/:id', async (req, res) => {
     const eventIdToDelete = req.params.id;
@@ -387,7 +399,6 @@ router.delete('/eliminar/:id', async (req, res) => {
         client = await pool.connect();
         await client.query('BEGIN');
 
-        // Primero, obtener la URL de la imagen para eliminarla del disco
         const eventImageResult = await client.query(
             `SELECT "URL_Imagen" FROM "Eventos" WHERE "Id_Evento" = $1`,
             [eventIdToDelete]
@@ -399,7 +410,6 @@ router.delete('/eliminar/:id', async (req, res) => {
         }
         const imageUrlToDelete = eventImageResult.rows[0].URL_Imagen;
 
-        // Luego, eliminar el evento de la base de datos
         const deleteResult = await client.query(
             `DELETE FROM "Eventos" WHERE "Id_Evento" = $1 RETURNING *`,
             [eventIdToDelete]
@@ -410,7 +420,6 @@ router.delete('/eliminar/:id', async (req, res) => {
             return res.status(404).json({ message: 'Evento no encontrado o no se pudo eliminar.' });
         }
 
-        // Finalmente, eliminar el archivo de imagen del disco si existe
         if (imageUrlToDelete && imageUrlToDelete.includes('/img/event_images/')) {
             const imagePath = path.join(__dirname, '..', '..', 'Fronted', imageUrlToDelete);
             if (fs.existsSync(imagePath)) {
@@ -433,11 +442,10 @@ router.delete('/eliminar/:id', async (req, res) => {
     }
 });
 
-
 /**
  * @route PUT /:id/aprobar
- * @description Aprueba una solicitud de evento, cambiando su estado a 'aprobado'.
- * @access Privado (Administrador - middleware aplicado en index.js)
+ * @description Aprueba un evento pendiente, cambiando su estado a 'aprobado'.
+ * @access Privado (Admin)
  */
 router.put('/:id/aprobar', async (req, res) => {
     const eventIdToApprove = req.params.id;
@@ -470,8 +478,8 @@ router.put('/:id/aprobar', async (req, res) => {
 
 /**
  * @route PUT /:id/rechazar
- * @description Rechaza una solicitud de evento, cambiando su estado a 'rechazado'.
- * @access Privado (Administrador - middleware aplicado en index.js)
+ * @description Rechaza un evento pendiente, cambiando su estado a 'rechazado'.
+ * @access Privado (Admin)
  */
 router.put('/:id/rechazar', async (req, res) => {
     const eventIdToReject = req.params.id;
@@ -497,6 +505,352 @@ router.put('/:id/rechazar', async (req, res) => {
         if (client) await client.query('ROLLBACK');
         console.error('Error al rechazar solicitud de evento:', error.message);
         res.status(500).json({ message: 'Error interno del servidor al rechazar solicitud de evento.' });
+    } finally {
+        if (client) client.release();
+    }
+});
+
+/**
+ * @route PUT /:id/destacar
+ * @description Permite al administrador destacar un evento aprobado, cambiando su SolicitudDestacar a 'aprobado'.
+ * @access Privado (Admin)
+ */
+router.put('/:id/destacar', async (req, res) => {
+    const eventIdToHighlight = req.params.id;
+    let client;
+    try {
+        client = await pool.connect();
+        await client.query('BEGIN');
+
+        // Solo se puede destacar si el evento está 'aprobado' y su SolicitudDestacar no es ya 'aprobado'
+        const result = await client.query(
+            `UPDATE "Eventos" SET "SolicitudDestacar" = 'aprobado'
+             WHERE "Id_Evento" = $1 AND "Estado" = 'aprobado' AND "SolicitudDestacar" != 'aprobado'
+             RETURNING *`,
+            [eventIdToHighlight]
+        );
+
+        if (result.rowCount === 0) {
+            await client.query('ROLLBACK');
+            const eventCheck = await client.query(
+                `SELECT "Nom_Evento", "Estado", "SolicitudDestacar" FROM "Eventos" WHERE "Id_Evento" = $1`,
+                [eventIdToHighlight]
+            );
+            if (eventCheck.rows.length === 0) {
+                return res.status(404).json({ message: 'Evento no encontrado.' });
+            }
+            const eventStatus = eventCheck.rows[0].Estado;
+            const highlightStatus = eventCheck.rows[0].SolicitudDestacar;
+
+            if (eventStatus !== 'aprobado') {
+                return res.status(400).json({ message: `No se puede destacar el evento "${eventCheck.rows[0].Nom_Evento}". Su estado actual es "${eventStatus}". Solo eventos aprobados pueden destacarse.` });
+            }
+            if (highlightStatus === 'aprobado') {
+                return res.status(400).json({ message: `El evento "${eventCheck.rows[0].Nom_Evento}" ya está destacado.` });
+            }
+            if (highlightStatus === 'pendiente') {
+                return res.status(400).json({ message: `El evento "${eventCheck.rows[0].Nom_Evento}" ya tiene una solicitud para destacar pendiente.` });
+            }
+            return res.status(400).json({ message: 'No se pudo destacar el evento. Posiblemente no está aprobado o ya se encuentra destacado.' });
+        }
+
+        await client.query('COMMIT');
+        res.status(200).json({ message: `Evento "${result.rows[0].Nom_Evento}" (ID: ${eventIdToHighlight}) destacado exitosamente.`, event: result.rows[0] });
+
+    } catch (error) {
+        if (client) await client.query('ROLLBACK');
+        console.error('Error al destacar evento:', error.message);
+        res.status(500).json({ message: 'Error interno del servidor al destacar el evento.' });
+    } finally {
+        if (client) client.release();
+    }
+});
+
+/**
+ * @route GET /categorias
+ * @description Obtiene una lista de todas las categorías únicas de eventos aprobados.
+ * @access Privado (Admin - middleware aplicado en index.js)
+ */
+router.get('/categorias', async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT DISTINCT "Categoria" FROM "Eventos" WHERE "Estado" = 'aprobado' AND "Categoria" IS NOT NULL ORDER BY "Categoria" ASC;`
+        );
+        const categories = result.rows.map(row => row.Categoria);
+        res.status(200).json({ categories: categories });
+    } catch (error) {
+        console.error('Error al obtener categorías de eventos:', error.message);
+        res.status(500).json({ message: 'Error interno del servidor al obtener categorías.' });
+    }
+});
+
+/**
+ * @route GET /por-categoria/:categoryName
+ * @description Obtiene todos los eventos aprobados de una categoría específica.
+ * @access Privado (Admin - middleware aplicado en index.js)
+ */
+router.get('/por-categoria/:categoryName', async (req, res) => {
+    const { categoryName } = req.params;
+    try {
+        const query = `
+            SELECT
+                e."Id_Evento",
+                e."Nom_Evento",
+                e."Fecha",
+                e."Horario_Inicio",
+                e."Horario_Fin",
+                e."Categoria",
+                e."Ubicacion",
+                e."Descripcion",
+                e."PrecioGeneral",
+                e."PrecioVIP",
+                e."PrecioConadis",
+                e."Estado",
+                e."URL_Imagen",
+                e."URL_Mapa",
+                e."Reglas",
+                e."SolicitudDestacar",
+                o."Nom_Empresa" AS "NombreEmpresaOrganizador",
+                u."Nom_Usuario" AS "NombreProveedor",
+                u."Ape_Usuario" AS "ApellidoProveedor",
+                u."Correo_Usuario" AS "EmailProveedor"
+            FROM "Eventos" e
+            JOIN "Organizadores" o ON e."Id_Organizador" = o."Id_Organizador"
+            JOIN "Usuarios" u ON o."Id_Usuario" = u.id
+            WHERE e."Estado" = 'aprobado' AND e."Categoria" = $1
+            ORDER BY e."Fecha" ASC, e."Horario_Inicio" ASC;
+        `;
+        const result = await pool.query(query, [categoryName]);
+
+        const eventsWithParsedData = result.rows.map(event => ({
+            ...event,
+            Reglas: event.Reglas || []
+        }));
+
+        res.status(200).json({ events: eventsWithParsedData });
+    } catch (error) {
+        console.error(`Error al obtener eventos para la categoría ${categoryName}:`, error.message);
+        res.status(500).json({ message: `Error interno del servidor al obtener eventos para la categoría ${categoryName}.` });
+    }
+});
+
+/*SOLICITUD PARA DESTACAR UN EVENTO*/
+
+/**
+ * @route GET /destacar/pendientes
+ * @description Obtiene todos los eventos con 'SolicitudDestacar' en estado 'pendiente'.
+ * @access Privado (Admin)
+ */
+router.get('/destacar/pendientes', async (req, res) => {
+    try {
+        const query = `
+            SELECT
+                e."Id_Evento",
+                e."Nom_Evento",
+                e."Categoria",
+                e."Estado", -- Estado actual del evento
+                e."URL_Imagen",
+                e."SolicitudDestacar",
+                u."Nom_Usuario" AS "NombreProveedor",
+                u."Ape_Usuario" AS "ApellidoProveedor",
+                u."Correo_Usuario" AS "EmailProveedor"
+            FROM "Eventos" e
+            JOIN "Organizadores" o ON e."Id_Organizador" = o."Id_Organizador"
+            JOIN "Usuarios" u ON o."Id_Usuario" = u.id
+            WHERE e."SolicitudDestacar" = 'pendiente'
+            ORDER BY e."Id_Evento" ASC;
+        `;
+        const result = await pool.query(query);
+        res.status(200).json({ requests: result.rows });
+    } catch (error) {
+        console.error('Error al obtener solicitudes para destacar eventos:', error.message);
+        res.status(500).json({ message: 'Error interno del servidor al obtener solicitudes para destacar.' });
+    }
+});
+
+/**
+ * @route PUT /destacar/:id/aprobar
+ * @description Aprueba una solicitud para destacar un evento.
+ * @access Privado (Admin)
+ */
+router.put('/destacar/:id/aprobar', async (req, res) => {
+    const eventId = req.params.id;
+    let client;
+    try {
+        client = await pool.connect();
+        await client.query('BEGIN');
+
+        const result = await client.query(
+            `UPDATE "Eventos" SET "SolicitudDestacar" = 'aprobado'
+             WHERE "Id_Evento" = $1 AND "SolicitudDestacar" = 'pendiente'
+             RETURNING *`,
+            [eventId]
+        );
+
+        if (result.rowCount === 0) {
+            await client.query('ROLLBACK');
+            const eventCheck = await client.query(
+                `SELECT "Nom_Evento", "SolicitudDestacar" FROM "Eventos" WHERE "Id_Evento" = $1`,
+                [eventId]
+            );
+            if (eventCheck.rows.length === 0) {
+                return res.status(404).json({ message: 'Evento no encontrado.' });
+            }
+            if (eventCheck.rows[0].SolicitudDestacar === 'aprobado') {
+                return res.status(400).json({ message: `La solicitud para destacar el evento "${eventCheck.rows[0].Nom_Evento}" ya está aprobada.` });
+            }
+            return res.status(400).json({ message: `No se pudo aprobar la solicitud para destacar el evento "${eventCheck.rows[0].Nom_Evento}". Su estado no es 'pendiente' o ya fue procesada.` });
+        }
+
+        await client.query('COMMIT');
+        res.status(200).json({ message: `Solicitud para destacar evento "${result.rows[0].Nom_Evento}" (ID: ${eventId}) aprobada exitosamente.` });
+
+    } catch (error) {
+        if (client) await client.query('ROLLBACK');
+        console.error('Error al aprobar solicitud para destacar evento:', error.message);
+        res.status(500).json({ message: 'Error interno del servidor al aprobar la solicitud para destacar.' });
+    } finally {
+        if (client) client.release();
+    }
+});
+
+/**
+ * @route PUT /destacar/:id/rechazar
+ * @description Rechaza una solicitud para destacar un evento.
+ * @access Privado (Admin)
+ */
+router.put('/destacar/:id/rechazar', async (req, res) => {
+    const eventId = req.params.id;
+    let client;
+    try {
+        client = await pool.connect();
+        await client.query('BEGIN');
+
+        const result = await client.query(
+            `UPDATE "Eventos" SET "SolicitudDestacar" = 'rechazado'
+             WHERE "Id_Evento" = $1 AND "SolicitudDestacar" = 'pendiente'
+             RETURNING *`,
+            [eventId]
+        );
+
+        if (result.rowCount === 0) {
+            await client.query('ROLLBACK');
+            const eventCheck = await client.query(
+                `SELECT "Nom_Evento", "SolicitudDestacar" FROM "Eventos" WHERE "Id_Evento" = $1`,
+                [eventId]
+            );
+            if (eventCheck.rows.length === 0) {
+                return res.status(404).json({ message: 'Evento no encontrado.' });
+            }
+            if (eventCheck.rows[0].SolicitudDestacar === 'rechazado') {
+                return res.status(400).json({ message: `La solicitud para destacar el evento "${eventCheck.rows[0].Nom_Evento}" ya está rechazada.` });
+            }
+            return res.status(400).json({ message: `No se pudo rechazar la solicitud para destacar el evento "${eventCheck.rows[0].Nom_Evento}". Su estado no es 'pendiente' o ya fue procesada.` });
+        }
+
+        await client.query('COMMIT');
+        res.status(200).json({ message: `Solicitud para destacar evento "${result.rows[0].Nom_Evento}" (ID: ${eventId}) rechazada exitosamente.` });
+
+    } catch (error) {
+        if (client) await client.query('ROLLBACK');
+        console.error('Error al rechazar solicitud para destacar evento:', error.message);
+        res.status(500).json({ message: 'Error interno del servidor al rechazar la solicitud para destacar.' });
+    } finally {
+        if (client) client.release();
+    }
+});
+
+
+/**
+ * @route GET /destacados
+ * @description Obtiene todos los eventos que están destacados ('SolicitudDestacar' = 'aprobado').
+ * @access Privado (Admin)
+ */
+router.get('/destacados', async (req, res) => {
+    try {
+        const query = `
+            SELECT
+                e."Id_Evento",
+                e."Nom_Evento",
+                e."Fecha",
+                e."Horario_Inicio",
+                e."Horario_Fin",
+                e."Categoria",
+                e."Ubicacion",
+                e."Descripcion",
+                e."PrecioGeneral",
+                e."PrecioVIP",
+                e."PrecioConadis",
+                e."Estado",
+                e."URL_Imagen",
+                e."URL_Mapa",
+                e."Reglas",
+                e."SolicitudDestacar",
+                o."Nom_Empresa" AS "NombreEmpresaOrganizador",
+                u."Nom_Usuario" AS "NombreProveedor",
+                u."Ape_Usuario" AS "ApellidoProveedor",
+                u."Correo_Usuario" AS "EmailProveedor"
+            FROM "Eventos" e
+            JOIN "Organizadores" o ON e."Id_Organizador" = o."Id_Organizador"
+            JOIN "Usuarios" u ON o."Id_Usuario" = u.id
+            WHERE e."SolicitudDestacar" = 'aprobado'
+            ORDER BY e."Fecha" DESC, e."Horario_Inicio" DESC;
+        `;
+        const result = await pool.query(query);
+
+        const eventsWithParsedData = result.rows.map(event => ({
+            ...event,
+            Reglas: event.Reglas || [] // Si es JSONB, node-pg ya lo parsea, solo aseguramos que sea array
+        }));
+
+        res.status(200).json({ events: eventsWithParsedData });
+    } catch (error) {
+        console.error('Error al obtener eventos destacados (admin):', error.message);
+        res.status(500).json({ message: 'Error interno del servidor al obtener eventos destacados.' });
+    }
+});
+
+/**
+ * @route PUT /:id/quitar-destacado
+ * @description Quita el estado de 'destacado' a un evento, cambiando 'SolicitudDestacar' a 'ninguna'.
+ * @access Privado (Admin)
+ */
+router.put('/:id/quitar-destacado', async (req, res) => {
+    const eventId = req.params.id;
+    let client;
+    try {
+        client = await pool.connect();
+        await client.query('BEGIN');
+
+        const result = await client.query(
+            `UPDATE "Eventos" SET "SolicitudDestacar" = 'ninguna'
+             WHERE "Id_Evento" = $1 AND "SolicitudDestacar" = 'aprobado'
+             RETURNING *`,
+            [eventId]
+        );
+
+        if (result.rowCount === 0) {
+            await client.query('ROLLBACK');
+            const eventCheck = await client.query(
+                `SELECT "Nom_Evento", "SolicitudDestacar" FROM "Eventos" WHERE "Id_Evento" = $1`,
+                [eventId]
+            );
+            if (eventCheck.rows.length === 0) {
+                return res.status(404).json({ message: 'Evento no encontrado.' });
+            }
+            if (eventCheck.rows[0].SolicitudDestacar !== 'aprobado') {
+                return res.status(400).json({ message: `El evento "${eventCheck.rows[0].Nom_Evento}" no está actualmente destacado.` });
+            }
+            return res.status(400).json({ message: 'No se pudo quitar el estado de destacado al evento. Posiblemente ya no está destacado.' });
+        }
+
+        await client.query('COMMIT');
+        res.status(200).json({ message: `Se ha quitado el estado de destacado al evento "${result.rows[0].Nom_Evento}" (ID: ${eventId}).` });
+
+    } catch (error) {
+        if (client) await client.query('ROLLBACK');
+        console.error('Error al quitar estado de destacado al evento:', error.message);
+        res.status(500).json({ message: 'Error interno del servidor al quitar el estado de destacado.' });
     } finally {
         if (client) client.release();
     }

@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEYCKETAN</title>
+    <title>Solicitudes para Destacar - TEYCKETAN</title>
     <!-- Usar el nuevo archivo CSS del panel de administración -->
-    <link rel="stylesheet" href="admin.css"> 
+    <link rel="stylesheet" href="admin.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
-    <!-- SIDEBAR - Reutilizando la estructura del admin.html -->
+    <!-- SIDEBAR -->
     <div class="admin-sidebar">
         <div class="admin-barra-logo">
             <img src="../img/logo.png" alt="Logo Teycketan" class="admin-logo-img" />
@@ -23,7 +23,8 @@
             <li><a href="eventos.html" class="admin-nav-item"><i class="fas fa-tasks"></i><span>Solicitud de eventos</span></a></li>
             <li><a href="eventoApro.html" class="admin-nav-item"><i class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
             <li><a href="categorias.html" class="admin-nav-item"><i class="fas fa-tags"></i><span>Eventos por categorias</span></a></li>
-            <li><a href="eventoDestacado.html" class="admin-nav-item"><i class="fas fa-star"></i><span>Eventos por categorias</span></a></li>
+            <!-- Corregida la ruta para eventos destacados -->
+            <li><a href="eventoDestacado.html" class="admin-nav-item"><i class="fas fa-star"></i><span>Eventos Destacados</span></a></li>
             <li><a href="solicitudDestacar.html" class="admin-nav-item active"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
         </ul>
     </div>
@@ -56,52 +57,40 @@
             <div id="adminMessageContainer" class="admin-message-container"></div>
 
             <!-- Tabla de solicitudes para destacar -->
-<div class="admin-tabla-contenedor">
-  <table class="admin-table">
-    <thead>
-      <tr>
-        <th>Imagen</th>
-        <th>Nombre del Evento</th>
-        <th>Proveedor</th>
-        <th>Fecha</th>
-        <th>Ubicación</th>
-        <th>Estado</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody id="solicitudesDestacarBody">
-      <tr>
-        <td><img src="../img/imagen.jpg" alt="Evento 1" class="admin-event-img"></td>
-        <td>Nombe de evento</td>
-        <td>empresa</td>
-        <td>fecha</td>
-        <td>lugar</td>
-        <td><span class="admin-status-pendiente">Pendiente</span></td>
-        <td class="admin-actions-cell">
-<button class="admin-btn-aprobar btn-shimmer">Aprobar</button>
-<button class="admin-btn-rechazar btn-shimmer">Rechazar</button>
-
-        </td>
-      </tr>
-      <tr>
-        <td><img src="../img/imagen.jpg" alt="Evento 2" class="admin-event-img"></td>
-        <td>nombre de evento</td>
-        <td>empresa</td>
-        <td>fecha</td>
-        <td>lugar</td>
-        <td><span class="admin-status-pendiente">Pendiente</span></td>
-        <td class="admin-actions-cell">
-<button class="admin-btn-aprobar btn-shimmer">Aprobar</button>
-<button class="admin-btn-rechazar btn-shimmer">Rechazar</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <p id="noRequestsMessage" class="admin-no-data-message" style="display: none;">No hay solicitudes pendientes.</p>
-</div>
-
+            <div class="admin-tabla-contenedor">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID Evento</th>
+                            <th>Imagen</th>
+                            <th>Nombre del Evento</th>
+                            <th>Categoría</th>
+                            <th>Organizador</th>
+                            <th>Estado Actual del Evento</th>
+                            <th>Estado Solicitud Destacar</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="solicitudesDestacarBody">
+                        <!-- Las solicitudes se cargarán aquí dinámicamente -->
+                        <tr><td colspan="8" class="admin-loading-message">Cargando solicitudes para destacar...</td></tr>
+                    </tbody>
+                </table>
+                <p id="noRequestsMessage" class="admin-no-data-message" style="display: none;">No hay solicitudes pendientes para destacar eventos en este momento.</p>
+            </div>
         </section>
     </div>
+
+    <!-- Modales -->
+    <div id="adminConfirmationModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="admin-close-button">&times;</span>
+            <p id="adminModalMessage">¿Estás seguro de realizar esta acción?</p>
+            <button id="adminModalConfirmBtn" class="admin-modal-btn admin-modal-confirm">Confirmar</button>
+            <button id="adminModalCancelBtn" class="admin-modal-btn admin-modal-cancel">Cancelar</button>
+        </div>
+    </div>
+
     <div id="adminMessageModal" class="admin-modal">
         <div class="admin-modal-content">
             <span class="admin-close-button">&times;</span>
@@ -109,7 +98,270 @@
             <button id="adminMessageModalCloseBtn" class="admin-modal-btn admin-modal-confirm">Aceptar</button>
         </div>
     </div>
-    
 
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta
+
+            // --- Lógica de Autenticación al cargar la página ---
+            const token = localStorage.getItem('jwtToken');
+            const userRole = localStorage.getItem('userRole');
+
+            console.log('Solicitud Destacar Page Loaded.');
+            console.log('JWT Token:', token ? 'Exists' : 'Missing');
+            console.log('User Role from localStorage:', userRole);
+
+            // Seguridad: Redirige si no hay token o el rol no es 'admin'
+            if (!token || userRole !== 'admin') {
+                showAdminMessageModal('Acceso denegado. Debes ser un administrador para ver esta página.', 'error');
+                setTimeout(() => {
+                    window.location.replace('../login.html');
+                }, 2000);
+                return;
+            }
+
+            // Elementos DOM principales
+            const adminLogoutButton = document.getElementById('adminLogoutButton');
+            const adminNotifToggle = document.getElementById('adminNotifToggle');
+            const adminNotifDropdown = document.getElementById('adminNotifDropdown');
+            const solicitudesDestacarBody = document.getElementById('solicitudesDestacarBody');
+            const adminMessageContainer = document.getElementById('adminMessageContainer');
+            const noRequestsMessage = document.getElementById('noRequestsMessage');
+
+            // Referencias a los IDs de modales
+            const adminConfirmationModal = document.getElementById('adminConfirmationModal');
+            const adminModalMessage = document.getElementById('adminModalMessage');
+            const adminModalConfirmBtn = document.getElementById('adminModalConfirmBtn');
+            const adminModalCancelBtn = document.getElementById('adminModalCancelBtn');
+            const adminMessageModal = document.getElementById('adminMessageModal');
+            const adminMessageModalText = document.getElementById('adminMessageModalText');
+            const adminMessageModalCloseBtn = document.getElementById('adminMessageModalCloseBtn');
+
+            // --- Funciones para Modales ---
+
+            /**
+             * @brief Muestra un modal de confirmación al usuario (específico para Admin).
+             * @param {string} message - El mensaje a mostrar en el modal.
+             * @returns {Promise<boolean>} Una promesa que se resuelve a `true` si el usuario confirma, `false` si cancela.
+             */
+            function showAdminConfirmationModal(message) {
+                return new Promise((resolve) => {
+                    adminModalMessage.textContent = message;
+                    adminConfirmationModal.style.display = 'flex'; // Usar flex para centrar
+
+                    const confirmHandler = () => {
+                        adminConfirmationModal.style.display = 'none';
+                        adminModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        adminModalCancelBtn.removeEventListener('click', cancelHandler);
+                        adminConfirmationModal.querySelector('.admin-close-button').removeEventListener('click', cancelHandler);
+                        resolve(true);
+                    };
+
+                    const cancelHandler = () => {
+                        adminConfirmationModal.style.display = 'none';
+                        adminModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        adminModalCancelBtn.removeEventListener('click', cancelHandler);
+                        adminConfirmationModal.querySelector('.admin-close-button').removeEventListener('click', cancelHandler);
+                        resolve(false);
+                    };
+
+                    adminModalConfirmBtn.addEventListener('click', confirmHandler);
+                    adminModalCancelBtn.addEventListener('click', cancelHandler);
+                    adminConfirmationModal.querySelector('.admin-close-button').addEventListener('click', cancelHandler);
+                });
+            }
+
+            /**
+             * @brief Muestra un modal de mensaje informativo al usuario (específico para Admin).
+             * @param {string} message - El mensaje a mostrar en el modal.
+             * @param {string} type - Tipo de mensaje ('success' o 'error') para estilos. Opcional.
+             */
+            function showAdminMessageModal(message, type = '') {
+                adminMessageModalText.textContent = message;
+                adminMessageModalText.className = `admin-message-text ${type ? 'admin-message-' + type : ''}`; // Añadir clase para estilo
+                adminMessageModal.style.display = 'flex'; // Usar flex para centrar
+
+                adminMessageModalCloseBtn.onclick = () => {
+                    adminMessageModal.style.display = 'none';
+                };
+                adminMessageModal.querySelector('.admin-close-button').onclick = () => {
+                    adminMessageModal.style.display = 'none';
+                };
+            }
+
+            // --- Event Listener para Cerrar Sesión ---
+            adminLogoutButton.addEventListener('click', async () => {
+                const confirmLogout = await showAdminConfirmationModal('¿Estás seguro de que quieres cerrar sesión?');
+                if (confirmLogout) {
+                    localStorage.removeItem('jwtToken');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('isOrganizer');
+                    localStorage.removeItem('userId');
+                    showAdminMessageModal('Sesión cerrada correctamente.', 'success');
+                    setTimeout(() => {
+                        window.location.replace('../login.html');
+                    }, 500);
+                }
+            });
+
+            // --- Lógica para Notificaciones (Dropdown) ---
+            adminNotifToggle.addEventListener('click', (event) => {
+                event.stopPropagation();
+                adminNotifDropdown.style.display = adminNotifDropdown.style.display === 'block' ? 'none' : 'block';
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!adminNotifDropdown.contains(event.target) && !adminNotifToggle.contains(event.target)) {
+                    adminNotifDropdown.style.display = 'none';
+                }
+            });
+
+            // Añadir clase 'active' al enlace de la página actual en el sidebar
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.admin-nav-item').forEach(link => {
+                if (link.href.includes('solicitudDestacar.html')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+
+            // --- Funcionalidad de Solicitudes de Eventos para Destacar ---
+
+            /**
+             * @brief Carga las solicitudes de eventos para destacar que están en estado 'pendiente'.
+             */
+            async function fetchHighlightRequests() {
+                solicitudesDestacarBody.innerHTML = '<tr><td colspan="8" class="admin-loading-message">Cargando solicitudes para destacar...</td></tr>';
+                noRequestsMessage.style.display = 'none';
+
+                try {
+                    const response = await fetch(`${API_URL}/api/admin/eventos/destacar/pendientes`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        if (data.requests && data.requests.length > 0) {
+                            renderHighlightRequests(data.requests);
+                        } else {
+                            solicitudesDestacarBody.innerHTML = ''; // Limpiar mensaje de carga
+                            noRequestsMessage.style.display = 'block';
+                        }
+                    } else {
+                        showAdminMessageModal(`Error al cargar solicitudes para destacar: ${data.message || 'Error desconocido'}`, 'error');
+                        solicitudesDestacarBody.innerHTML = `<tr><td colspan="8" class="admin-error-text">No se pudieron cargar las solicitudes.</td></tr>`;
+                    }
+                } catch (error) {
+                    console.error('Error al obtener solicitudes para destacar:', error);
+                    showAdminMessageModal('Error de conexión con el servidor al cargar solicitudes para destacar.', 'error');
+                    solicitudesDestacarBody.innerHTML = `<tr><td colspan="8" class="admin-error-text">Error de red.</td></tr>`;
+                }
+            }
+
+            /**
+             * @brief Renderiza las solicitudes para destacar en la tabla.
+             * @param {Array<Object>} requests - Un array de objetos de solicitud de destacar.
+             */
+            function renderHighlightRequests(requests) {
+                solicitudesDestacarBody.innerHTML = ''; // Clear previous content
+                noRequestsMessage.style.display = 'none';
+
+                if (requests.length === 0) {
+                    noRequestsMessage.style.display = 'block';
+                    return;
+                }
+
+                let tableRowsHtml = '';
+                requests.forEach(request => {
+                    const imageUrl = request.URL_Imagen ? `${API_URL}${request.URL_Imagen}` : 'https://placehold.co/80x80/cccccc/000000?text=No+Img';
+                    const statusClass = request.SolicitudDestacar === 'pendiente' ? 'admin-status-pendiente' :
+                                        request.SolicitudDestacar === 'aprobado' ? 'admin-status-aprobado' :
+                                        'admin-status-rechazado'; // Or 'admin-status-otro' for other states
+
+                    tableRowsHtml += `
+                        <tr>
+                            <td data-label="ID Evento">${request.Id_Evento}</td>
+                            <td data-label="Imagen"><img src="${imageUrl}" alt="Imagen del evento" class="admin-event-image-thumbnail"></td>
+                            <td data-label="Nombre del Evento">${request.Nom_Evento}</td>
+                            <td data-label="Categoría">${request.Categoria || 'N/A'}</td>
+                            <td data-label="Organizador">${request.NombreProveedor || 'N/A'} ${request.ApellidoProveedor || ''} (${request.EmailProveedor || 'N/A'})</td>
+                            <td data-label="Estado Actual del Evento"><span class="admin-status-${request.Estado.toLowerCase()}">${request.Estado}</span></td>
+                            <td data-label="Estado Solicitud Destacar"><span class="${statusClass}">${request.SolicitudDestacar}</span></td>
+                            <td class="admin-actions-cell">
+                                <button class="admin-btn-aprobar" data-id="${request.Id_Evento}" data-name="${request.Nom_Evento}"><i class="fas fa-check"></i> Aprobar</button>
+                                <button class="admin-btn-rechazar" data-id="${request.Id_Evento}" data-name="${request.Nom_Evento}"><i class="fas fa-times"></i> Rechazar</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                solicitudesDestacarBody.innerHTML = tableRowsHtml;
+
+                // Attach event listeners to action buttons
+                solicitudesDestacarBody.querySelectorAll('.admin-btn-aprobar').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const eventId = e.target.dataset.id || e.target.closest('button').dataset.id;
+                        const eventName = e.target.dataset.name || e.target.closest('button').dataset.name;
+                        handleHighlightAction(eventId, eventName, 'aprobar');
+                    });
+                });
+                solicitudesDestacarBody.querySelectorAll('.admin-btn-rechazar').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const eventId = e.target.dataset.id || e.target.closest('button').dataset.id;
+                        const eventName = e.target.dataset.name || e.target.closest('button').dataset.name;
+                        handleHighlightAction(eventId, eventName, 'rechazar');
+                    });
+                });
+            }
+
+            /**
+             * @brief Maneja las acciones de aprobar o rechazar una solicitud para destacar.
+             * @param {number} eventId - El ID del evento a modificar.
+             * @param {string} eventName - El nombre del evento para el mensaje de confirmación.
+             * @param {string} action - La acción a realizar ('aprobar' o 'rechazar').
+             */
+            async function handleHighlightAction(eventId, eventName, action) {
+                adminMessageContainer.innerHTML = ''; // Clear previous messages
+
+                const actionText = action === 'aprobar' ? 'aprobar' : 'rechazar';
+                const confirmed = await showAdminConfirmationModal(
+                    `¿Estás seguro de ${actionText} la solicitud para destacar el evento "${eventName}" (ID: ${eventId})?`
+                );
+
+                if (!confirmed) {
+                    return; // User canceled the action
+                }
+
+                try {
+                    const response = await fetch(`${API_URL}/api/admin/eventos/destacar/${eventId}/${action}`, {
+                        method: 'PUT', // Use PUT to update resource state
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showAdminMessageModal(data.message, 'success');
+                        fetchHighlightRequests(); // Reload data after action
+                    } else {
+                        showAdminMessageModal(`Error al ${actionText} la solicitud: ${data.message || data.error || 'Error desconocido'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error(`Error al ${actionText} la solicitud de destacar evento:`, error);
+                    showAdminMessageModal(`Error de conexión con el servidor al ${actionText} solicitud.`, 'error');
+                }
+            }
+
+            // Load highlight requests on page load
+            fetchHighlightRequests();
+        });
+    </script>
 </body>
 </html>

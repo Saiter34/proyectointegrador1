@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitudes de Organizador - TEYCKETAN</title>
     <!-- Usar el nuevo archivo CSS del panel de administración -->
-    <link rel="stylesheet" href="admin.css"> 
+    <link rel="stylesheet" href="admin.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
-    <!-- SIDEBAR - Reutilizando la estructura del admin.html -->
+    <!-- SIDEBAR -->
     <div class="admin-sidebar">
         <div class="admin-barra-logo">
+            <!-- RUTA CORREGIDA: Acceso absoluto desde la raíz del servidor estático o subiendo un nivel -->
             <img src="../img/logo.png" alt="Logo Teycketan" class="admin-logo-img" />
         </div>
         <ul class="admin-nav-list">
@@ -27,7 +28,7 @@
         </ul>
     </div>
 
-    <!-- MAIN CONTENT - Reutilizando la estructura del admin.html -->
+    <!-- MAIN CONTENT -->
     <div class="admin-main-content">
         <header class="admin-topbar">
             <h1 class="admin-titulo-seccion">Solicitudes de Organizador</h1>
@@ -55,7 +56,7 @@
 
             <!-- Contenedor para mensajes -->
             <div id="adminMessageContainer" class="admin-message-container"></div>
-            
+
             <div class="admin-tabla-contenedor">
                 <table class="admin-table-solicitudes">
                     <thead>
@@ -80,7 +81,7 @@
         </section>
     </div>
 
-    <!-- Modales (copiados de admin.html, para consistencia) -->
+    <!-- Modales -->
     <div id="adminConfirmationModal" class="admin-modal">
         <div class="admin-modal-content">
             <span class="admin-close-button">&times;</span>
@@ -102,6 +103,23 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta
 
+            // --- Lógica de Autenticación al cargar la página ---
+            const token = localStorage.getItem('jwtToken');
+            const userRole = localStorage.getItem('userRole');
+
+            console.log('Solicitud Page Loaded.');
+            console.log('JWT Token:', token ? 'Exists' : 'Missing');
+            console.log('User Role from localStorage:', userRole);
+
+            // Seguridad: Redirige si no hay token o el rol no es 'admin'
+            if (!token || userRole !== 'admin') {
+                showAdminMessageModal('Acceso denegado. Debes ser un administrador para ver esta página.', 'error');
+                setTimeout(() => {
+                    window.location.replace('../login.html');
+                }, 2000);
+                return; // Detener la ejecución del script aquí
+            }
+
             // Elementos DOM principales
             const adminLogoutButton = document.getElementById('adminLogoutButton');
             const adminNotifToggle = document.getElementById('adminNotifToggle');
@@ -119,7 +137,7 @@
             const adminMessageModalText = document.getElementById('adminMessageModalText');
             const adminMessageModalCloseBtn = document.getElementById('adminMessageModalCloseBtn');
 
-            // --- Funciones para Modales (copiadas de admin.html para auto-contención) ---
+            // --- Funciones para Modales ---
 
             /**
              * @brief Muestra un modal de confirmación al usuario (específico para Admin).
@@ -130,7 +148,7 @@
                 return new Promise((resolve) => {
                     adminModalMessage.textContent = message;
                     adminConfirmationModal.style.display = 'flex'; // Usar flex para centrar
-                    
+
                     const confirmHandler = () => {
                         adminConfirmationModal.style.display = 'none';
                         adminModalConfirmBtn.removeEventListener('click', confirmHandler);
@@ -156,13 +174,13 @@
             /**
              * @brief Muestra un modal de mensaje informativo al usuario (específico para Admin).
              * @param {string} message - El mensaje a mostrar en el modal.
-             * @param {string} type - Tipo de mensaje ('success' o 'error') para estilos. Opcional, si no se usa para estilos.
+             * @param {string} type - Tipo de mensaje ('success' o 'error') para estilos. Opcional.
              */
             function showAdminMessageModal(message, type = '') {
                 adminMessageModalText.textContent = message;
                 adminMessageModalText.className = `admin-message-text ${type ? 'admin-message-' + type : ''}`; // Añadir clase para estilo
                 adminMessageModal.style.display = 'flex'; // Usar flex para centrar
-                
+
                 adminMessageModalCloseBtn.onclick = () => {
                     adminMessageModal.style.display = 'none';
                 };
@@ -170,23 +188,6 @@
                     adminMessageModal.style.display = 'none';
                 };
             }
-
-     /*       // --- Lógica de Autenticación al cargar la página ---
-            const token = localStorage.getItem('jwtToken');
-            const userRole = localStorage.getItem('userRole');
-
-            console.log('Solicitud Page Loaded.'); 
-            console.log('JWT Token:', token ? 'Exists' : 'Missing'); 
-            console.log('User Role from localStorage:', userRole); 
-
-            // Seguridad: Redirige si no hay token o el rol no es 'admin'
-            if (!token || userRole !== 'admin') {
-                showAdminMessageModal('Acceso denegado. Debes ser un administrador para ver esta página.', 'error'); 
-                setTimeout(() => {
-                    window.location.replace('../login.html'); 
-                }, 2000); 
-                return; 
-            }*/
 
             // --- Event Listener para Cerrar Sesión ---
             adminLogoutButton.addEventListener('click', async () => {
@@ -196,17 +197,17 @@
                     localStorage.removeItem('userName');
                     localStorage.removeItem('userRole');
                     localStorage.removeItem('isOrganizer');
-                    localStorage.removeItem('userId'); 
+                    localStorage.removeItem('userId');
                     showAdminMessageModal('Sesión cerrada correctamente.', 'success');
                     setTimeout(() => {
-                        window.location.replace('../login.html'); 
-                    }, 500); 
+                        window.location.replace('../login.html');
+                    }, 500);
                 }
             });
 
             // --- Lógica para Notificaciones (Dropdown) ---
             adminNotifToggle.addEventListener('click', (event) => {
-                event.stopPropagation(); 
+                event.stopPropagation();
                 adminNotifDropdown.style.display = adminNotifDropdown.style.display === 'block' ? 'none' : 'block';
             });
 
@@ -219,11 +220,10 @@
             // Añadir clase 'active' al enlace de la página actual en el sidebar
             const currentPath = window.location.pathname;
             document.querySelectorAll('.admin-nav-item').forEach(link => {
-                // Ajuste para que 'solicitud.html' se marque como activo correctamente
                 if (link.href.includes('solicitud.html')) {
                     link.classList.add('active');
                 } else {
-                    link.classList.remove('active'); // Remover de otros enlaces por si acaso
+                    link.classList.remove('active');
                 }
             });
 
@@ -239,7 +239,7 @@
                 try {
                     const response = await fetch(`${API_URL}/api/admin/solicitudes/organizer-requests/pending`, {
                         headers: {
-                            'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${token}` // Asegúrate de enviar el token
                         }
                     });
                     const data = await response.json();
@@ -260,29 +260,30 @@
             /**
              * @brief Handles approving or rejecting an organizer request.
              * @param {string} userId - The ID of the user whose request is being acted upon.
+             * @param {string} userName - The name of the user for confirmation messages.
              * @param {string} actionType - 'approve' or 'reject'.
              */
             async function handleAction(userId, userName, actionType) {
                 const actionText = actionType === 'approve' ? 'APROBAR' : 'RECHAZAR';
                 const confirmAction = await showAdminConfirmationModal(`¿Estás seguro de ${actionText} la solicitud de ${userName} (ID: ${userId})?`);
-                
+
                 if (!confirmAction) {
                     return; // User cancelled
                 }
 
                 try {
                     const response = await fetch(`${API_URL}/api/admin/solicitudes/organizer-requests/${actionType}/${userId}`, {
-                        method: 'POST', 
+                        method: 'POST', // O PUT, según tu backend
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${token}` // Asegúrate de enviar el token
                         }
                     });
                     const data = await response.json();
 
                     if (response.ok) {
                         showAdminMessageModal(data.message, 'success');
-                        fetchPendingRequests(); // Reload requests after action
+                        fetchPendingRequests(); // Recargar solicitudes después de la acción
                     } else {
                         showAdminMessageModal(`Error al ${actionType} la solicitud: ${data.message || 'Desconocido'}`, 'error');
                     }
@@ -297,12 +298,12 @@
              * @param {Array<Object>} requests - An array of pending request objects.
              */
             function renderRequests(requests) {
-                listaSolicitudesBody.innerHTML = ''; // Clear previous content
+                listaSolicitudesBody.innerHTML = ''; // Limpiar contenido previo
                 if (requests.length === 0) {
-                    noRequestsMessage.style.display = 'block'; // Show "no requests" message
+                    noRequestsMessage.style.display = 'block'; // Mostrar mensaje de "no hay solicitudes"
                     return;
                 }
-                noRequestsMessage.style.display = 'none'; // Hide if there are requests
+                noRequestsMessage.style.display = 'none'; // Ocultar si hay solicitudes
 
                 let tableRowsHtml = '';
                 requests.forEach(req => {
@@ -343,7 +344,7 @@
             }
 
             // Initial fetch of pending requests
-            fetchPendingRequests(); 
+            fetchPendingRequests();
         });
     </script>
 </body>

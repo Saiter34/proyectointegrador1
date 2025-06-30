@@ -4,17 +4,19 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db'); 
-const { authenticateToken, authorizeRole } = require('../middleware/authMiddleware'); // Importa los middlewares
+// No importes los middlewares aquí, ya que se aplican en index.js al montar este router.
+// const { authenticateToken, authorizeRole } = require('../middleware/authMiddleware'); 
 
 // --- RUTAS PROTEGIDAS PARA ADMINISTRADORES DE SOLICITUDES DE ORGANIZADOR ---
-// Todas estas rutas requieren autenticación y rol de 'admin'.
+// Todas estas rutas requieren autenticación y rol de 'admin', aplicado en index.js.
 
 /**
- * @route GET /api/admin/solicitudes/organizer-requests/pending
+ * @route GET /organizer-requests/pending
  * @description Obtiene todas las solicitudes de registro de organizadores que están en estado 'pendiente'.
- * @access Privado (solo administradores)
+ * @access Privado (solo administradores - middleware aplicado en index.js)
  */
-router.get('/organizer-requests/pending', authenticateToken, authorizeRole(['admin']), async (req, res) => {
+// **ATENCIÓN: Se eliminaron 'authenticateToken, authorizeRole(['admin'])' de aquí.**
+router.get('/organizer-requests/pending', async (req, res) => {
     try {
         const result = await pool.query(
             `SELECT
@@ -28,8 +30,8 @@ router.get('/organizer-requests/pending', authenticateToken, authorizeRole(['adm
                 o."Descripcion",
                 o."Estado_Solicitud",
                 o.fecha_solicitud AS "Fecha_Solicitud"
-            FROM "Usuarios" u
-            JOIN "Organizadores" o ON u.id = o."Id_Usuario"
+            FROM "Organizadores" o
+            JOIN "Usuarios" u ON o."Id_Usuario" = u.id
             WHERE o."Estado_Solicitud" = 'pendiente'
             ORDER BY o.fecha_solicitud ASC;` 
         );
@@ -41,11 +43,12 @@ router.get('/organizer-requests/pending', authenticateToken, authorizeRole(['adm
 });
 
 /**
- * @route POST /api/admin/solicitudes/organizer-requests/approve/:userId
+ * @route POST /organizer-requests/approve/:userId
  * @description Aprueba una solicitud de registro de organizador, cambiando su rol a 'organizador'.
- * @access Privado (solo administradores)
+ * @access Privado (solo administradores - middleware aplicado en index.js)
  */
-router.post('/organizer-requests/approve/:userId', authenticateToken, authorizeRole(['admin']), async (req, res) => {
+// **ATENCIÓN: Se eliminaron 'authenticateToken, authorizeRole(['admin'])' de aquí.**
+router.post('/organizer-requests/approve/:userId', async (req, res) => {
     const userIdToApprove = req.params.userId;
     let client;
     try {
@@ -89,11 +92,12 @@ router.post('/organizer-requests/approve/:userId', authenticateToken, authorizeR
 });
 
 /**
- * @route POST /api/admin/solicitudes/organizer-requests/reject/:userId
+ * @route POST /organizer-requests/reject/:userId
  * @description Rechaza una solicitud de registro de organizador, revirtiendo su rol a 'cliente'.
- * @access Privado (solo administradores)
+ * @access Privado (solo administradores - middleware aplicado en index.js)
  */
-router.post('/organizer-requests/reject/:userId', authenticateToken, authorizeRole(['admin']), async (req, res) => {
+// **ATENCIÓN: Se eliminaron 'authenticateToken, authorizeRole(['admin'])' de aquí.**
+router.post('/organizer-requests/reject/:userId', async (req, res) => {
     const userIdToReject = req.params.userId;
     let client;
     try {
@@ -137,11 +141,12 @@ router.post('/organizer-requests/reject/:userId', authenticateToken, authorizeRo
 });
 
 /**
- * @route GET /api/admin/solicitudes/organizers/approved
+ * @route GET /organizers/approved
  * @description Obtiene la lista de organizadores ya aprobados.
- * @access Privado (solo administradores)
+ * @access Privado (solo administradores - middleware aplicado en index.js)
  */
-router.get('/organizers/approved', authenticateToken, authorizeRole(['admin']), async (req, res) => {
+// **ATENCIÓN: Se eliminaron 'authenticateToken, authorizeRole(['admin'])' de aquí.**
+router.get('/organizers/approved', async (req, res) => {
     try {
         const result = await pool.query(
             `SELECT
@@ -166,20 +171,19 @@ router.get('/organizers/approved', authenticateToken, authorizeRole(['admin']), 
 });
 
 /**
- * @route POST /api/admin/solicitudes/organizers/remove/:userId
+ * @route POST /organizers/remove/:userId
  * @description Elimina un organizador (revierte su rol a 'cliente' y elimina la entrada de organizador),
  * pero solo si no tiene eventos asociados.
- * @access Privado (solo administradores)
+ * @access Privado (solo administradores - middleware aplicado en index.js)
  */
-router.post('/organizers/remove/:userId', authenticateToken, authorizeRole(['admin']), async (req, res) => {
+// **ATENCIÓN: Se eliminaron 'authenticateToken, authorizeRole(['admin'])' de aquí.**
+router.post('/organizers/remove/:userId', async (req, res) => {
     const userIdToRemove = req.params.userId;
     let client;
     try {
         client = await pool.connect();
         await client.query('BEGIN');
 
-        // Paso 1: Obtener el Id_Organizador de la tabla "Organizadores"
-        // para el userId dado. Necesitamos este ID para buscar en Eventos.
         const organizerIdResult = await client.query(
             `SELECT "Id_Organizador" FROM "Organizadores" WHERE "Id_Usuario" = $1 AND "Estado_Solicitud" = 'aprobado'`,
             [userIdToRemove]
@@ -192,8 +196,6 @@ router.post('/organizers/remove/:userId', authenticateToken, authorizeRole(['adm
 
         const organizerId = organizerIdResult.rows[0].Id_Organizador;
 
-        // Paso 2: Verificar si el organizador tiene eventos asociados
-        // ¡CORRECCIÓN AQUÍ! Cambiado "Fk_Id_Organizador" a "Id_Organizador"
         const eventsCheckResult = await client.query(
             `SELECT COUNT(*) FROM "Eventos" WHERE "Id_Organizador" = $1`,
             [organizerId]
@@ -206,7 +208,6 @@ router.post('/organizers/remove/:userId', authenticateToken, authorizeRole(['adm
             return res.status(400).json({ message: `No se puede eliminar el organizador. Tiene ${eventCount} evento(s) asociado(s). Por favor, gestione sus eventos primero.` });
         }
 
-        // Paso 3: Revertir el rol del usuario a 'cliente' y ES_Organizador a FALSE.
         const userUpdateResult = await client.query(
             `UPDATE "Usuarios" SET "Rol_Usuario" = 'cliente', "ES_Organizador" = FALSE WHERE id = $1 AND "Rol_Usuario" = 'organizador'`,
             [userIdToRemove]
@@ -217,7 +218,6 @@ router.post('/organizers/remove/:userId', authenticateToken, authorizeRole(['adm
             return res.status(404).json({ message: 'Usuario no encontrado o no es un organizador activo.' });
         }
 
-        // Paso 4: Eliminar la entrada de la tabla "Organizadores".
         const organizerDeleteResult = await client.query(
             `DELETE FROM "Organizadores" WHERE "Id_Usuario" = $1 AND "Estado_Solicitud" = 'aprobado'`,
             [userIdToRemove]

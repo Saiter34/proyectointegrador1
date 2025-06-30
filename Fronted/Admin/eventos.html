@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitudes de Eventos - TEYCKETAN</title>
     <!-- Usar el nuevo archivo CSS del panel de administración -->
-    <link rel="stylesheet" href="admin.css"> 
+    <link rel="stylesheet" href="admin.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
-    <!-- SIDEBAR - Reutilizando la estructura del admin.html -->
+    <!-- SIDEBAR -->
     <div class="admin-sidebar">
         <div class="admin-barra-logo">
             <img src="../img/logo.png" alt="Logo Teycketan" class="admin-logo-img" />
@@ -27,7 +27,7 @@
         </ul>
     </div>
 
-    <!-- MAIN CONTENT - Reutilizando la estructura del admin.html -->
+    <!-- MAIN CONTENT -->
     <div class="admin-main-content">
         <header class="admin-topbar">
             <h1 class="admin-titulo-seccion">Solicitudes de Eventos</h1>
@@ -55,12 +55,12 @@
 
             <!-- Contenedor para mensajes -->
             <div id="adminMessageContainer" class="admin-message-container"></div>
-            
+
             <div class="admin-tabla-contenedor">
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>ID Evento</th>
                             <th>Imagen</th>
                             <th>Evento</th>
                             <th>Categoría</th>
@@ -83,7 +83,7 @@
         </section>
     </div>
 
-    <!-- Modales (copiados de admin.html para auto-contención) -->
+    <!-- Modales -->
     <div id="adminConfirmationModal" class="admin-modal">
         <div class="admin-modal-content">
             <span class="admin-close-button">&times;</span>
@@ -105,11 +105,30 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta
 
+            // --- Lógica de Autenticación al cargar la página ---
+            const token = localStorage.getItem('jwtToken');
+            const userRole = localStorage.getItem('userRole');
+            // No se usa userId en esta página, pero es buena práctica tenerlo si se necesita más tarde
+            // const userId = localStorage.getItem('userId');
+
+            console.log('Event Requests Page Loaded.');
+            console.log('JWT Token:', token ? 'Exists' : 'Missing');
+            console.log('User Role from localStorage:', userRole);
+
+            // Seguridad: Redirige si no hay token o el rol no es 'admin'
+            if (!token || userRole !== 'admin') {
+                showAdminMessageModal('Acceso denegado. Debes ser un administrador para ver esta página.', 'error');
+                setTimeout(() => {
+                    window.location.replace('../login.html');
+                }, 2000);
+                return; // Detener la ejecución del script aquí
+            }
+
             // Elementos DOM principales
             const adminLogoutButton = document.getElementById('adminLogoutButton');
             const adminNotifToggle = document.getElementById('adminNotifToggle');
             const adminNotifDropdown = document.getElementById('adminNotifDropdown');
-            const eventRequestsListBody = document.getElementById('eventRequestsListBody'); // Usar tbody directamente
+            const eventRequestsListBody = document.getElementById('eventRequestsListBody');
             const adminMessageContainer = document.getElementById('adminMessageContainer');
             const noRequestsMessage = document.getElementById('noRequestsMessage');
 
@@ -122,7 +141,7 @@
             const adminMessageModalText = document.getElementById('adminMessageModalText');
             const adminMessageModalCloseBtn = document.getElementById('adminMessageModalCloseBtn');
 
-            // --- Funciones para Modales (copiadas de admin.html para auto-contención) ---
+            // --- Funciones para Modales ---
 
             /**
              * @brief Muestra un modal de confirmación al usuario (específico para Admin).
@@ -133,7 +152,7 @@
                 return new Promise((resolve) => {
                     adminModalMessage.textContent = message;
                     adminConfirmationModal.style.display = 'flex'; // Usar flex para centrar
-                    
+
                     const confirmHandler = () => {
                         adminConfirmationModal.style.display = 'none';
                         adminModalConfirmBtn.removeEventListener('click', confirmHandler);
@@ -159,13 +178,13 @@
             /**
              * @brief Muestra un modal de mensaje informativo al usuario (específico para Admin).
              * @param {string} message - El mensaje a mostrar en el modal.
-             * @param {string} type - Tipo de mensaje ('success' o 'error') para estilos. Opcional, si no se usa para estilos.
+             * @param {string} type - Tipo de mensaje ('success' o 'error') para estilos. Opcional.
              */
             function showAdminMessageModal(message, type = '') {
                 adminMessageModalText.textContent = message;
                 adminMessageModalText.className = `admin-message-text ${type ? 'admin-message-' + type : ''}`; // Añadir clase para estilo
                 adminMessageModal.style.display = 'flex'; // Usar flex para centrar
-                
+
                 adminMessageModalCloseBtn.onclick = () => {
                     adminMessageModal.style.display = 'none';
                 };
@@ -173,23 +192,6 @@
                     adminMessageModal.style.display = 'none';
                 };
             }
-
-    /*        // --- Lógica de Autenticación al cargar la página ---
-            const token = localStorage.getItem('jwtToken');
-            const userRole = localStorage.getItem('userRole');
-
-            console.log('Event Requests Page Loaded.'); 
-            console.log('JWT Token:', token ? 'Exists' : 'Missing'); 
-            console.log('User Role from localStorage:', userRole); 
-
-            // Seguridad: Redirige si no hay token o el rol no es 'admin'
-            if (!token || userRole !== 'admin') {
-                showAdminMessageModal('Acceso denegado. Debes ser un administrador para ver esta página.', 'error'); 
-                setTimeout(() => {
-                    window.location.replace('../login.html'); 
-                }, 2000); 
-                return; 
-            }*/
 
             // --- Event Listener para Cerrar Sesión ---
             adminLogoutButton.addEventListener('click', async () => {
@@ -199,17 +201,17 @@
                     localStorage.removeItem('userName');
                     localStorage.removeItem('userRole');
                     localStorage.removeItem('isOrganizer');
-                    localStorage.removeItem('userId'); 
+                    localStorage.removeItem('userId');
                     showAdminMessageModal('Sesión cerrada correctamente.', 'success');
                     setTimeout(() => {
-                        window.location.replace('../login.html'); 
-                    }, 500); 
+                        window.location.replace('../login.html');
+                    }, 500);
                 }
             });
 
             // --- Lógica para Notificaciones (Dropdown) ---
             adminNotifToggle.addEventListener('click', (event) => {
-                event.stopPropagation(); 
+                event.stopPropagation();
                 adminNotifDropdown.style.display = adminNotifDropdown.style.display === 'block' ? 'none' : 'block';
             });
 
@@ -257,7 +259,7 @@
                             renderEventRequests(data.events);
                         } else {
                             // Fallback si el backend responde con un array directo (menos ideal pero posible)
-                            renderEventRequests(data); 
+                            renderEventRequests(data);
                         }
                     } else {
                         showAdminMessageModal(`Error al cargar solicitudes: ${data.message || 'Error desconocido'}`, 'error');
@@ -296,7 +298,7 @@
 
                     // Asegurarse de que la URL de la imagen sea absoluta si viene de la raíz del servidor
                     const imageUrl = request.URL_Imagen ? `${API_URL}${request.URL_Imagen}` : 'https://placehold.co/80x80/cccccc/000000?text=No+Img';
-                    
+
                     tableRowsHtml += `
                         <tr>
                             <td data-label="ID">${request.Id_Evento}</td>
@@ -321,14 +323,14 @@
                 // Añadir event listeners a los botones de acción
                 eventRequestsListBody.querySelectorAll('.admin-btn-approve').forEach(button => {
                     button.addEventListener('click', (e) => {
-                        const eventId = e.target.dataset.id || e.target.closest('button').dataset.id; // Manejar clic en icono
+                        const eventId = e.target.dataset.id || e.target.closest('button').dataset.id;
                         const eventName = e.target.dataset.name || e.target.closest('button').dataset.name;
                         handleAction(eventId, eventName, 'aprobar');
                     });
                 });
                 eventRequestsListBody.querySelectorAll('.admin-btn-reject').forEach(button => {
                     button.addEventListener('click', (e) => {
-                        const eventId = e.target.dataset.id || e.target.closest('button').dataset.id; // Manejar clic en icono
+                        const eventId = e.target.dataset.id || e.target.closest('button').dataset.id;
                         const eventName = e.target.dataset.name || e.target.closest('button').dataset.name;
                         handleAction(eventId, eventName, 'rechazar');
                     });

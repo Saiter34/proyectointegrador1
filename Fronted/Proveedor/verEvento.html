@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ver Eventos - TEYCKETAN</title>
-    <link rel="stylesheet" href="proveedor.css"> 
+    <link rel="stylesheet" href="proveedor.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -13,14 +13,15 @@
     <!-- SIDEBAR -->
     <div class="prov-sidebar">
         <div class="prov-barra-logo">
+            <!-- RUTA CORREGIDA: Acceso absoluto desde la raíz del servidor estático o subiendo un nivel -->
             <img src="../img/logo.png" alt="Logo Teycketan" class="prov-logo-img" />
         </div>
         <ul class="prov-nav-list">
             <li><a href="proveedorPanel.html" class="prov-nav-item"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
             <li><a href="crearevento.html" class="prov-nav-item"><i class="fas fa-plus-circle"></i><span>Crear evento</span></a></li>
             <li><a href="verEvento.html" class="prov-nav-item active"><i class="fas fa-calendar-alt"></i><span>Ver eventos</span></a></li>
-            <li><a href="contactarEmpresa.html" class="prov-nav-item"><i  class="fas fa-envelope"></i><span>Contactar empresa</span></a></li>
-            <li><a href="eventosAprov.html" class="prov-nav-item"><i  class="fas fa-envelope"></i><span>Eventos aprobados</span></a></li>
+            <li><a href="contactarEmpresa.html" class="prov-nav-item"><i class="fas fa-envelope"></i><span>Contactar empresa</span></a></li>
+            <li><a href="eventosAprov.html" class="prov-nav-item"><i class="fas fa-check-circle"></i><span>Eventos Aprobados</span></a></li>
         </ul>
     </div>
 
@@ -53,7 +54,7 @@
 
             <!-- Contenedor para mensajes (para modales) -->
             <div id="provMessageContainer" class="prov-message-container"></div>
-            
+
             <div class="prov-tabla-contenedor">
                 <table class="prov-table">
                     <thead>
@@ -99,6 +100,25 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta
 
+            // --- Lógica de Autenticación al cargar la página ---
+            const token = localStorage.getItem('jwtToken');
+            const userRole = localStorage.getItem('userRole');
+            const userId = localStorage.getItem('userId');
+
+            console.log('Ver Eventos Page Loaded.');
+            console.log('JWT Token:', token ? 'Exists' : 'Missing');
+            console.log('User Role from localStorage:', userRole);
+            console.log('User ID from localStorage:', userId);
+
+            // Seguridad: Redirige si no hay token o el rol no es 'organizador'
+            if (!token || userRole !== 'organizador' || !userId) {
+                showProvMessageModal('Acceso denegado. Debes ser un proveedor autenticado para ver esta página.', 'error');
+                setTimeout(() => {
+                    window.location.replace('../login.html'); // Redirige al login.html (un nivel arriba de Proveedor/)
+                }, 2000);
+                return; // Detener la ejecución del script aquí
+            }
+
             // Elementos DOM principales
             const provLogoutButton = document.getElementById('provLogoutButton');
             const provNotifToggle = document.getElementById('provNotifToggle');
@@ -127,7 +147,7 @@
                 return new Promise((resolve) => {
                     provModalMessage.textContent = message;
                     provConfirmationModal.style.display = 'flex'; // Usar flex para centrar
-                    
+
                     const confirmHandler = () => {
                         provConfirmationModal.style.display = 'none';
                         provModalConfirmBtn.removeEventListener('click', confirmHandler);
@@ -159,7 +179,7 @@
                 provMessageModalText.textContent = message;
                 provMessageModalText.className = `prov-message-text ${type ? 'prov-message-' + type : ''}`; // Añadir clase para estilo
                 provMessageModal.style.display = 'flex'; // Usar flex para centrar
-                
+
                 provMessageModalCloseBtn.onclick = () => {
                     provMessageModal.style.display = 'none';
                 };
@@ -167,24 +187,6 @@
                     provMessageModal.style.display = 'none';
                 };
             }
-
-     /*       // --- Lógica de Autenticación al cargar la página ---
-            const token = localStorage.getItem('jwtToken');
-            const userRole = localStorage.getItem('userRole');
-            const userId = localStorage.getItem('userId');
-
-            console.log('Ver Eventos Page Loaded.'); 
-            console.log('JWT Token:', token ? 'Exists' : 'Missing'); 
-            console.log('User Role from localStorage:', userRole); 
-
-            // Seguridad: Redirige si no hay token o el rol no es 'organizador'
-            if (!token || userRole !== 'organizador' || !userId) {
-                showProvMessageModal('Acceso denegado. Debes ser un proveedor autenticado para ver esta página.', 'error'); 
-                setTimeout(() => {
-                    window.location.replace('../login.html'); 
-                }, 2000); 
-                return; 
-            }*/
 
             // --- Event Listener para Cerrar Sesión ---
             provLogoutButton.addEventListener('click', async () => {
@@ -194,17 +196,17 @@
                     localStorage.removeItem('userName');
                     localStorage.removeItem('userRole');
                     localStorage.removeItem('isOrganizer');
-                    localStorage.removeItem('userId'); 
+                    localStorage.removeItem('userId');
                     showProvMessageModal('Sesión cerrada correctamente.', 'success');
                     setTimeout(() => {
-                        window.location.replace('../login.html'); 
-                    }, 500); 
+                        window.location.replace('../login.html');
+                    }, 500);
                 }
             });
 
             // --- Lógica para Notificaciones (Dropdown) ---
             provNotifToggle.addEventListener('click', (event) => {
-                event.stopPropagation(); 
+                event.stopPropagation();
                 provNotifDropdown.style.display = provNotifDropdown.style.display === 'block' ? 'none' : 'block';
             });
 
@@ -237,15 +239,15 @@
                     const response = await fetch(`${API_URL}/api/proveedor/eventos`, {
                         method: 'GET',
                         headers: {
-                            'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${token}` // Aquí se usa el token
                         }
                     });
                     const data = await response.json();
 
                     if (response.ok && data.events) {
                         if (data.events.length === 0) {
-                            eventsListBody.innerHTML = ''; 
-                            noEventsMessage.style.display = 'block'; 
+                            eventsListBody.innerHTML = '';
+                            noEventsMessage.style.display = 'block';
                         } else {
                             renderEventsTable(data.events);
                         }
@@ -276,7 +278,7 @@
                 let tableRowsHtml = '';
                 events.forEach(event => {
                     const imageUrl = event.URL_Imagen ? `${API_URL}${event.URL_Imagen}` : 'https://placehold.co/60x60/cccccc/000000?text=No+Img';
-                    
+
                     tableRowsHtml += `
                         <tr data-event-id="${event.Id_Evento}" class="event-main-row">
                             <td data-label="Imagen"><img src="${imageUrl}" alt="Imagen del evento" class="prov-event-image-thumbnail"></td>
@@ -284,7 +286,7 @@
                             <td data-label="Fecha">${new Date(event.Fecha).toLocaleDateString('es-ES')}</td>
                             <td data-label="Horario">${event.Horario_Inicio || 'N/A'} - ${event.Horario_Fin || 'N/A'}</td>
                             <td data-label="Ubicación">${event.Ubicacion}</td>
-                            <td data-label="Solicitar destacar">
+                            <td data-label="Estado">
                                 <span class="event-status event-status-${event.Estado.toLowerCase()}">${event.Estado}</span>
                             </td>
                             <td class="prov-actions-cell">
@@ -297,13 +299,14 @@
                             <td colspan="7">
                                 <div class="prov-details-content">
                                     <h3>Estadísticas de Venta para "${event.Nom_Evento}"</h3>
-                                    <p><strong>Precio General (Evento):</strong> S/. ${parseFloat(event.PrecioGeneral).toFixed(2)}</p>
+                                    <!-- Campos para rellenar con estadísticas de venta reales -->
+                                    <p><strong>Precio General (Evento):</strong> S/. ${parseFloat(event.PrecioGeneral || 0).toFixed(2)}</p>
                                     <p><strong>Precio VIP (Evento):</strong> ${event.PrecioVIP ? `S/. ${parseFloat(event.PrecioVIP).toFixed(2)}` : 'N/A'}</p>
-                                    <p><strong>Precio CONADIS (Evento):</strong> S/. ${parseFloat(event.PrecioConadis).toFixed(2)}</p>
-                                    <p><strong>Asientos General (Inicial):</strong> ${event.Asientos_General_Disponibles}</p>
-                                    <p><strong>Asientos VIP (Inicial):</strong> ${event.Asientos_VIP_Disponibles}</p>
-                                    <p><strong>Asientos CONADIS (Inicial):</strong> ${event.Asientos_CONADIS_Disponibles}</p>
-                                    
+                                    <p><strong>Precio CONADIS (Evento):</strong> ${event.PrecioConadis ? `S/. ${parseFloat(event.PrecioConadis).toFixed(2)}` : 'N/A'}</p>
+                                    <p><strong>Asientos General (Inicial):</strong> ${event.Asientos_General_Disponibles || 'N/A'}</p>
+                                    <p><strong>Asientos VIP (Inicial):</strong> ${event.Asientos_VIP_Disponibles || 'N/A'}</p>
+                                    <p><strong>Asientos CONADIS (Inicial):</strong> ${event.Asientos_CONADIS_Disponibles || 'N/A'}</p>
+
                                     <h4>Tickets Vendidos:</h4>
                                     <p><strong>General Vendidos:</strong> <span id="sold-general-${event.Id_Evento}">Cargando...</span></p>
                                     <p><strong>VIP Vendidos:</strong> <span id="sold-vip-${event.Id_Evento}">Cargando...</span></p>
@@ -327,7 +330,7 @@
                 eventsListBody.querySelectorAll('.prov-btn-edit').forEach(button => {
                     button.addEventListener('click', (e) => {
                         const eventId = e.target.dataset.id || e.target.closest('button').dataset.id;
-                        window.location.href = `editarprov.html?eventId=${eventId}`; 
+                        window.location.href = `editarEvento.html?eventId=${eventId}`; // Corregido a 'editarEvento.html'
                     });
                 });
                 eventsListBody.querySelectorAll('.prov-btn-delete').forEach(button => {
@@ -346,6 +349,14 @@
             async function toggleEventDetails(eventId) {
                 const detailsRow = document.getElementById(`details-row-${eventId}`);
                 if (detailsRow.style.display === 'none') {
+                    // Ocultar cualquier otra fila de detalles que pueda estar abierta
+                    document.querySelectorAll('.prov-details-row').forEach(row => {
+                        if (row.id !== `details-row-${eventId}` && row.style.display !== 'none') {
+                            row.style.display = 'none';
+                            row.classList.remove('show-details');
+                        }
+                    });
+
                     detailsRow.style.display = 'table-row'; // Mostrar la fila de detalles
                     detailsRow.classList.add('show-details'); // Añadir clase para la animación
                     await fetchEventStatistics(eventId); // Cargar estadísticas cuando se muestra
@@ -368,21 +379,22 @@
                 document.getElementById(`revenue-${eventId}`).textContent = 'Cargando...';
 
                 try {
+                    // Asegúrate de que esta ruta exista y devuelva las estadísticas correctas para el proveedor
                     const response = await fetch(`${API_URL}/api/proveedor/eventos/${eventId}/stats`, {
                         method: 'GET',
                         headers: {
-                            'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${token}` // Aquí se usa el token
                         }
                     });
                     const data = await response.json();
 
                     if (response.ok && data.statistics) {
                         const stats = data.statistics;
-                        document.getElementById(`sold-general-${eventId}`).textContent = stats.general_vendidos;
-                        document.getElementById(`sold-vip-${eventId}`).textContent = stats.vip_vendidos;
-                        document.getElementById(`sold-conadis-${eventId}`).textContent = stats.conadis_vendidos;
-                        document.getElementById(`sold-total-${eventId}`).textContent = stats.total_vendidos; 
-                        document.getElementById(`revenue-${eventId}`).textContent = `S/. ${parseFloat(stats.ganancias_estimadas).toFixed(2)}`;
+                        document.getElementById(`sold-general-${eventId}`).textContent = stats.general_vendidos || 0;
+                        document.getElementById(`sold-vip-${eventId}`).textContent = stats.vip_vendidos || 0;
+                        document.getElementById(`sold-conadis-${eventId}`).textContent = stats.conadis_vendidos || 0;
+                        document.getElementById(`sold-total-${eventId}`).textContent = stats.total_vendidos || 0;
+                        document.getElementById(`revenue-${eventId}`).textContent = `S/. ${parseFloat(stats.ganancias_estimadas || 0).toFixed(2)}`;
                     } else {
                         throw new Error(data.message || 'Error al obtener estadísticas del evento.');
                     }
@@ -393,7 +405,7 @@
                     document.getElementById(`sold-conadis-${eventId}`).textContent = 'Error';
                     document.getElementById(`sold-total-${eventId}`).textContent = 'Error';
                     document.getElementById(`revenue-${eventId}`).textContent = 'Error';
-                    showProvMessageModal(`No se pudieron cargar las estadísticas para el evento.`, 'error');
+                    showProvMessageModal(`No se pudieron cargar las estadísticas para el evento (ID: ${eventId}).`, 'error');
                 }
             }
 
@@ -404,18 +416,18 @@
              */
             async function handleDeleteEvent(eventId, eventName) {
                 const confirmDelete = await showProvConfirmationModal(`¿Estás seguro de que quieres ELIMINAR el evento "${eventName}" (ID: ${eventId})? Esta acción no se puede deshacer.`);
-                
+
                 if (!confirmDelete) {
-                    return; 
+                    return;
                 }
 
                 showProvMessageModal('Eliminando evento...', 'info');
 
                 try {
                     const response = await fetch(`${API_URL}/api/proveedor/eventos/${eventId}`, {
-                        method: 'DELETE', 
+                        method: 'DELETE',
                         headers: {
-                            'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${token}` // Aquí se usa el token
                         }
                     });
 
@@ -433,7 +445,8 @@
                 }
             }
 
-            fetchProviderEvents(); // Cargar eventos al cargar la página
+            // Llamar a la función para cargar eventos al cargar la página
+            fetchProviderEvents();
         });
     </script>
 </body>

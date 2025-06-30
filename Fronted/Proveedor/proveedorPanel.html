@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Proveedor - TEYCKETAN</title>
     <!-- Usar el nuevo archivo CSS específico para el panel de proveedor -->
-    <link rel="stylesheet" href="proveedor.css"> 
+    <link rel="stylesheet" href="proveedor.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -21,8 +21,8 @@
             <li><a href="proveedorPanel.html" class="prov-nav-item active"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
             <li><a href="crearevento.html" class="prov-nav-item"><i class="fas fa-plus-circle"></i><span>Crear evento</span></a></li>
             <li><a href="verEvento.html" class="prov-nav-item"><i class="fas fa-calendar-alt"></i><span>Ver eventos</span></a></li>
-            <li><a href="contactarEmpresa.html" class="prov-nav-item"><i  class="fas fa-envelope"></i><span>Contactar empresa</span></a></li>
-            <li><a href="eventosAprov.html" class="prov-nav-item"><i  class="fas fa-envelope"></i><span>Eventos aprobados</span></a></li>
+            <li><a href="contactarEmpresa.html" class="prov-nav-item"><i class="fas fa-envelope"></i><span>Contactar empresa</span></a></li>
+            <li><a href="eventosAprov.html" class="prov-nav-item"><i class="fas fa-check-circle"></i><span>Eventos Aprobados</span></a></li>
         </ul>
     </div>
 
@@ -79,7 +79,7 @@
         </section>
     </div>
 
-    <!-- Modales (copiados de admin.html/eventoApro.html, pero con prefijo prov-) -->
+    <!-- Modales (copiados de admin.html/eventoAprov.html, pero con prefijo prov-) -->
     <div id="provConfirmationModal" class="prov-modal">
         <div class="prov-modal-content">
             <span class="prov-close-button">&times;</span>
@@ -101,12 +101,31 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta
 
+            // --- Lógica de Autenticación al cargar la página ---
+            const token = localStorage.getItem('jwtToken');
+            const userRole = localStorage.getItem('userRole');
+            const userId = localStorage.getItem('userId'); // Necesitarás el userId para las solicitudes de eventos del proveedor
+
+            console.log('Proveedor Panel Page Loaded.');
+            console.log('JWT Token:', token ? 'Exists' : 'Missing');
+            console.log('User Role from localStorage:', userRole);
+            console.log('User ID from localStorage:', userId);
+
+            // Seguridad: Redirige si no hay token o el rol no es 'organizador'
+            if (!token || userRole !== 'organizador' || !userId) {
+                showProvMessageModal('Acceso denegado. Debes ser un proveedor autenticado para ver esta página.', 'error');
+                setTimeout(() => {
+                    window.location.replace('../login.html'); // Redirige al login.html (un nivel arriba de Proveedor/)
+                }, 2000);
+                return; // Detener la ejecución del script aquí
+            }
+
             // Elementos DOM principales
             const provLogoutButton = document.getElementById('provLogoutButton');
             const provNotifToggle = document.getElementById('provNotifToggle');
             const provNotifDropdown = document.getElementById('provNotifDropdown');
             const provMessageContainer = document.getElementById('provMessageContainer');
-            
+
             // Elementos para los contadores de eventos
             const pendingEventsCount = document.getElementById('pendingEventsCount');
             const approvedEventsCount = document.getElementById('approvedEventsCount');
@@ -132,7 +151,7 @@
                 return new Promise((resolve) => {
                     provModalMessage.textContent = message;
                     provConfirmationModal.style.display = 'flex'; // Usar flex para centrar
-                    
+
                     const confirmHandler = () => {
                         provConfirmationModal.style.display = 'none';
                         provModalConfirmBtn.removeEventListener('click', confirmHandler);
@@ -164,7 +183,7 @@
                 provMessageModalText.textContent = message;
                 provMessageModalText.className = `prov-message-text ${type ? 'prov-message-' + type : ''}`; // Añadir clase para estilo
                 provMessageModal.style.display = 'flex'; // Usar flex para centrar
-                
+
                 provMessageModalCloseBtn.onclick = () => {
                     provMessageModal.style.display = 'none';
                 };
@@ -172,24 +191,6 @@
                     provMessageModal.style.display = 'none';
                 };
             }
-
-        /*    // --- Lógica de Autenticación al cargar la página ---
-            const token = localStorage.getItem('jwtToken');
-            const userRole = localStorage.getItem('userRole');
-            const userId = localStorage.getItem('userId'); // Necesitarás el userId para las solicitudes de eventos del proveedor
-
-            console.log('Proveedor Panel Page Loaded.'); 
-            console.log('JWT Token:', token ? 'Exists' : 'Missing'); 
-            console.log('User Role from localStorage:', userRole); 
-
-            // Seguridad: Redirige si no hay token o el rol no es 'organizador'
-            if (!token || userRole !== 'organizador' || !userId) {
-                showProvMessageModal('Acceso denegado. Debes ser un proveedor autenticado para ver esta página.', 'error'); 
-                setTimeout(() => {
-                    window.location.replace('../login.html'); // Redirige al login.html (un nivel arriba de Proveedor/)
-                }, 2000); 
-                return; 
-            }*/
 
             // --- Event Listener para Cerrar Sesión ---
             provLogoutButton.addEventListener('click', async () => {
@@ -199,17 +200,17 @@
                     localStorage.removeItem('userName');
                     localStorage.removeItem('userRole');
                     localStorage.removeItem('isOrganizer');
-                    localStorage.removeItem('userId'); 
+                    localStorage.removeItem('userId');
                     showProvMessageModal('Sesión cerrada correctamente.', 'success');
                     setTimeout(() => {
-                        window.location.replace('../login.html'); 
-                    }, 500); 
+                        window.location.replace('../login.html');
+                    }, 500);
                 }
             });
 
             // --- Lógica para Notificaciones (Dropdown) ---
             provNotifToggle.addEventListener('click', (event) => {
-                event.stopPropagation(); 
+                event.stopPropagation();
                 provNotifDropdown.style.display = provNotifDropdown.style.display === 'block' ? 'none' : 'block';
             });
 
@@ -236,7 +237,7 @@
                     const response = await fetch(`${API_URL}/api/proveedor/eventos`, {
                         method: 'GET',
                         headers: {
-                            'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${token}` // Aquí se usa el token
                         }
                     });
                     const data = await response.json();

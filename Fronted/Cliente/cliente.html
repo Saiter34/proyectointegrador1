@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teycketan - Mi Perfil</title>
-    <!-- Ruta relativa desde 'Fronted/Cliente' para el CSS -->
+    <!-- Ruta relativa desde 'Fronted/Clientes' para el CSS (correcta) -->
     <link rel="stylesheet" href="cliente.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -18,24 +18,24 @@
     <main>
         <header class="encabezado">
             <div class="logo">
-                <!-- Ruta relativa desde 'Fronted/Cliente' para acceder a 'Fronted/img/' -->
+                <!-- Ruta relativa desde 'Fronted/Clientes' para acceder a 'Fronted/img/' (correcta) -->
                 <img src="../img/logo.png" alt="Logo de Teycketan">
             </div>
             <nav>
-                <!-- "Quieres ser organizador?" - Visible/oculto por JS según rol -->
+                <!-- "¿Quieres ser organizador?" - Visible/oculto por JS según rol -->
                 <div class="nav-box" id="organizerLinkContainer">
-                    <!-- Ruta relativa desde 'Fronted/Cliente' para acceder a 'Fronted/Organizador/bienvenidoprov.html' -->
-                    <a href="../Organizador/bienvenidoprov.html" id="organizerLink">¿Quieres ser organizador?</a>
+                    <!-- Ruta relativa desde 'Fronted/Clientes' para acceder a 'Fronted/Organizador/bienvenidoprov.html' (correcta) -->
+                    <a href="bienvenidoprov.html" id="organizerLink">¿Quieres ser organizador?</a>
                 </div>
 
                 <!-- Dropdown de Categorías -->
                 <div class="nav-box dropdown">
                     <button>Categorías</button>
                     <div class="dropdown-content">
-                        <!-- Rutas relativas desde 'Fronted/Cliente' para acceder a otras categorías en la misma carpeta -->
-                        <a href="concierto.html">Conciertos</a>
-                        <a href="teatro.html">Teatro</a>
-                        <a href="deportes.html">Deportes</a>
+                        <!-- Rutas corregidas para apuntar a categorias.html dentro de la misma carpeta Clientes/ -->
+                        <a href="categorias.html?categoria=Conciertos">Conciertos</a>
+                        <a href="categorias.html?categoria=Teatro">Teatro</a>
+                        <a href="categorias.html?categoria=Deportes">Deportes</a>
                     </div>
                 </div>
 
@@ -70,6 +70,7 @@
         <section class="carrusel" id="carrusel-eventos-destacados">
             <!-- Los slides del carrusel se cargarán dinámicamente aquí -->
             <p class="loading-carousel-message">Cargando eventos destacados...</p>
+            <!-- Los botones de control se añadirán en JS al renderizar los slides -->
         </section>
 
         <div class="contenido-principal-doscolumnas">
@@ -85,7 +86,7 @@
             <aside class="destacados contenedor-estilo">
                 <h3>Ubicaciones destacadas</h3>
                 <div class="circulos">
-                    <!-- Rutas relativas desde 'Fronted/Cliente' para acceder a otras ubicaciones -->
+                    <!-- Rutas relativas desde 'Fronted/Clientes' para acceder a otras ubicaciones (correctas) -->
                     <a href="sanmarcos.html" class="circulo">
                         <img src="../img/sanmarcos.png" alt="Estadio San Marcos">
                         <span>San Marcos</span>
@@ -134,7 +135,7 @@
                 <div class="footer-col">
                     <h4>Métodos de pago</h4>
                     <div class="payment-methods">
-                        <!-- Rutas relativas desde 'Fronted/Cliente' para acceder a 'Fronted/img/' -->
+                        <!-- Rutas relativas desde 'Fronted/Clientes' para acceder a 'Fronted/img/' (correctas) -->
                         <img src="../img/logo-yape.jpg" alt="Logo Yape">
                         <img src="../img/logo-plin.jpg" alt="Logo Plin">
                     </div>
@@ -144,7 +145,7 @@
                 <small>&copy; 2024 <b>SLee Dw</b> - Todos los Derechos Reservados.</small>
             </div>
         </div>
-        <!-- Ruta relativa desde 'Fronted/Cliente' para acceder a 'Fronted/img/' -->
+        <!-- Ruta relativa desde 'Fronted/Clientes' para acceder a 'Fronted/img/' (correcta) -->
         <img src="../img/logo.png" alt="Logo Teycketan" class="logo-footer"/>
     </footer>
 
@@ -174,6 +175,7 @@
             const clientNotifDropdown = document.getElementById('clientNotifDropdown');
             const clientNotifDot = document.querySelector('.client-notif-dot');
 
+            let carouselInterval; // Variable para almacenar el intervalo del carrusel
 
             // Modal elements
             const clientModal = document.getElementById('clientModal');
@@ -232,16 +234,22 @@
                 showModal('Para acceder a tu perfil, necesitas iniciar sesión primero.', 'error', [{
                     text: 'Ir a Iniciar Sesión',
                     type: 'confirm',
-                    handler: () => window.location.replace('../login.html') // Ruta a login.html en la carpeta padre
+                    // Ruta corregida a login.html (desde Clientes/ a Fronted/)
+                    handler: () => window.location.replace('../login.html') 
                 }]);
-                return; // Detener la ejecución del script aquí
+                // No detener la ejecución aquí para permitir que se carguen los eventos públicos.
             }
 
             // Si hay token y userName, el usuario está logueado.
-            miCuentaButton.textContent = `Hola, ${userName}`;
+            if (userName) { // Solo si userName existe
+                miCuentaButton.textContent = `Hola, ${userName}`;
+            } else {
+                miCuentaButton.textContent = `Mi Cuenta`; // Default text if not logged in
+            }
+
 
             // Mostrar u ocultar "¿Quieres ser organizador?" según el rol
-            if (userRole === 'organizador' || userRole === 'admin') {
+            if (userRole === 'organizador' || userRole === 'admin' || userRole === 'pendiente_organizador') { // También ocultar si ya solicitó
                 if (organizerLinkContainer) {
                     organizerLinkContainer.style.display = 'none';
                 }
@@ -255,24 +263,44 @@
             async function fetchFeaturedEvents() {
                 carruselEventosDestacados.innerHTML = '<p class="loading-carousel-message">Cargando eventos destacados...</p>';
                 try {
+                    // Endpoint para obtener eventos destacados (público)
                     const response = await fetch(`${API_URL}/api/eventos/destacados`);
-                    const events = await response.json();
+                    const data = await response.json(); // Leer la respuesta como JSON
 
                     if (response.ok) {
-                        if (events.length === 0) {
+                        const events = data.events; // Asumiendo que el backend envía { events: [...] }
+                        if (events && events.length === 0) {
                             carruselEventosDestacados.innerHTML = '<p class="no-events-found-message">No hay eventos destacados por el momento.</p>';
-                        } else {
+                            // Ocultar controles del carrusel si no hay eventos
+                            const prevBtn = carruselEventosDestacados.querySelector('.carousel-control.prev');
+                            const nextBtn = carruselEventosDestacados.querySelector('.carousel-control.next');
+                            if(prevBtn) prevBtn.style.display = 'none';
+                            if(nextBtn) nextBtn.style.display = 'none';
+                        } else if (events) {
                             renderFeaturedEvents(events);
                             initCarousel(); // Inicializar carrusel después de renderizar
+                        } else {
+                             carruselEventosDestacados.innerHTML = `<p class="error-message">Formato de datos inesperado para eventos destacados.</p>`;
+                             console.error('Unexpected data format for featured events:', data);
                         }
                     } else {
-                        carruselEventosDestacados.innerHTML = `<p class="error-message">Error al cargar eventos destacados: ${events.message || 'Error desconocido'}</p>`;
-                        console.error('Error fetching featured events:', events);
+                        carruselEventosDestacados.innerHTML = `<p class="error-message">Error al cargar eventos destacados: ${data.message || 'Error desconocido'}</p>`;
+                        console.error('Error fetching featured events:', data);
+                        // Ocultar controles del carrusel si hay un error
+                        const prevBtn = carruselEventosDestacados.querySelector('.carousel-control.prev');
+                        const nextBtn = carruselEventosDestacados.querySelector('.carousel-control.next');
+                        if(prevBtn) prevBtn.style.display = 'none';
+                        if(nextBtn) nextBtn.style.display = 'none';
                     }
                 }
                 catch (error) {
                     carruselEventosDestacados.innerHTML = '<p class="error-message">Error de conexión con el servidor. No se pueden cargar los eventos destacados.</p>';
                     console.error('Network error fetching featured events:', error);
+                    // Ocultar controles del carrusel si hay un error de red
+                    const prevBtn = carruselEventosDestacados.querySelector('.carousel-control.prev');
+                    const nextBtn = carruselEventosDestacados.querySelector('.carousel-control.next');
+                    if(prevBtn) prevBtn.style.display = 'none';
+                    if(nextBtn) nextBtn.style.display = 'none';
                 }
             }
 
@@ -281,27 +309,41 @@
              * @param {Array<Object>} events - Un array de objetos de eventos.
              */
             function renderFeaturedEvents(events) {
-                let carouselHtml = '';
+                let slidesHtml = '';
                 events.forEach((event, index) => {
                     const formattedDate = new Date(event.Fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
-                    // Asegúrate de que event.URL_Imagen contiene la ruta completa o relativa al servidor
                     const imageUrl = event.URL_Imagen ? `${API_URL}${event.URL_Imagen}` : 'https://placehold.co/800x450/cccccc/000000?text=No+Img';
 
-                    carouselHtml += `
+                    slidesHtml += `
                         <div class="slide ${index === 0 ? 'activo' : ''}">
                             <div class="info">
                                 <h2>${event.Nom_Evento}</h2>
-                                <p><strong>${event.Categoria}</strong> / Presencial</p>
-                                <p>${event.Descripcion}</p>
+                                <p><strong>${event.Categoria || 'Categoría'}</strong> / Presencial</p>
+                                <p>${event.Descripcion || 'Especificación del evento'}</p>
                                 <p>${formattedDate}</p>
-                                <!-- Ruta corregida a detalles.html dentro de la misma carpeta -->
+                                <!-- Ruta corregida a detalles.html dentro de la misma carpeta Clientes/ -->
                                 <a href="detalles.html?eventId=${event.Id_Evento}" class="btn-vermas">Ver más</a>
                             </div>
                             <img src="${imageUrl}" alt="${event.Nom_Evento}">
                         </div>
                     `;
                 });
-                carruselEventosDestacados.innerHTML = carouselHtml;
+                carruselEventosDestacados.innerHTML = slidesHtml; // Solo los slides
+                
+                // Añadir los botones de control después de los slides
+                if (events.length > 1) { // Solo si hay más de un evento para el carrusel
+                    const prevButton = document.createElement('button');
+                    prevButton.classList.add('carousel-control', 'prev');
+                    prevButton.id = 'prevSlide';
+                    prevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                    carruselEventosDestacados.appendChild(prevButton);
+
+                    const nextButton = document.createElement('button');
+                    nextButton.classList.add('carousel-control', 'next');
+                    nextButton.id = 'nextSlide';
+                    nextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                    carruselEventosDestacados.appendChild(nextButton);
+                }
             }
 
             /**
@@ -309,37 +351,75 @@
              */
             function initCarousel() {
                 let slideIndex = 0;
-                const slides = document.querySelectorAll('.carrusel .slide');
-
-                if (slides.length === 0) {
-                    return; // No hay slides para inicializar
+                const slides = carruselEventosDestacados.querySelectorAll('.carrusel .slide');
+                
+                // Limpiar cualquier intervalo existente
+                if (carouselInterval) {
+                    clearInterval(carouselInterval);
                 }
+
+                if (slides.length <= 1) {
+                    // Ocultar botones si hay 0 o 1 slide
+                    const prevBtn = carruselEventosDestacados.querySelector('#prevSlide');
+                    const nextBtn = carruselEventosDestacados.querySelector('#nextSlide');
+                    if (prevBtn) prevBtn.style.display = 'none';
+                    if (nextBtn) nextBtn.style.display = 'none';
+                    return; // No hay suficientes slides para un carrusel
+                } else {
+                    // Mostrar botones si hay más de un slide
+                    const prevBtn = carruselEventosDestacados.querySelector('#prevSlide');
+                    const nextBtn = carruselEventosDestacados.querySelector('#nextSlide');
+                    if (prevBtn) prevBtn.style.display = 'block';
+                    if (nextBtn) nextBtn.style.display = 'block';
+                }
+
 
                 // Asegurarse de que solo el primer slide esté activo inicialmente
                 slides.forEach((slide, i) => {
+                    slide.style.transition = 'transform 0.5s ease-in-out, opacity 0.5s ease-in-out'; // Añadir transición
                     if (i === 0) {
                         slide.classList.add('activo');
-                        slide.style.left = '0';
+                        slide.style.transform = 'translateX(0)';
+                        slide.style.opacity = '1';
                     } else {
                         slide.classList.remove('activo');
-                        slide.style.left = '100%';
+                        slide.style.transform = 'translateX(100%)';
+                        slide.style.opacity = '0';
                     }
                 });
 
-                function showNextSlide() {
+                function showSlide(n) {
                     slides[slideIndex].classList.remove('activo');
-                    slides[slideIndex].style.left = '-100%'; // Mover el slide saliente a la izquierda
+                    slides[slideIndex].style.transform = (n > slideIndex || (n === 0 && slideIndex === slides.length - 1)) ? 'translateX(-100%)' : 'translateX(100%)';
+                    slides[slideIndex].style.opacity = '0';
 
-                    slideIndex = (slideIndex + 1) % slides.length;
 
+                    slideIndex = (n + slides.length) % slides.length;
+                    
                     slides[slideIndex].classList.add('activo');
-                    slides[slideIndex].style.left = '0'; // Mover el nuevo slide a la posición central
+                    slides[slideIndex].style.transform = 'translateX(0)';
+                    slides[slideIndex].style.opacity = '1';
                 }
 
-                // Iniciar carrusel solo si hay más de un slide
-                if (slides.length > 1) {
-                    setInterval(showNextSlide, 10000); // Cambiar slide cada 10 segundos
+                const prevBtn = carruselEventosDestacados.querySelector('#prevSlide');
+                const nextBtn = carruselEventosDestacados.querySelector('#nextSlide');
+
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', () => {
+                        showSlide(slideIndex - 1);
+                        clearInterval(carouselInterval);
+                        carouselInterval = setInterval(() => showSlide(slideIndex + 1), 10000);
+                    });
                 }
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => {
+                        showSlide(slideIndex + 1);
+                        clearInterval(carouselInterval);
+                        carouselInterval = setInterval(() => showSlide(slideIndex + 1), 10000);
+                    });
+                }
+                
+                carouselInterval = setInterval(() => showSlide(slideIndex + 1), 10000); // Auto-avance cada 10 segundos
             }
 
 
@@ -348,17 +428,21 @@
                 proximosEventosGrid.innerHTML = '<p class="loading-events-message">Cargando próximos eventos...</p>';
                 try {
                     const response = await fetch(`${API_URL}/api/eventos/aprobados-para-cliente`);
-                    const events = await response.json();
+                    const data = await response.json(); // Leer la respuesta como JSON
 
                     if (response.ok) {
-                        if (events.length === 0) {
+                        const events = data.events; // Asumiendo que el backend envía { events: [...] }
+                        if (events && events.length === 0) {
                             proximosEventosGrid.innerHTML = '<p class="no-events-found-message">No hay eventos disponibles por el momento. ¡Vuelve pronto!</p>';
-                        } else {
+                        } else if (events) {
                             renderEvents(events);
+                        } else {
+                            proximosEventosGrid.innerHTML = `<p class="error-message">Formato de datos inesperado para próximos eventos.</p>`;
+                            console.error('Unexpected data format for approved events:', data);
                         }
                     } else {
-                        proximosEventosGrid.innerHTML = `<p class="error-message">Error al cargar eventos: ${events.message || 'Error desconocido'}</p>`;
-                        console.error('Error fetching approved events:', events);
+                        proximosEventosGrid.innerHTML = `<p class="error-message">Error al cargar eventos: ${data.message || 'Error desconocido'}</p>`;
+                        console.error('Error fetching approved events:', data);
                     }
                 }
                 catch (error) {
@@ -375,7 +459,7 @@
                     const imageUrl = event.URL_Imagen ? `${API_URL}${event.URL_Imagen}` : 'https://placehold.co/150x100/cccccc/000000?text=No+Img';
 
                     eventsHtml += `
-                        <!-- Ruta corregida a detalles.html dentro de la misma carpeta -->
+                        <!-- Ruta corregida a detalles.html dentro de la misma carpeta Clientes/ -->
                         <a href="detalles.html?eventId=${event.Id_Evento}" class="evento-link">
                             <div class="evento">
                                 <img src="${imageUrl}" alt="${event.Nom_Evento}">
@@ -398,9 +482,6 @@
             // --- Event Listeners para la navegación de usuario logueado ---
             viewProfileLink.addEventListener('click', (e) => {
                 e.preventDefault();
-                // Aquí, podrías cargar la información del perfil en un modal,
-                // o redirigir a una sección específica de esta misma página si es un SPA (Single Page Application).
-                // Por ahora, se mantiene en la misma página sin acción visible.
                 showModal('Visualización de perfil en desarrollo.', 'info');
             });
 
@@ -416,7 +497,8 @@
                             localStorage.removeItem('userEmail');
                             localStorage.removeItem('userRole');
                             localStorage.removeItem('userId');
-                            window.location.replace('../principal.html'); // Ruta a principal.html en la carpeta padre
+                            // Ruta corregida a principal.html (desde Clientes/ a Fronted/)
+                            window.location.replace('../principal.html'); 
                         }
                     },
                     {
