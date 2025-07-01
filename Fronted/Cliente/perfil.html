@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Perfil - Teycketan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="perfil.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <!-- Fondos -->
+  <div class="fondo-overlay-extra"></div>
+  <div class="fondo-overlay"></div>
+
+  <!-- Header -->
+  <header class="encabezado">
+    <div class="barra-logo">
+      <img src="../img/logo.png" alt="Logo Teycketan" class="logo" />
+    </div>
+    <div class="barra-pasos">
+      <a href="cliente.html" class="paso activo no-subrayado">
+        <span>INICIO</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="perfil-contenedor">
+    <section class="perfil-box perfil-datos-flex">
+  <h2>Mi Perfil</h2>
+  <div class="perfil-contenido">
+    <div class="perfil-foto">
+      <img src="../img/imagen.jpg" alt="Foto de perfil" />
+    </div>
+    <div class="perfil-datos">
+      <p><strong>Datos:</strong> Dato de usuario</p>
+      <p><strong>Datos:</strong> Dato de usuario</p>
+      <p><strong>Datos:</strong> Dato de usuario</p>
+      <p><strong>Datos:</strong> Dato de usuario</p>
+      <button class="btn-editar">Editar Perfil</button>
+    </div>
+  </div>
+</section>
+
+<section class="perfil-box puntos-box">
+  <h2>Puntos Acumulados</h2>
+  <p><strong>Saldo actual:</strong> 2000 Puntos Teycketan</p>
+  <p><strong>Equivalente:</strong> S/ 20.00</p>
+</section>
+
+<section class="perfil-box historial-box">
+  <h2>Historial de Compras</h2>
+  <button class="btn-ver-historial" onclick="toggleHistorial()">Ver historial de compras</button>
+  <div id="historialCompras" class="tabla-historial-contenedor oculto">
+    <table class="tabla-historial">
+      <thead>
+        <tr>
+          <th>Evento</th>
+          <th>Fecha</th>
+          <th>Cantidad</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>evento</td>
+          <td>fecha</td>
+          <td>2</td>
+          <td>S/ 160.00</td>
+        </tr>
+        <tr>
+          <td>evento</td>
+          <td>fecha</td>
+          <td>1</td>
+          <td>S/ 90.00</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<script>
+  function toggleHistorial() {
+    const tabla = document.getElementById('historialCompras');
+    tabla.classList.toggle('oculto');
+  }
+</script>
+
+  </main>
+
+  <footer>
+    <img src="../img/logo.png" alt="Logo Footer" class="logo-footer" />
+  </footer>
+</body>
+</html>

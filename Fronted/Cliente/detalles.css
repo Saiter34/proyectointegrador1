@@ -60,7 +60,6 @@ h1, h2, h3, h4 {
 /* --- ENCABEZADO ---*/
 header.encabezado {
     background-color: #4c0000; /* Rojo oscuro como base del encabezado */
-    border-bottom: 4px solid #b30000; /* Borde inferior más oscuro */
     padding: 10px 30px;
     display: flex;
     justify-content: flex-start; /* Alinea los elementos a la izquierda */
