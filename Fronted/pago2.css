@@ -22,8 +22,7 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #333;
-  border-bottom: 4px solid #b30000;
+  background-color: #4c0000;
   padding: 5px 20px;
   height: 60px;
   position: relative;
@@ -72,7 +71,6 @@ body::before {
   justify-content: center;
   font-weight: bold;
   margin-bottom: 4px;
-  border: 2px solid #ff0000;
 }
 
 main.contenedor {
@@ -180,3 +178,58 @@ footer {
 .logo-footer {
   height: 50px;
 }
+/* Sección de puntos Teycketan */
+.puntos-section {
+  background-color: rgba(100, 0, 0, 0.4);
+  border: 1px solid #ff0000;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+  color: #f7f7f7;
+  font-family: 'Poppins', sans-serif;
+}
+
+.puntos-section h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-family: 'Orbitron', sans-serif;
+  color: #ff6666;
+  font-size: 1.1rem;
+}
+
+.puntos-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.puntos-info span {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.puntos-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.puntos-checkbox input[type="checkbox"] {
+  accent-color: #ff0000;
+  transform: scale(1.2);
+}
+
+.puntos-checkbox label {
+  font-size: 0.95rem;
+  color: #ffdddd;
+}
+
+
+/* Estilos para líneas de descuento */
+.linea.descuento {
+  font-size: 0.95rem;
+  color: yellow;
+}
+

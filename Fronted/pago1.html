@@ -2,12 +2,18 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Selecciona tu ubicación - TEYCKETAN</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="pago1.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
+  <!-- Capas de fondo -->
+  <div class="fondo-overlay-extra"></div>
+  <div class="fondo-overlay"></div>
+
+  <!-- Header estilo detalles -->
   <header class="encabezado">
     <div class="barra-logo">
       <img src="img/logo.png" alt="Logo Teycketan" class="logo" />
@@ -15,7 +21,8 @@
     <div class="barra-pasos">
       <div class="paso activo">
         <div class="circulo">1</div>
-        <span>TIK</span>
+        <span>SELECCIÓN</span>
+        
       </div>
       <div class="paso">
         <div class="circulo">2</div>
@@ -28,65 +35,107 @@
     </div>
   </header>
 
-  <main class="contenedor">
-    <h1><span class="evento">Your Damiano David</span><br><span class="en-vivo">EN VIVO</span></h1>
+  <main class="main-content">
+    <section class="precios">
+      <div class="precios-box">
+        <div class="lado-imagen">
+          <img src="img/imagen.jpg" alt="Escenario" /> 
+        </div>
+        <div class="lado-precios">
+          <h2 class="event-title">Nombre de evento</h2>
 
-    <section class="zonas">
-      <div class="zona vip">
-        <h2>VIP</h2>
-      </div>
-      <div class="zona general">
-        <h2>GENERAL</h2>
-      </div>
-    </section>
-
-    <section class="detalles">
-      <div class="precios">
-        <label><input type="radio" name="zona" value="vip-standard" data-price="120.00" data-name="ZONA VIP" required /> ZONA VIP - S/ 120.00</label><br>
-        <label><input type="radio" name="zona" value="vip-comodis" data-price="105.00" data-name="ZONA VIP - COMODIS" /> ZONA VIP - CONADIS S/ 105.00</label><br>
-        <label><input type="radio" name="zona" value="general" data-price="84.00" data-name="ZONA GENERAL" /> ZONA GENERAL - S/ 84.00</label>
-      </div>
-
-      <table class="tabla-compra">
-        <thead>
-          <tr>
-            <th>TICKET</th>
-            <th>PRECIO</th>
-            <th>SELECCIONA CANTIDAD</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>ZONA VIP</td>
-            <td>S/ 120.00</td>
-            <td>
-              <div class="cantidad" data-zone="vip-standard"> <button class="btn-menos">-</button>
-                <input type="text" value="0" class="cantidad-input" data-price="120.00" data-name="ZONA VIP" />
+          <div class="tabla-precios">
+            <div class="fila tabla-encabezado">
+              <div>Zona</div>
+              <div>Precio</div>
+              <div>Cantidad</div>
+            </div>
+            <div class="fila">
+              <div>ZONA VIP</div>
+              <div>S/ 120.00</div>
+              <div class="cantidad">
+                <button class="btn-menos">-</button>
+                <input type="text" value="0" class="cantidad-input" data-price="120.00" />
                 <button class="btn-mas">+</button>
               </div>
-            </td>
-          </tr>
-          <tr>
-            <td>ZONA GENERAL</td>
-            <td>S/ 84.00</td>
-            <td>
-              <div class="cantidad" data-zone="general"> <button class="btn-menos">-</button>
-                <input type="text" value="0" class="cantidad-input" data-price="84.00" data-name="ZONA GENERAL" />
+            </div>
+            <div class="fila">
+              <div>ZONA GENERAL</div>
+              <div>S/ 84.00</div>
+              <div class="cantidad">
+                <button class="btn-menos">-</button>
+                <input type="text" value="0" class="cantidad-input" data-price="84.00" />
                 <button class="btn-mas">+</button>
               </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            </div>
+            <div class="fila">
+              <div>ZONA CONADIS</div>
+              <div>S/ 80.00</div>
+              <div class="cantidad">
+                <button class="btn-menos">-</button>
+                <input type="text" value="0" class="cantidad-input" data-price="84.00" />
+                <button class="btn-mas">+</button>
+              </div>
+            </div>
+            <div class="fila">
+              <div>ZONA PREVENTA</div>
+              <div>S/ 80.00</div>
+              <div class="cantidad">
+                <button class="btn-menos">-</button>
+                <input type="text" value="0" class="cantidad-input" data-price="84.00" />
+                <button class="btn-mas">+</button>
+              </div>
+            </div>
+          </div>
 
-      <button id="btnSiguiente" class="btn-siguiente">SIGUIENTE</button>
-
-
+          <button id="btnSiguiente" class="btn-comprar">SIGUIENTE</button>
+        </div>
+      </div>
     </section>
   </main>
 
-  <footer>
-    <img src="img/logo.png" alt="Logo Footer" class="logo-footer"/>
+  <!-- Footer estilo detalles -->
+  <footer class="footer-completo">
+    <div class="container-footer">
+      <div class="footer-row">
+        <div class="footer-col">
+          <h4>Síguenos</h4>
+          <div class="social-links">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Compañía</h4>
+          <ul>
+            <li><a href="#">Nosotros</a></li>
+            <li><a href="#">Servicios</a></li>
+            <li><a href="#">Política de Privacidad</a></li>
+            <li><a href="#">Califícanos</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Ayuda</h4>
+          <ul>
+            <li><a href="#">Teléfono: (999-999-999)</a></li>
+            <li><a href="#">Correo: Teycketan@gmail.com</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Métodos de pago</h4>
+          <div class="payment-methods">
+            <img src="img/logo-yape.jpg" alt="Logo Yape">
+            <img src="img/logo-plin.jpg" alt="Logo Plin">
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <small>&copy; 2024 <b>Teycketan</b> - Todos los Derechos Reservados.</small>
+      </div>
+    </div>
+    <img src="img/logo.png" alt="Logo Teycketan" class="logo-footer"/>
   </footer>
 <script>
 document.addEventListener('DOMContentLoaded', function () {

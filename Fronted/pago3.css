@@ -26,8 +26,7 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #333;
-  border-bottom: 4px solid #b30000;
+  background-color: #4c0000;
   padding: 5px 20px;
   height: 60px;
   position: fixed;
@@ -75,7 +74,6 @@ body::before {
   justify-content: center;
   font-weight: bold;
   margin-bottom: 4px;
-  border: 2px solid #ff0000;
 }
 
 /* CONTENIDO PRINCIPAL */

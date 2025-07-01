@@ -8,6 +8,11 @@
   <link rel="stylesheet" href="pago2.css" />
 </head>
 <body>
+  <!-- Capas de fondo -->
+  <div class="fondo-overlay-extra"></div>
+  <div class="fondo-overlay"></div>
+
+  <!-- Header estilo Teycketan -->
   <header class="encabezado">
     <div class="barra-logo">
       <img src="img/logo.png" alt="Logo Teycketan" class="logo" />
@@ -15,7 +20,7 @@
     <div class="barra-pasos">
       <div class="paso">
         <div class="circulo">1</div>
-        <span>TICKETS</span>
+        <span>SELECCIÓN</span>
       </div>
       <div class="paso activo">
         <div class="circulo">2</div>
@@ -28,29 +33,54 @@
     </div>
   </header>
 
+  <!-- Contenido principal -->
   <main class="contenedor">
     <h2 class="subtitulo">Selecciona método de pago</h2>
 
+    <!-- Métodos de pago -->
     <section class="metodos-pago">
       <label class="metodo">
         <input type="radio" name="pago" value="efectivo" required />
         <span>PAGO EFECTIVO</span>
       </label>
-
       <label class="metodo">
         <input type="radio" name="pago" value="yape" />
         <span>YAPE</span>
       </label>
-      </section>
+    </section>
 
+    <!-- Puntos Teycketan -->
+    <section class="puntos-section">
+      <h3>PUNTOS TEYCKETAN: <span class="valor-soles">S/ 20.00</span></h3>
+      <div class="puntos-info">
+        <span>Equivale a: <strong>2000 Puntos Teycketan</strong></span>
+      </div>
+      <div class="puntos-checkbox">
+        <input type="checkbox" id="usarPuntos" />
+        <label for="usarPuntos">Usar puntos en esta compra</label>
+      </div>
+    </section>
+
+    <!-- Resumen de compra -->
     <section class="resumen">
       <h3>RESUMEN</h3>
       <div class="linea">
         <span class="item">TICKET</span>
         <span class="item">PRECIO</span>
       </div>
-      <div id="summaryTickets">
-        </div>
+      <div class="linea">
+        <span class="item">Precio ticket</span>
+        <span class="item">S/ 100.00</span>
+      </div>
+      <div id="summaryTickets"></div>
+      <div class="linea descuento">
+        <span class="item">Descuento por primera compra</span>
+        <span class="item">- S/ 10.00</span>
+      </div>
+      <div class="linea descuento">
+        <span class="item">Descuento promocional</span>
+        <span class="item">- S/ 5.00</span>
+      </div>
       <div class="linea total">
         <span class="item">TOTAL</span>
         <span class="item" id="totalAmount">S/ 0.00</span>
@@ -60,16 +90,15 @@
     <button id="btnSiguiente2" class="btn-siguiente">SIGUIENTE</button>
   </main>
 
+  <!-- Footer -->
   <footer>
     <img src="img/logo.png" alt="Logo Footer" class="logo-footer" />
   </footer>
-
-<script>
+  <script>
 document.addEventListener('DOMContentLoaded', function () {
     const summaryTicketsDiv = document.getElementById('summaryTickets');
     const totalAmountSpan = document.getElementById('totalAmount');
     const btnSiguiente2 = document.getElementById('btnSiguiente2');
-    const paymentMethodsRadios = document.querySelectorAll('input[name="pago"]');
 
     let purchaseDetails = JSON.parse(localStorage.getItem('purchaseDetails'));
 
@@ -101,12 +130,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         purchaseDetails.paymentMethod = selectedPaymentMethod.value;
-
         localStorage.setItem('purchaseDetails', JSON.stringify(purchaseDetails));
 
         window.location.href = 'pago3.html';
     });
 });
 </script>
+
 </body>
 </html>
+
+  

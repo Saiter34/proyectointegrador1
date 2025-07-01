@@ -1,51 +1,59 @@
+/* Estilos combinados con el mismo estilo de detalles.css */
 body {
   margin: 0;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Orbitron', sans-serif;
   background: url('img/fondometal.jpg') repeat;
   background-size: cover;
-  position: relative;
   color: white;
+  position: relative;
 }
 
-body::before {
-  content: "";
-  position: absolute;
-  inset: 0;
+.fondo-overlay, .fondo-overlay-extra {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+}
+
+.fondo-overlay {
   background: url('img/fondodetalles.jpg') no-repeat center;
   background-size: cover;
   opacity: 0.5;
-  z-index: 0;
+}
+
+.fondo-overlay-extra {
+  background: rgba(0, 0, 0, 0.6);
 }
 
 .encabezado {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #333;
-  border-bottom: 4px solid #b30000;
-  padding: 5px 20px; /* Menos padding vertical */
-  height: 60px;
-  position: relative;
-  z-index: 3;
-  position: fixed;
+  background-color: #4c0000;
+  padding: 10px 20px;
+  position: sticky;
   top: 0;
-  left: 0;
-  width: 100%;
-
+  z-index: 5;
 }
 
 .barra-logo .logo {
-  height: 40px;
+  height: 50px;
 }
 
 .barra-pasos {
   display: flex;
   gap: 30px;
-  margin-right: 20px;
+  align-items: center;
+}
+
+.paso {
+  text-align: center;
+  color: #ccc;
 }
 
 .paso.activo {
-  opacity: 1;
   color: #ff3b3b;
 }
 
@@ -61,99 +69,81 @@ body::before {
   justify-content: center;
   font-weight: bold;
   margin-bottom: 4px;
-  border: 2px solid #ff0000;
 }
 
-main.contenedor {
+.main-content {
   position: relative;
   z-index: 1;
-  max-width: 900px;
-  margin: 40px auto 0 auto; 
-  padding: 30px;
-  background-color: rgba(50, 0, 0, 0.7);
-  border-radius: 15px;
-  box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
-  margin-top: 80px;
-}
-
-h1 {
-  text-align: center;
-  font-family: 'Orbitron', sans-serif;
-  margin-bottom: 20px;
-}
-
-h1 .evento {
-  color: #cccccc;
-  letter-spacing: 1px;
-}
-
-h1 .en-vivo {
-  font-size: 1.2rem;
-  color: #ff0000;
-}
-
-.zonas {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.zona {
-  width: 180px;
-  height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.5);
-}
-
-.zona.vip {
-  background-color: #4d0000;
-  color: white;
-}
-
-.zona.general {
-  background-color: #ddd;
-  color: #222;
-}
-
-.detalles {
-  background-color: rgba(255, 255, 255, 0.05);
+  max-width: 1100px;
+  margin: 80px auto;
   padding: 20px;
+}
+
+.precios-box {
+  display: flex;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 2px solid #b30000;
   border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
 }
 
-.precios {
-  margin-bottom: 20px;
-  line-height: 1.8;
-  color: #f7f7f7;
+.lado-imagen {
+  flex: 1;
+  background-color: #111;
 }
 
-.precios input[type="radio"] {
-  margin-right: 8px;
-}
-
-.tabla-compra {
+.lado-imagen img {
   width: 100%;
-  border-collapse: collapse;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lado-precios {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.event-title {
+  font-family: 'Orbitron', sans-serif;
+  color: #ff0000;
+  text-align: center;
   margin-bottom: 20px;
 }
 
-.tabla-compra th, .tabla-compra td {
-  padding: 10px;
-  text-align: center;
-  border-bottom: 1px solid #ccc;
+.tabla-precios {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.fila {
+  display: grid;
+  grid-template-columns: 2fr 1fr 2fr;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  border-bottom: 1px solid #555;
+  padding-bottom: 10px;
+}
+
+.tabla-encabezado {
+  font-weight: bold;
+  color: #ff3b3b;
+  border-bottom: 2px solid #ff3b3b;
 }
 
 .cantidad {
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .cantidad button {
@@ -161,61 +151,97 @@ h1 .en-vivo {
   height: 30px;
   background-color: #610000;
   color: white;
-  font-weight: bold;
   border: none;
-  border-radius: 5px;
+  font-size: 18px;
   cursor: pointer;
 }
 
 .cantidad input {
   width: 40px;
   text-align: center;
-  border-radius: 5px;
-  border: 1px solid #444;
-  background-color: #2a2a2a;
+  background-color: #222;
   color: white;
+  border: 1px solid #555;
 }
 
-.btn-agregar {
-  background-color: #4c0000;
-  color: white;
-  font-weight: bold;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 10px;
-  display: block;
-  margin: auto;
-  transition: 0.3s ease;
-  cursor: pointer;
-}
-
-.btn-agregar:hover {
-  background-color: #610000;
-  box-shadow: 0 0 10px red;
-}
-.btn-siguiente {
-  background-color: #610000;
+.btn-comprar {
+  background-color: #b30000;
   color: white;
   font-weight: bold;
-  padding: 10px 20px;
+  padding: 12px;
   border: none;
-  border-radius: 10px;
-  display: block;
-  margin: 20px auto 0 auto;
-  transition: 0.3s ease;
-  cursor: pointer;
-}
-
-.btn-siguiente:hover {
-  background-color: #610000;
-  box-shadow: 0 0 10px red;
-}
-
-footer {
+  border-radius: 8px;
   text-align: center;
-  padding: 20px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-comprar:hover {
+  background-color: #e60000;
+  box-shadow: 0 0 10px red;
+}
+
+.footer-completo {
+  background-color: #111;
+  color: #ccc;
+  padding: 30px 20px;
+  border-top: 2px solid #b30000;
+  position: relative;
+  z-index: 2;
+}
+
+.container-footer {
+  max-width: 1200px;
+  margin: auto;
+}
+
+.footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: space-between;
+}
+
+.footer-col h4 {
+  color: white;
+  margin-bottom: 15px;
+}
+
+.footer-col ul,
+.footer-col .social-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-col ul li {
+  margin-bottom: 10px;
+}
+
+.footer-col a {
+  color: #ccc;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.footer-col a:hover {
+  color: white;
+}
+
+.payment-methods img {
+  height: 30px;
+  margin-right: 10px;
+}
+
+.footer-bottom {
+  text-align: center;
+  margin-top: 20px;
+  color: #777;
 }
 
 .logo-footer {
-  height: 50px;
+  height: 40px;
+  display: block;
+  margin: 20px auto 0 auto;
 }
