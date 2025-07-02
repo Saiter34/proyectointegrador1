@@ -13,7 +13,6 @@
     <!-- SIDEBAR -->
     <div class="prov-sidebar">
         <div class="prov-barra-logo">
-            <!-- RUTA CORREGIDA: Acceso absoluto desde la raíz del servidor estático o subiendo un nivel -->
             <img src="../img/logo.png" alt="Logo Teycketan" class="prov-logo-img" />
         </div>
         <ul class="prov-nav-list">
@@ -22,6 +21,7 @@
             <li><a href="verEvento.html" class="prov-nav-item active"><i class="fas fa-calendar-alt"></i><span>Ver eventos</span></a></li>
             <li><a href="contactarEmpresa.html" class="prov-nav-item"><i class="fas fa-envelope"></i><span>Contactar empresa</span></a></li>
             <li><a href="eventosAprov.html" class="prov-nav-item"><i class="fas fa-check-circle"></i><span>Eventos Aprobados</span></a></li>
+            <li><a href="catalogoDeLugares.html" class="prov-nav-item"><i class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
         </ul>
     </div>
 
@@ -63,14 +63,15 @@
                             <th>Nombre del Evento</th>
                             <th>Fecha</th>
                             <th>Horario</th>
-                            <th>Ubicación</th>
+                            <th>Lugar</th> <!-- NUEVO: Nombre del lugar -->
+                            <th>Ubicación del Lugar</th> <!-- NUEVO: Ubicación del lugar -->
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="eventsListBody">
                         <!-- Los eventos se cargarán aquí dinámicamente -->
-                        <tr><td colspan="7" class="prov-loading-message">Cargando tus eventos...</td></tr>
+                        <tr><td colspan="8" class="prov-loading-message">Cargando tus eventos...</td></tr>
                     </tbody>
                 </table>
                 <p id="noEventsMessage" class="prov-no-data-message" style="display: none;">No has creado ningún evento aún.</p>
@@ -232,7 +233,7 @@
              * @brief Carga todos los eventos creados por el proveedor autenticado.
              */
             async function fetchProviderEvents() {
-                eventsListBody.innerHTML = '<tr><td colspan="7" class="prov-loading-message">Cargando tus eventos...</td></tr>';
+                eventsListBody.innerHTML = '<tr><td colspan="8" class="prov-loading-message">Cargando tus eventos...</td></tr>';
                 noEventsMessage.style.display = 'none';
 
                 try {
@@ -253,12 +254,12 @@
                         }
                     } else {
                         showProvMessageModal(`Error al cargar tus eventos: ${data.message || 'Desconocido'}`, 'error');
-                        eventsListBody.innerHTML = `<tr><td colspan="7" class="prov-no-data-message prov-error-text">No se pudieron cargar tus eventos.</td></tr>`;
+                        eventsListBody.innerHTML = `<tr><td colspan="8" class="prov-no-data-message prov-error-text">No se pudieron cargar tus eventos.</td></tr>`;
                     }
                 } catch (error) {
                     console.error('Error al cargar eventos del proveedor:', error);
                     showProvMessageModal('Error de red al cargar tus eventos.', 'error');
-                    eventsListBody.innerHTML = `<tr><td colspan="7" class="prov-no-data-message prov-error-text">Error de red.</td></tr>`;
+                    eventsListBody.innerHTML = `<tr><td colspan="8" class="prov-no-data-message prov-error-text">Error de red.</td></tr>`;
                 }
             }
 
@@ -277,7 +278,11 @@
 
                 let tableRowsHtml = '';
                 events.forEach(event => {
-                    const imageUrl = event.URL_Imagen ? `${API_URL}${event.URL_Imagen}` : 'https://placehold.co/60x60/cccccc/000000?text=No+Img';
+                    // --- CORRECCIÓN AQUÍ: Usar event.URL_Imagen_Evento ---
+                    console.log(`Valor de event.URL_Imagen_Evento (proveedor verEvento):`, event.URL_Imagen_Evento); 
+                    const imageUrl = event.URL_Imagen_Evento ? `${API_URL}${event.URL_Imagen_Evento}` : 'https://placehold.co/60x60/cccccc/000000?text=No+Img';
+                    console.log(`URL final de imagen para proveedor verEvento: ${imageUrl}`);
+                    // --- FIN CORRECCIÓN ---
 
                     tableRowsHtml += `
                         <tr data-event-id="${event.Id_Evento}" class="event-main-row">
@@ -285,7 +290,8 @@
                             <td data-label="Nombre">${event.Nom_Evento}</td>
                             <td data-label="Fecha">${new Date(event.Fecha).toLocaleDateString('es-ES')}</td>
                             <td data-label="Horario">${event.Horario_Inicio || 'N/A'} - ${event.Horario_Fin || 'N/A'}</td>
-                            <td data-label="Ubicación">${event.Ubicacion}</td>
+                            <td data-label="Lugar">${event.Nom_Lugar || 'N/A'}</td> 
+                            <td data-label="Ubicación del Lugar">${event.Ubicacion || 'N/A'}</td> <!-- USANDO EL ALIAS 'Ubicacion' -->
                             <td data-label="Estado">
                                 <span class="event-status event-status-${event.Estado.toLowerCase()}">${event.Estado}</span>
                             </td>
@@ -296,17 +302,23 @@
                             </td>
                         </tr>
                         <tr class="prov-details-row" id="details-row-${event.Id_Evento}" style="display: none;">
-                            <td colspan="7">
+                            <td colspan="8"> <!-- Aumentado a 8 columnas -->
                                 <div class="prov-details-content">
-                                    <h3>Estadísticas de Venta para "${event.Nom_Evento}"</h3>
-                                    <!-- Campos para rellenar con estadísticas de venta reales -->
-                                    <p><strong>Precio General (Evento):</strong> S/. ${parseFloat(event.PrecioGeneral || 0).toFixed(2)}</p>
-                                    <p><strong>Precio VIP (Evento):</strong> ${event.PrecioVIP ? `S/. ${parseFloat(event.PrecioVIP).toFixed(2)}` : 'N/A'}</p>
-                                    <p><strong>Precio CONADIS (Evento):</strong> ${event.PrecioConadis ? `S/. ${parseFloat(event.PrecioConadis).toFixed(2)}` : 'N/A'}</p>
-                                    <p><strong>Asientos General (Inicial):</strong> ${event.Asientos_General_Disponibles || 'N/A'}</p>
-                                    <p><strong>Asientos VIP (Inicial):</strong> ${event.Asientos_VIP_Disponibles || 'N/A'}</p>
-                                    <p><strong>Asientos CONADIS (Inicial):</strong> ${event.Asientos_CONADIS_Disponibles || 'N/A'}</p>
-
+                                    <h3>Detalles y Estadísticas de Venta para "${event.Nom_Evento}"</h3>
+                                    <p><strong>Categoría:</strong> ${event.Categoria || 'N/A'}</p>
+                                    <p><strong>Descripción:</strong> ${event.Descripcion || 'N/A'}</p>
+                                    <p><strong>Reglas:</strong> ${event.Reglas && event.Reglas.length > 0 ? event.Reglas.join(', ') : 'N/A'}</p>
+                                    <p><strong>URL Mapa:</strong> ${event.URL_Mapa ? `<a href="${event.URL_Mapa}" target="_blank">${event.URL_Mapa}</a>` : 'N/A'}</p>
+                                    <hr class="catl-divider">
+                                    <h4>Precios y Asientos Iniciales:</h4>
+                                    <p><strong>Precio General:</strong> S/. ${parseFloat(event.PrecioGeneral || 0).toFixed(2)}</p>
+                                    <p><strong>Precio VIP:</strong> ${event.PrecioVIP ? `S/. ${parseFloat(event.PrecioVIP).toFixed(2)}` : 'N/A'}</p>
+                                    <p><strong>Precio CONADIS:</strong> ${event.PrecioConadis ? `S/. ${parseFloat(event.PrecioConadis).toFixed(2)}` : 'N/A'}</p>
+                                    <p><strong>Asientos General (Inicial):</strong> ${event.Asientos_General_Disp || '0'}</p>
+                                    <p><strong>Asientos VIP (Inicial):</strong> ${event.Asientos_VIP_Disp || '0'}</p>
+                                    <p><strong>Asientos CONADIS (Inicial):</strong> ${event.Asientos_Conadis_Disp || '0'}</p>
+                                    
+                                    <hr class="catl-divider">
                                     <h4>Tickets Vendidos:</h4>
                                     <p><strong>General Vendidos:</strong> <span id="sold-general-${event.Id_Evento}">Cargando...</span></p>
                                     <p><strong>VIP Vendidos:</strong> <span id="sold-vip-${event.Id_Evento}">Cargando...</span></p>

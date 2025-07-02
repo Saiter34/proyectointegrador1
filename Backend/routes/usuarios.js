@@ -1,28 +1,12 @@
+// Backend/routes/usuarios.js
 const express = require('express');
 const router = express.Router();
-const { pool } = require('../db');
-const bcrypt = require('bcryptjs');
+const pool = require('../db'); 
+const bcrypt = require('bcryptjs'); // <-- CORRECCIÓN AQUÍ
 const jwt = require('jsonwebtoken');
 
-const verifyToken = (req, res, next) => {
-    const authHeader = req.header('Authorization');
-    if (!authHeader) {
-        return res.status(401).json({ message: 'Acceso denegado. No se proporcionó token.' });
-    }
-
-    const token = authHeader.split(' ')[1];
-    if (!token) {
-        return res.status(401).json({ message: 'Acceso denegado. Formato de token incorrecto.' });
-    }
-
-    try {
-        const verified = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = verified;
-        next();
-    } catch (err) {
-        res.status(400).json({ message: 'Token inválido o expirado.' });
-    }
-};
+// Importa el middleware de autenticación desde authMiddleware.js
+const { authenticateToken, authorizeRole } = require('../middleware/authMiddleware'); 
 
 router.post('/registro', async (req, res) => {
     const { nombre, apellido, email, telefono, contrasena, dia, mes, anio } = req.body;
@@ -48,8 +32,9 @@ router.post('/registro', async (req, res) => {
                 "Fecha_Reg",
                 "ES_Organizador",
                 "Autenticacion_2fa",
-                "Rol_Usuario" -- Asegúrate de incluir esta columna
-            ) VALUES ($1, $2, $3, $4, $5, $6, NOW(), false, false, 'cliente') -- 'cliente' como valor por defecto
+                "Rol_Usuario",
+                "Puntos_Teycketan" 
+            ) VALUES ($1, $2, $3, $4, $5, $6, NOW(), false, false, 'cliente', 0) 
             RETURNING "id", "Nom_Usuario", "Correo_Usuario", "Rol_Usuario"`,
             [nombre, apellido, email, password_hash, telefono, fecha_nacimiento]
         );
@@ -92,7 +77,7 @@ router.post('/login', async (req, res) => {
                 email: user.Correo_Usuario,
                 nombre: user.Nom_Usuario,
                 is_organizador: user.ES_Organizador,
-                rol: user.Rol_Usuario  
+                rol: user.Rol_Usuario 
             },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
@@ -117,10 +102,10 @@ router.post('/login', async (req, res) => {
     }
 });
 
-router.get('/me', verifyToken, async (req, res) => {
+router.get('/me', authenticateToken, async (req, res) => {
     try {
         const result = await pool.query(
-            'SELECT "id", "Nom_Usuario", "Ape_Usuario", "Correo_Usuario", "Tlf_Usuario", "Fecha_Nacimiento", "ES_Organizador", "Rol_Usuario" FROM "Usuarios" WHERE "id" = $1',
+            'SELECT "id", "Nom_Usuario", "Ape_Usuario", "Correo_Usuario", "Tlf_Usuario", "Fecha_Nacimiento", "ES_Organizador", "Rol_Usuario", "Puntos_Teycketan" FROM "Usuarios" WHERE "id" = $1',
             [req.user.id]
         );
         const user = result.rows[0];
@@ -135,5 +120,36 @@ router.get('/me', verifyToken, async (req, res) => {
         res.status(500).json({ mensaje: 'Error interno del servidor al obtener datos del usuario.' });
     }
 });
+
+/**
+ * @route GET /:id/points
+ * @description Obtiene los puntos Teycketan de un usuario específico.
+ * @access Protegido (solo el propio usuario o un admin)
+ */
+router.get('/:id/points', authenticateToken, async (req, res) => {
+    const { id } = req.params;
+    const requestingUserId = req.user.id; 
+
+    if (id != requestingUserId && req.user.rol !== 'admin') {
+        return res.status(403).json({ message: 'Acceso denegado. No tienes permiso para ver los puntos de este usuario.' });
+    }
+
+    try {
+        const result = await pool.query(
+            `SELECT "Puntos_Teycketan" FROM "Usuarios" WHERE "id" = $1`,
+            [id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Usuario no encontrado.' });
+        }
+
+        res.status(200).json({ points: result.rows[0].Puntos_Teycketan || 0 });
+    } catch (error) {
+        console.error('Error al obtener puntos del usuario:', error.message);
+        res.status(500).json({ message: 'Error interno del servidor al obtener puntos.' });
+    }
+});
+
 
 module.exports = router;

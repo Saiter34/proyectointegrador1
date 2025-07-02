@@ -23,14 +23,13 @@ const JWT_SECRET = process.env.JWT_SECRET || 'tu_secreto_jwt_super_seguro_y_larg
 const { authenticateToken, authorizeRole } = require('./middleware/authMiddleware');
 
 // --- Importa tus módulos de rutas ---
-// Importa las rutas para los eventos del administrador (asumo que 'eventos.js' es para admin o general)
 const eventosAdminRoutes = require('./routes/eventos'); 
-// Importa las rutas específicas del proveedor (eventosprov.js)
 const eventosProveedorRoutes = require('./routes/eventosprov'); 
-// Asumiendo que 'intermediario.js' maneja las rutas de solicitudes de organizador.
 const intermediarioRoutes = require('./routes/intermediario');
-// Importa el archivo con el nombre correcto 'eventospublicos'
 const publicEventsRoutes = require('./routes/eventospublicos');
+const lugaresRoutes = require('./routes/lugares'); // Rutas para el catálogo de lugares
+const comprasRoutes = require('./routes/compras'); // NUEVO: Importa las rutas de compras
+const usuariosRoutes = require('./routes/usuarios'); // NUEVO: Importa las rutas de usuarios (para puntos, etc.)
 
 
 // --- Middlewares Globales de Express ---
@@ -43,25 +42,35 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-// --- Configuración de Multer: Directorio para imágenes de eventos ---
+// --- Configuración de Multer: Directorios para imágenes ---
+// Directorio para imágenes de eventos (ya existente)
 const eventImagesDir = path.join(__dirname, '..', 'Fronted', 'img', 'event_images');
-
-// Asegúrate de que el directorio 'Fronted/img/event_images' exista. Si no existe, lo crea.
 if (!fs.existsSync(eventImagesDir)) {
     fs.mkdirSync(eventImagesDir, { recursive: true });
     console.log(`Carpeta de imágenes de eventos creada en: ${eventImagesDir}`);
 }
+
+// NUEVO: Directorio para imágenes de lugares
+const placeImagesDir = path.join(__dirname, '..', 'Fronted', 'img', 'place_images');
+if (!fs.existsSync(placeImagesDir)) {
+    fs.mkdirSync(placeImagesDir, { recursive: true });
+    console.log(`Carpeta de imágenes de lugares creada en: ${placeImagesDir}`);
+}
+
 
 // =========================================================
 // !!! LÍNEAS IMPORTANTES PARA SERVIR EL FRONTEND DESDE EL BACKEND !!!
 // =========================================================
 
 // Servir archivos estáticos desde la carpeta 'Fronted'
-// Esto permite que el navegador solicite directamente CSS, JS, e imágenes
 app.use(express.static(path.join(__dirname, '../Fronted')));
 
 // Esto permite que las imágenes de eventos se sirvan directamente desde /img/event_images/
 app.use('/img/event_images', express.static(eventImagesDir));
+
+// NUEVO: Esto permite que las imágenes de lugares se sirvan directamente desde /img/place_images/
+app.use('/img/place_images', express.static(placeImagesDir));
+
 
 // Ruta para servir login.html por defecto cuando se accede a la raíz del servidor
 app.get('/', (req, res) => {
@@ -73,7 +82,7 @@ app.get('/', (req, res) => {
 // =========================================================
 
 
-// --- Rutas de Autenticación y Registro de Usuarios ---
+// --- Rutas de Autenticación y Registro de Usuarios (mantener aquí si no están en usuarios.js) ---
 
 /**
  * @route POST /register
@@ -218,13 +227,9 @@ app.post('/organizer-request', authenticateToken, async (req, res) => {
 // --- Montaje de Rutas Modulares ---
 
 // Monta las rutas de administración de eventos (protegidas para admin).
-// Las rutas como '/pendientes', '/:id/aprobar' en eventos.js se convierten en
-// /api/admin/eventos/pendientes, /api/admin/eventos/:id/aprobar
 app.use('/api/admin/eventos', authenticateToken, authorizeRole(['admin']), eventosAdminRoutes);
 
 // Monta las rutas para el panel del proveedor/organizador.
-// Las rutas como '/eventos/crear', '/eventos' en eventosprov.js se convierten en
-// /api/proveedor/eventos/crear, /api/proveedor/eventos
 app.use('/api/proveedor', authenticateToken, authorizeRole(['organizador']), eventosProveedorRoutes); 
 
 
@@ -234,10 +239,17 @@ app.use('/api/admin/solicitudes', authenticateToken, authorizeRole(['admin']), i
 // MONTAJE CORRECTO: Monta las rutas públicas de eventos (accesibles sin autenticación).
 app.use('/api/eventos', publicEventsRoutes);
 
+// Monta las rutas de lugares, protegidas para administradores y organizadores.
+app.use('/api/lugares', authenticateToken, authorizeRole(['admin', 'organizador']), lugaresRoutes);
+
+// NUEVO: Monta las rutas de compras (protegidas para usuarios autenticados).
+app.use('/api/compras', authenticateToken, comprasRoutes); 
+
+// NUEVO: Monta las rutas de usuarios (protegidas para usuarios autenticados, para obtener puntos, etc.).
+app.use('/api/usuarios', authenticateToken, usuariosRoutes);
+
 
 // --- Rutas protegidas de ejemplo para diferentes roles ---
-// Estas rutas son solo para demostración, puedes moverlas a archivos de ruta dedicados si lo necesitas.
-
 /**
  * @route GET /protected-organizer-route
  * @description Ruta de ejemplo accesible por organizadores y administradores.
@@ -287,4 +299,11 @@ process.on('uncaughtException', (err) => {
 app.listen(PORT, () => {
     console.log(`Servidor backend corriendo en http://localhost:${PORT}`);
     console.log(`Frontend disponible en http://localhost:${PORT}`);
+    pool.query('SELECT NOW()', (err, res) => {
+        if (err) {
+            console.error('Error de conexión a PostgreSQL:', err.message);
+        } else {
+            console.log('Conexión exitosa a PostgreSQL!');
+        }
+    });
 });

@@ -21,6 +21,7 @@
             <li><a href="verEvento.html" class="prov-nav-item"><i class="fas fa-calendar-alt"></i><span>Ver eventos</span></a></li>
             <li><a href="contactarEmpresa.html" class="prov-nav-item"><i class="fas fa-envelope"></i><span>Contactar empresa</span></a></li>
             <li><a href="eventosAprov.html" class="prov-nav-item active"><i class="fas fa-check-circle"></i><span>Eventos Aprobados</span></a></li>
+            <li><a href="catalogoDeLugares.html" class="prov-nav-item"><i class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
         </ul>
     </div>
 
@@ -278,7 +279,12 @@
 
                 let tableRowsHtml = '';
                 events.forEach(event => {
-                    const imageUrl = event.URL_Imagen ? `${API_URL}${event.URL_Imagen}` : 'https://placehold.co/60x60/cccccc/000000?text=No+Img';
+                    // --- CORRECCIÓN AQUÍ: Usar event.URL_Imagen_Evento ---
+                    console.log(`Valor de event.URL_Imagen_Evento (proveedor eventosAprov):`, event.URL_Imagen_Evento); 
+                    const imageUrl = event.URL_Imagen_Evento ? `${API_URL}${event.URL_Imagen_Evento}` : 'https://placehold.co/60x60/cccccc/000000?text=No+Img';
+                    console.log(`URL final de imagen para proveedor eventosAprov: ${imageUrl}`);
+                    // --- FIN CORRECCIÓN ---
+
                     const isFeaturedPending = event.SolicitudDestacar === 'pendiente'; // Asumiendo que esta propiedad viene del backend
 
                     tableRowsHtml += `
@@ -288,7 +294,7 @@
                             <td data-label="Fecha">${new Date(event.Fecha).toLocaleDateString('es-ES')}</td>
                             <td data-label="Horario">${event.Horario_Inicio || 'N/A'} - ${event.Horario_Fin || 'N/A'}</td>
                             <td data-label="Ubicación">${event.Ubicacion}</td>
-                            <td data-label="Estado Destacar">
+                            <td data-label="Estado Destacar"> <!-- Cambiado a "Estado Destacar" para claridad -->
                                 ${isFeaturedPending
                                     ? '<span class="event-status event-status-pendiente">Pendiente</span>'
                                     : `<button class="prov-btn-solicitar" data-id="${event.Id_Evento}"><i class="fas fa-star"></i> Solicitar destacar</button>`

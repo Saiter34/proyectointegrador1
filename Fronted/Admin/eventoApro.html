@@ -24,8 +24,8 @@
             <li><a href="eventoApro.html" class="admin-nav-item active"><i class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
             <li><a href="categorias.html" class="admin-nav-item"><i class="fas fa-tags"></i><span>Eventos por categorias</span></a></li>
             <li><a href="eventoDestacado.html" class="admin-nav-item"><i class="fas fa-star"></i><span>Eventos Destacados</span></a></li>
-            <li><a href="solicitudDestacar.html" class="admin-nav-item active"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
-            <li><a href="catalogoDeLugares.html" class="admin-nav-item active"><i  class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
+            <li><a href="solicitudDestacar.html" class="admin-nav-item"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
+            <li><a href="catalogoDeLugares.html" class="admin-nav-item"><i class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
         </ul>
     </div>
 
@@ -68,9 +68,11 @@
                             <th>Categoría</th>
                             <th>Fecha</th>
                             <th>Horario</th>
-                            <th>Ubicación</th>
+                            <th>Lugar</th> 
+                            <th>Ubicación del Lugar</th> 
                             <th>Descripción</th>
                             <th>Precios (G/V/C)</th>
+                            <th>Asientos (G/V/C)</th> 
                             <th>Organizador</th>
                             <th>Estado</th>
                             <th>Acciones</th>
@@ -78,7 +80,7 @@
                     </thead>
                     <tbody id="approvedEventsListBody">
                         <!-- Los eventos aprobados se cargarán aquí dinámicamente -->
-                        <tr><td colspan="12" class="admin-loading-message">Cargando eventos aprobados...</td></tr>
+                        <tr><td colspan="14" class="admin-loading-message">Cargando eventos aprobados...</td></tr>
                     </tbody>
                 </table>
                 <p id="noApprovedEventsMessage" class="admin-no-requests-message" style="display: none;">No hay eventos aprobados en este momento.</p>
@@ -238,11 +240,11 @@
              * @brief Carga los eventos aprobados desde el backend.
              */
             async function fetchApprovedEvents() {
-                approvedEventsListBody.innerHTML = '<tr><td colspan="12" class="admin-loading-message">Cargando eventos aprobados...</td></tr>';
+                approvedEventsListBody.innerHTML = '<tr><td colspan="14" class="admin-loading-message">Cargando eventos aprobados...</td></tr>';
                 noApprovedEventsMessage.style.display = 'none'; // Ocultar mensaje de "no hay eventos"
 
                 try {
-                    // Endpoint para obtener eventos aprobados (ajustar si es diferente en tu backend)
+                    // Endpoint para obtener eventos aprobados
                     const response = await fetch(`${API_URL}/api/admin/eventos/aprobados`, {
                         method: 'GET',
                         headers: {
@@ -259,17 +261,17 @@
                         } else if (data.events) {
                             renderApprovedEvents(data.events);
                         } else {
-                            // Fallback si el backend responde con un array directo
+                            // Fallback si el backend responde con un array directo (menos probable con el backend actual)
                             renderApprovedEvents(data);
                         }
                     } else {
                         showAdminMessageModal(`Error al cargar eventos aprobados: ${data.message || 'Error desconocido'}`, 'error');
-                        approvedEventsListBody.innerHTML = `<tr><td colspan="12" class="admin-no-requests-message admin-error-text">No se pudieron cargar los eventos aprobados.</td></tr>`;
+                        approvedEventsListBody.innerHTML = `<tr><td colspan="14" class="admin-no-requests-message admin-error-text">No se pudieron cargar los eventos aprobados.</td></tr>`;
                     }
                 } catch (error) {
                     console.error('Error al obtener eventos aprobados:', error);
                     showAdminMessageModal('Error de conexión con el servidor al cargar eventos aprobados.', 'error');
-                    approvedEventsListBody.innerHTML = `<tr><td colspan="12" class="admin-no-requests-message admin-error-text">Error de red.</td></tr>`;
+                    approvedEventsListBody.innerHTML = `<tr><td colspan="14" class="admin-no-requests-message admin-error-text">Error de red.</td></tr>`;
                 }
             }
 
@@ -332,8 +334,10 @@
                     const precioConadis = parseFloat(event.PrecioConadis);
                     const formattedPrecioConadis = isNaN(precioConadis) ? 'N/A' : `S/. ${precioConadis.toFixed(2)}`;
 
-                    // Asegurarse de que la URL de la imagen sea absoluta si viene de la raíz del servidor
-                    const imageUrl = event.URL_Imagen ? `${API_URL}${event.URL_Imagen}` : 'https://placehold.co/80x80/cccccc/000000?text=No+Img';
+                    // Depuración: Log el valor crudo de event.URL_Imagen_Evento
+                    console.log(`Valor de event.URL_Imagen_Evento (admin aprobados):`, event.URL_Imagen_Evento); 
+                    const imageUrl = event.URL_Imagen_Evento ? `${API_URL}${event.URL_Imagen_Evento}` : 'https://placehold.co/80x80/cccccc/000000?text=No+Img';
+                    console.log(`URL final de imagen para admin aprobados: ${imageUrl}`);
 
                     tableRowsHtml += `
                         <tr>
@@ -343,10 +347,24 @@
                             <td data-label="Categoría">${event.Categoria || 'N/A'}</td>
                             <td data-label="Fecha">${new Date(event.Fecha).toLocaleDateString('es-ES')}</td>
                             <td data-label="Horario">${event.Horario_Inicio || 'N/A'} - ${event.Horario_Fin || 'N/A'}</td>
-                            <td data-label="Ubicación">${event.Ubicacion}</td>
+                            <td data-label="Lugar">${event.Nom_Lugar || 'N/A'}</td> 
+                            <td data-label="Ubicación del Lugar">${event.Ubicacion || 'N/A'}</td> <!-- Usar event.Ubicacion del alias -->
                             <td data-label="Descripción">${event.Descripcion ? event.Descripcion.substring(0, 50) + '...' : 'N/A'}</td>
-                            <td data-label="Precios">${formattedPrecioGeneral}<br>${formattedPrecioVIP}<br>${formattedPrecioConadis}</td>
-                            <td data-label="Organizador">${event.NombreProveedor || 'N/A'} ${event.ApellidoProveedor || ''} (${event.EmailProveedor || 'N/A'})</td>
+                            <td data-label="Precios">
+                                G: ${formattedPrecioGeneral}<br>
+                                VIP: ${formattedPrecioVIP}<br>
+                                CONADIS: ${formattedPrecioConadis}
+                            </td>
+                            <td data-label="Asientos">
+                                G: ${event.Asientos_General_Disp || '0'}<br>
+                                VIP: ${event.Asientos_VIP_Disp || '0'}<br>
+                                CONADIS: ${event.Asientos_Conadis_Disp || '0'}
+                            </td>
+                            <td data-label="Organizador">
+                                ${event.NombreProveedor || 'N/A'} ${event.ApellidoProveedor || ''}<br>
+                                (${event.EmailProveedor || 'N/A'})<br>
+                                ${event.NombreEmpresaOrganizador ? `Empresa: ${event.NombreEmpresaOrganizador}` : ''}
+                            </td>
                             <td data-label="Estado">${event.Estado}</td>
                             <td class="admin-actions-cell">
                                 <button class="admin-btn-details" data-id="${event.Id_Evento}" data-name="${event.Nom_Evento}"><i class="fas fa-info-circle"></i> Detalles</button>
@@ -362,7 +380,6 @@
                 approvedEventsListBody.querySelectorAll('.admin-btn-details').forEach(button => {
                     button.addEventListener('click', (e) => {
                         const eventId = e.target.dataset.id || e.target.closest('button').dataset.id;
-                        // Aquí podrías redirigir a una página de detalles del evento o abrir un modal con más info
                         showAdminMessageModal(`Ver detalles del evento ID: ${eventId}. Funcionalidad pendiente.`, 'info');
                     });
                 });
@@ -398,7 +415,7 @@
                 try {
                     // Endpoint para destacar un evento. Este se encargaría de cambiar 'SolicitudDestacar' a 'aprobado'
                     const response = await fetch(`${API_URL}/api/admin/eventos/${eventId}/destacar`, {
-                        method: 'PUT', // O POST, según cómo lo tengas en el backend
+                        method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`
@@ -418,7 +435,6 @@
                     showAdminMessageModal(`Error de conexión con el servidor al destacar evento.`, 'error');
                 }
             }
-
 
             fetchApprovedEvents(); // Cargar eventos aprobados al cargar la página
         });

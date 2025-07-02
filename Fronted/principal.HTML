@@ -156,7 +156,7 @@
                     // Ruta corregida a la carpeta Clientes/
                     window.location.replace('Clientes/cliente.html'); 
                 }
-                return; // Detener la ejecución del script aquí después de la redirección
+                // No retornar aquí, ya que queremos que los eventos públicos se carguen si la redirección no ocurre inmediatamente
             } else {
                 // Usuario no logueado: Asegurarse de que los enlaces de login/registro estén visibles
                 miCuentaButton.textContent = 'Mi Cuenta';
@@ -203,7 +203,10 @@
                 let slidesHtml = '';
                 events.forEach((event, index) => {
                     const formattedDate = new Date(event.Fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
-                    const imageUrl = event.URL_Imagen ? `${API_URL}${event.URL_Imagen}` : 'https://placehold.co/800x450/cccccc/000000?text=No+Img';
+                    // Depuración: Log el valor crudo de event.URL_Imagen_Evento (ahora se espera este nombre)
+                    console.log(`Valor de event.URL_Imagen_Evento (carrusel principal):`, event.URL_Imagen_Evento); 
+                    const imageUrl = event.URL_Imagen_Evento ? `${API_URL}${event.URL_Imagen_Evento}` : 'https://placehold.co/800x450/cccccc/000000?text=No+Img';
+                    console.log(`URL final de imagen para carrusel principal: ${imageUrl}`); 
 
                     slidesHtml += `
                         <div class="slide ${index === 0 ? 'activo' : ''}">
@@ -219,7 +222,7 @@
                         </div>
                     `;
                 });
-                carruselEventosDestacados.innerHTML = slidesHtml; // Solo los slides
+                carruselEventosDestacados.innerHTML = slidesHtml; 
                 
                 // Añadir los botones de control después de los slides
                 if (events.length > 1) { // Solo si hay más de un evento para el carrusel
@@ -280,16 +283,31 @@
                 });
 
                 function showSlide(n) {
-                    slides[slideIndex].classList.remove('activo');
-                    slides[slideIndex].style.transform = (n > slideIndex || (n === 0 && slideIndex === slides.length - 1)) ? 'translateX(-100%)' : 'translateX(100%)';
-                    slides[slideIndex].style.opacity = '0';
+                    const currentSlide = slides[slideIndex];
+                    const newIndex = (n + slides.length) % slides.length;
+                    const nextSlide = slides[newIndex];
 
+                    // Determinar la dirección de la transición
+                    const direction = (newIndex > slideIndex || (newIndex === 0 && slideIndex === slides.length - 1)) ? 1 : -1;
 
-                    slideIndex = (n + slides.length) % slides.length;
-                    
-                    slides[slideIndex].classList.add('activo');
-                    slides[slideIndex].style.transform = 'translateX(0)';
-                    slides[slideIndex].style.opacity = '1';
+                    // Mover el slide actual fuera de la vista
+                    currentSlide.style.transform = `translateX(${-100 * direction}%)`;
+                    currentSlide.style.opacity = '0';
+                    currentSlide.classList.remove('activo');
+
+                    // Posicionar el nuevo slide en la posición de entrada
+                    nextSlide.style.transform = `translateX(${100 * direction}%)`;
+                    nextSlide.style.opacity = '0'; // Asegurarse de que esté oculto antes de la transición
+
+                    // Forzar un reflow para que la transición de transform se aplique desde la posición correcta
+                    void nextSlide.offsetWidth; 
+
+                    // Mover el nuevo slide a la vista
+                    nextSlide.style.transform = 'translateX(0)';
+                    nextSlide.style.opacity = '1';
+                    nextSlide.classList.add('activo');
+
+                    slideIndex = newIndex;
                 }
 
                 const prevBtn = carruselEventosDestacados.querySelector('#prevSlide');
@@ -346,8 +364,10 @@
                 let eventsHtml = '';
                 events.forEach(event => {
                     const formattedDate = new Date(event.Fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
-                    // Asegúrate de que event.URL_Imagen contiene la ruta completa o relativa al servidor
-                    const imageUrl = event.URL_Imagen ? `${API_URL}${event.URL_Imagen}` : 'https://placehold.co/150x100/cccccc/000000?text=No+Img';
+                    // Depuración: Log el valor crudo de event.URL_Imagen_Evento (ahora se espera este nombre)
+                    console.log(`Valor de event.URL_Imagen_Evento (eventos principal):`, event.URL_Imagen_Evento); 
+                    const imageUrl = event.URL_Imagen_Evento ? `${API_URL}${event.URL_Imagen_Evento}` : 'https://placehold.co/150x100/cccccc/000000?text=No+Img';
+                    console.log(`URL final de imagen para evento principal: ${imageUrl}`); 
 
                     eventsHtml += `
                         <!-- Ruta corregida a detalles.html dentro de la carpeta Clientes/ -->
@@ -356,7 +376,7 @@
                                 <img src="${imageUrl}" alt="${event.Nom_Evento}">
                                 <div class="evento-info">
                                     <h4>${event.Nom_Evento}</h4>
-                                    <p>${event.Ubicacion}</p>
+                                    <p>${event.Ubicacion || 'Ubicación Desconocida'}</p>
                                     <p>${formattedDate}</p>
                                 </div>
                             </div>

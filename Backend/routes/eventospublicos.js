@@ -20,18 +20,19 @@ router.get('/destacados', async (req, res) => {
                 e."Horario_Inicio",
                 e."Horario_Fin",
                 e."Categoria",
-                e."Ubicacion",
+                l."Ubicacion_Lugar" AS "Ubicacion", -- Obtener Ubicacion desde Lugares
                 e."Descripcion",
                 e."PrecioGeneral",
                 e."PrecioVIP",
                 e."PrecioConadis",
                 e."Estado",
-                e."URL_Imagen",
-                e."URL_Mapa",
+                e."URL_Imagen_Evento", 
+                l."URL_Imagen_Asientos", -- AHORA SELECCIONAMOS LA IMAGEN DE ASIENTOS DEL LUGAR
                 e."Reglas",
                 e."SolicitudDestacar",
                 o."Nom_Empresa" AS "NombreEmpresaOrganizador"
             FROM "Eventos" e
+            LEFT JOIN "Lugares" l ON e."Id_Lugar" = l."Id_Lugar" -- Unir con la tabla Lugares
             JOIN "Organizadores" o ON e."Id_Organizador" = o."Id_Organizador"
             WHERE e."Estado" = 'aprobado' AND e."SolicitudDestacar" = 'aprobado'
             ORDER BY e."Fecha" ASC, e."Horario_Inicio" ASC;
@@ -40,12 +41,12 @@ router.get('/destacados', async (req, res) => {
 
         const eventsWithParsedData = result.rows.map(event => ({
             ...event,
-            Reglas: event.Reglas || [] // Si es JSONB, node-pg ya lo parsea, solo aseguramos que sea array
+            Reglas: event.Reglas || [] 
         }));
 
-        res.status(200).json({ events: eventsWithParsedData }); // Envía los eventos dentro de un objeto con la clave 'events'
+        res.status(200).json({ events: eventsWithParsedData }); 
     } catch (error) {
-        console.error('Error al obtener eventos destacados para el cliente:', error.message);
+        console.error('Error al obtener eventos destacados públicos:', error.message);
         res.status(500).json({ message: 'Error interno del servidor al obtener eventos destacados.' });
     }
 });
@@ -67,18 +68,19 @@ router.get('/aprobados-para-cliente', async (req, res) => {
                 e."Horario_Inicio",
                 e."Horario_Fin",
                 e."Categoria",
-                e."Ubicacion",
+                l."Ubicacion_Lugar" AS "Ubicacion", -- Obtener Ubicacion desde Lugares
                 e."Descripcion",
                 e."PrecioGeneral",
                 e."PrecioVIP",
                 e."PrecioConadis",
                 e."Estado",
-                e."URL_Imagen",
-                e."URL_Mapa",
+                e."URL_Imagen_Evento", 
+                l."URL_Imagen_Asientos", -- AHORA SELECCIONAMOS LA IMAGEN DE ASIENTOS DEL LUGAR
                 e."Reglas",
                 e."SolicitudDestacar",
                 o."Nom_Empresa" AS "NombreEmpresaOrganizador"
             FROM "Eventos" e
+            LEFT JOIN "Lugares" l ON e."Id_Lugar" = l."Id_Lugar" -- Unir con la tabla Lugares
             JOIN "Organizadores" o ON e."Id_Organizador" = o."Id_Organizador"
             WHERE e."Estado" = 'aprobado'
             ORDER BY e."Fecha" ASC, e."Horario_Inicio" ASC;
@@ -87,10 +89,10 @@ router.get('/aprobados-para-cliente', async (req, res) => {
 
         const eventsWithParsedData = result.rows.map(event => ({
             ...event,
-            Reglas: event.Reglas || [] // Si es JSONB, node-pg ya lo parsea, solo aseguramos que sea array
+            Reglas: event.Reglas || [] 
         }));
 
-        res.status(200).json({ events: eventsWithParsedData }); // Envía los eventos dentro de un objeto con la clave 'events'
+        res.status(200).json({ events: eventsWithParsedData }); 
     } catch (error) {
         console.error('Error al obtener eventos aprobados para el cliente:', error.message);
         res.status(500).json({ message: 'Error interno del servidor al obtener eventos aprobados.' });
@@ -110,22 +112,23 @@ router.get('/:id', async (req, res) => {
     try {
         const query = `
             SELECT
-                "Id_Evento",
-                "Nom_Evento",
-                "Fecha",
-                "Horario_Inicio",
-                "Horario_Fin",
-                "Categoria",
-                "Ubicacion",
-                "Descripcion",
-                "PrecioGeneral",
-                "PrecioVIP",
-                "PrecioConadis",
-                "URL_Imagen",
-                "URL_Mapa",
-                "Reglas"
-            FROM "Eventos"
-            WHERE "Id_Evento" = $1 AND "Estado" = 'aprobado';
+                e."Id_Evento",
+                e."Nom_Evento",
+                e."Fecha",
+                e."Horario_Inicio",
+                e."Horario_Fin",
+                e."Categoria",
+                l."Ubicacion_Lugar" AS "Ubicacion", -- Obtener Ubicacion desde Lugares
+                e."Descripcion",
+                e."PrecioGeneral",
+                e."PrecioVIP",
+                e."PrecioConadis",
+                e."URL_Imagen_Evento", 
+                l."URL_Imagen_Asientos", -- AHORA SÍ: OBTENEMOS LA IMAGEN DE ASIENTOS DEL LUGAR
+                e."Reglas"
+            FROM "Eventos" e
+            LEFT JOIN "Lugares" l ON e."Id_Lugar" = l."Id_Lugar" -- Unir con la tabla Lugares
+            WHERE e."Id_Evento" = $1 AND e."Estado" = 'aprobado';
         `;
         const result = await pool.query(query, [id]);
 
@@ -159,9 +162,6 @@ router.get('/:id', async (req, res) => {
         }
         // Si hay otras zonas de precios, se añadirían aquí
 
-        // Obtener URL_Mapa directamente de la base de datos o usar un fallback
-        const URL_Mapa = event.URL_Mapa || '/img/default_map.jpg';
-
         // Obtener Reglas directamente de la base de datos (ya es un array si es JSONB) o usar un fallback
         const reglas = event.Reglas || []; // Asegúrate de que siempre sea un array.
 
@@ -175,10 +175,10 @@ router.get('/:id', async (req, res) => {
             Categoria: event.Categoria,
             Ubicacion: event.Ubicacion,
             Descripcion: event.Descripcion,
-            URL_Imagen: event.URL_Imagen,
-            URL_Mapa: URL_Mapa, // Usar el valor de la BD o el fallback
+            URL_Imagen_Evento: event.URL_Imagen_Evento, 
+            URL_Imagen_Asientos: event.URL_Imagen_Asientos, // AHORA SE INCLUYE LA IMAGEN DE ASIENTOS
             Precios: precios,
-            Reglas: reglas // Usar el valor de la BD o el fallback
+            Reglas: reglas 
         };
 
         res.status(200).json(responseEvent);

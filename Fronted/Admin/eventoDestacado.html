@@ -25,7 +25,7 @@
             <li><a href="categorias.html" class="admin-nav-item"><i class="fas fa-tags"></i><span>Eventos por categorias</span></a></li>
             <li><a href="eventoDestacado.html" class="admin-nav-item active"><i class="fas fa-star"></i><span>Eventos destacados</span></a></li>
             <li><a href="solicitudDestacar.html" class="admin-nav-item"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
-            <li><a href="catalogoDeLugares.html" class="admin-nav-item active"><i  class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
+            <li><a href="catalogoDeLugares.html" class="admin-nav-item"><i class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
         </ul>
     </div>
 
@@ -269,7 +269,11 @@
                     const precioConadis = parseFloat(event.PrecioConadis);
                     const formattedPrecioConadis = isNaN(precioConadis) ? 'N/A' : `S/. ${precioConadis.toFixed(2)}`;
 
-                    const imageUrl = event.URL_Imagen ? `${API_URL}${event.URL_Imagen}` : 'https://placehold.co/80x80/cccccc/000000?text=No+Img';
+                    // --- CORRECCIÓN AQUÍ: Usar event.URL_Imagen_Evento ---
+                    console.log(`Valor de event.URL_Imagen_Evento (admin destacados):`, event.URL_Imagen_Evento); 
+                    const imageUrl = event.URL_Imagen_Evento ? `${API_URL}${event.URL_Imagen_Evento}` : 'https://placehold.co/80x80/cccccc/000000?text=No+Img';
+                    console.log(`URL final de imagen para admin destacados: ${imageUrl}`); 
+                    // --- FIN CORRECCIÓN ---
 
                     const eventCard = document.createElement('div');
                     eventCard.classList.add('admin-card');

@@ -24,8 +24,8 @@
             <li><a href="eventoApro.html" class="admin-nav-item"><i class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
             <li><a href="categorias.html" class="admin-nav-item"><i class="fas fa-tags"></i><span>Eventos por categorias</span></a></li>
             <li><a href="eventoDestacado.html" class="admin-nav-item"><i class="fas fa-star"></i><span>Eventos Destacados</span></a></li>
-            <li><a href="solicitudDestacar.html" class="admin-nav-item active"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
-            <li><a href="catalogoDeLugares.html" class="admin-nav-item active"><i  class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
+            <li><a href="solicitudDestacar.html" class="admin-nav-item"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
+            <li><a href="catalogoDeLugares.html" class="admin-nav-item"><i class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
         </ul>
     </div>
 
@@ -68,16 +68,18 @@
                             <th>Categoría</th>
                             <th>Fecha</th>
                             <th>Horario</th>
-                            <th>Ubicación</th>
+                            <th>Lugar</th> 
+                            <th>Ubicación del Lugar</th> 
                             <th>Descripción</th>
                             <th>Precios (G/V/C)</th>
+                            <th>Asientos (G/V/C)</th> 
                             <th>Organizador</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="eventRequestsListBody">
                         <!-- Las solicitudes se cargarán aquí dinámicamente -->
-                        <tr><td colspan="11" class="admin-loading-message">Cargando solicitudes de eventos...</td></tr>
+                        <tr><td colspan="13" class="admin-loading-message">Cargando solicitudes de eventos...</td></tr>
                     </tbody>
                 </table>
                 <p id="noRequestsMessage" class="admin-no-requests-message" style="display: none;">No hay solicitudes de eventos pendientes en este momento.</p>
@@ -110,9 +112,7 @@
             // --- Lógica de Autenticación al cargar la página ---
             const token = localStorage.getItem('jwtToken');
             const userRole = localStorage.getItem('userRole');
-            // No se usa userId en esta página, pero es buena práctica tenerlo si se necesita más tarde
-            // const userId = localStorage.getItem('userId');
-
+            
             console.log('Event Requests Page Loaded.');
             console.log('JWT Token:', token ? 'Exists' : 'Missing');
             console.log('User Role from localStorage:', userRole);
@@ -141,7 +141,7 @@
             const adminModalCancelBtn = document.getElementById('adminModalCancelBtn');
             const adminMessageModal = document.getElementById('adminMessageModal');
             const adminMessageModalText = document.getElementById('adminMessageModalText');
-            const adminMessageModalCloseBtn = document.getElementById('adminMessageModalCloseBtn');
+            const adminMessageModalCloseBtn = document = document.getElementById('adminMessageModalCloseBtn');
 
             // --- Funciones para Modales ---
 
@@ -226,7 +226,8 @@
             // Añadir clase 'active' al enlace de la página actual en el sidebar
             const currentPath = window.location.pathname;
             document.querySelectorAll('.admin-nav-item').forEach(link => {
-                if (link.href.includes('eventos.html')) {
+                // Ajuste para que 'eventos.html' sea el activo si la URL lo contiene
+                if (link.href.includes('eventos.html') && !link.href.includes('eventoApro.html')) { // Excluir eventoApro.html
                     link.classList.add('active');
                 } else {
                     link.classList.remove('active');
@@ -239,7 +240,7 @@
              * @brief Carga las solicitudes de eventos pendientes desde el backend.
              */
             async function fetchEventRequests() {
-                eventRequestsListBody.innerHTML = '<tr><td colspan="11" class="admin-loading-message">Cargando solicitudes de eventos...</td></tr>';
+                eventRequestsListBody.innerHTML = '<tr><td colspan="13" class="admin-loading-message">Cargando solicitudes de eventos...</td></tr>';
                 noRequestsMessage.style.display = 'none'; // Ocultar mensaje de "no hay solicitudes"
 
                 try {
@@ -265,12 +266,12 @@
                         }
                     } else {
                         showAdminMessageModal(`Error al cargar solicitudes: ${data.message || 'Error desconocido'}`, 'error');
-                        eventRequestsListBody.innerHTML = `<tr><td colspan="11" class="admin-no-requests-message admin-error-text">No se pudieron cargar las solicitudes de eventos.</td></tr>`;
+                        eventRequestsListBody.innerHTML = `<tr><td colspan="13" class="admin-no-requests-message admin-error-text">No se pudieron cargar las solicitudes de eventos.</td></tr>`;
                     }
                 } catch (error) {
                     console.error('Error al obtener solicitudes de eventos:', error);
                     showAdminMessageModal('Error de conexión con el servidor al cargar solicitudes de eventos.', 'error');
-                    eventRequestsListBody.innerHTML = `<tr><td colspan="11" class="admin-no-requests-message admin-error-text">Error de red.</td></tr>`;
+                    eventRequestsListBody.innerHTML = `<tr><td colspan="13" class="admin-no-requests-message admin-error-text">Error de red.</td></tr>`;
                 }
             }
 
@@ -298,8 +299,10 @@
                     const precioConadis = parseFloat(request.PrecioConadis);
                     const formattedPrecioConadis = isNaN(precioConadis) ? 'N/A' : `S/. ${precioConadis.toFixed(2)}`;
 
-                    // Asegurarse de que la URL de la imagen sea absoluta si viene de la raíz del servidor
-                    const imageUrl = request.URL_Imagen ? `${API_URL}${request.URL_Imagen}` : 'https://placehold.co/80x80/cccccc/000000?text=No+Img';
+                    // Depuración: Log el valor crudo de request.URL_Imagen_Evento
+                    console.log(`Valor de request.URL_Imagen_Evento (admin eventos pendientes):`, request.URL_Imagen_Evento); 
+                    const imageUrl = request.URL_Imagen_Evento ? `${API_URL}${request.URL_Imagen_Evento}` : 'https://placehold.co/80x80/cccccc/000000?text=No+Img';
+                    console.log(`URL final de imagen para admin eventos pendientes: ${imageUrl}`); 
 
                     tableRowsHtml += `
                         <tr>
@@ -309,10 +312,24 @@
                             <td data-label="Categoría">${request.Categoria || 'N/A'}</td>
                             <td data-label="Fecha">${new Date(request.Fecha).toLocaleDateString('es-ES')}</td>
                             <td data-label="Horario">${request.Horario_Inicio || 'N/A'} - ${request.Horario_Fin || 'N/A'}</td>
-                            <td data-label="Ubicación">${request.Ubicacion}</td>
+                            <td data-label="Lugar">${request.Nom_Lugar || 'N/A'}</td> 
+                            <td data-label="Ubicación del Lugar">${request.Ubicacion || 'N/A'}</td> <!-- Usar request.Ubicacion -->
                             <td data-label="Descripción">${request.Descripcion ? request.Descripcion.substring(0, 50) + '...' : 'N/A'}</td>
-                            <td data-label="Precios">${formattedPrecioGeneral}<br>${formattedPrecioVIP}<br>${formattedPrecioConadis}</td>
-                            <td data-label="Organizador">${request.NombreProveedor || 'N/A'} ${request.ApellidoProveedor || ''} (${request.EmailProveedor || 'N/A'})</td>
+                            <td data-label="Precios">
+                                G: ${formattedPrecioGeneral}<br>
+                                VIP: ${formattedPrecioVIP}<br>
+                                CONADIS: ${formattedPrecioConadis}
+                            </td>
+                            <td data-label="Asientos">
+                                G: ${request.Asientos_General_Disp || '0'}<br>
+                                VIP: ${request.Asientos_VIP_Disp || '0'}<br>
+                                CONADIS: ${request.Asientos_Conadis_Disp || '0'}
+                            </td>
+                            <td data-label="Organizador">
+                                ${request.NombreProveedor || 'N/A'} ${request.ApellidoProveedor || ''}<br>
+                                (${request.EmailProveedor || 'N/A'})<br>
+                                ${request.NombreEmpresaOrganizador ? `Empresa: ${request.NombreEmpresaOrganizador}` : ''}
+                            </td>
                             <td class="admin-actions-cell">
                                 <button class="admin-btn-approve" data-id="${request.Id_Evento}" data-name="${request.Nom_Evento}"><i class="fas fa-check"></i> Aprobar</button>
                                 <button class="admin-btn-reject" data-id="${request.Id_Evento}" data-name="${request.Nom_Evento}"><i class="fas fa-times"></i> Rechazar</button>

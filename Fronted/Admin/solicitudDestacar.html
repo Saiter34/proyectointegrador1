@@ -25,7 +25,7 @@
             <li><a href="categorias.html" class="admin-nav-item"><i class="fas fa-tags"></i><span>Eventos por categorias</span></a></li>
             <li><a href="eventoDestacado.html" class="admin-nav-item"><i class="fas fa-star"></i><span>Eventos Destacados</span></a></li>
             <li><a href="solicitudDestacar.html" class="admin-nav-item active"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
-            <li><a href="catalogoDeLugares.html" class="admin-nav-item active"><i  class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
+            <li><a href="catalogoDeLugares.html" class="admin-nav-item"><i class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
         </ul>
     </div>
 
@@ -65,6 +65,9 @@
                             <th>Imagen</th>
                             <th>Nombre del Evento</th>
                             <th>Categoría</th>
+                            <th>Lugar</th> 
+                            <th>Ubicación del Lugar</th> 
+                            <th>Asientos (G/V/C)</th> 
                             <th>Organizador</th>
                             <th>Estado Actual del Evento</th>
                             <th>Estado Solicitud Destacar</th>
@@ -73,7 +76,7 @@
                     </thead>
                     <tbody id="solicitudesDestacarBody">
                         <!-- Las solicitudes se cargarán aquí dinámicamente -->
-                        <tr><td colspan="8" class="admin-loading-message">Cargando solicitudes para destacar...</td></tr>
+                        <tr><td colspan="11" class="admin-loading-message">Cargando solicitudes para destacar...</td></tr>
                     </tbody>
                 </table>
                 <p id="noRequestsMessage" class="admin-no-data-message" style="display: none;">No hay solicitudes pendientes para destacar eventos en este momento.</p>
@@ -233,7 +236,7 @@
              * @brief Carga las solicitudes de eventos para destacar que están en estado 'pendiente'.
              */
             async function fetchHighlightRequests() {
-                solicitudesDestacarBody.innerHTML = '<tr><td colspan="8" class="admin-loading-message">Cargando solicitudes para destacar...</td></tr>';
+                solicitudesDestacarBody.innerHTML = '<tr><td colspan="11" class="admin-loading-message">Cargando solicitudes para destacar...</td></tr>';
                 noRequestsMessage.style.display = 'none';
 
                 try {
@@ -254,12 +257,12 @@
                         }
                     } else {
                         showAdminMessageModal(`Error al cargar solicitudes para destacar: ${data.message || 'Error desconocido'}`, 'error');
-                        solicitudesDestacarBody.innerHTML = `<tr><td colspan="8" class="admin-error-text">No se pudieron cargar las solicitudes.</td></tr>`;
+                        solicitudesDestacarBody.innerHTML = `<tr><td colspan="11" class="admin-error-text">No se pudieron cargar las solicitudes.</td></tr>`;
                     }
                 } catch (error) {
                     console.error('Error al obtener solicitudes para destacar:', error);
                     showAdminMessageModal('Error de conexión con el servidor al cargar solicitudes para destacar.', 'error');
-                    solicitudesDestacarBody.innerHTML = `<tr><td colspan="8" class="admin-error-text">Error de red.</td></tr>`;
+                    solicitudesDestacarBody.innerHTML = `<tr><td colspan="11" class="admin-error-text">Error de red.</td></tr>`;
                 }
             }
 
@@ -278,10 +281,15 @@
 
                 let tableRowsHtml = '';
                 requests.forEach(request => {
-                    const imageUrl = request.URL_Imagen ? `${API_URL}${request.URL_Imagen}` : 'https://placehold.co/80x80/cccccc/000000?text=No+Img';
+                    // --- CORRECCIÓN AQUÍ: Usar request.URL_Imagen_Evento ---
+                    console.log(`Valor de request.URL_Imagen_Evento (admin solicitud destacar):`, request.URL_Imagen_Evento); 
+                    const imageUrl = request.URL_Imagen_Evento ? `${API_URL}${request.URL_Imagen_Evento}` : 'https://placehold.co/80x80/cccccc/000000?text=No+Img';
+                    console.log(`URL final de imagen para admin solicitud destacar: ${imageUrl}`);
+                    // --- FIN CORRECCIÓN ---
+
                     const statusClass = request.SolicitudDestacar === 'pendiente' ? 'admin-status-pendiente' :
-                                        request.SolicitudDestacar === 'aprobado' ? 'admin-status-aprobado' :
-                                        'admin-status-rechazado'; // Or 'admin-status-otro' for other states
+                                         request.SolicitudDestacar === 'aprobado' ? 'admin-status-aprobado' :
+                                         'admin-status-rechazado'; // Or 'admin-status-otro' for other states
 
                     tableRowsHtml += `
                         <tr>
@@ -289,7 +297,17 @@
                             <td data-label="Imagen"><img src="${imageUrl}" alt="Imagen del evento" class="admin-event-image-thumbnail"></td>
                             <td data-label="Nombre del Evento">${request.Nom_Evento}</td>
                             <td data-label="Categoría">${request.Categoria || 'N/A'}</td>
-                            <td data-label="Organizador">${request.NombreProveedor || 'N/A'} ${request.ApellidoProveedor || ''} (${request.EmailProveedor || 'N/A'})</td>
+                            <td data-label="Lugar">${request.Nom_Lugar || 'N/A'}</td> 
+                            <td data-label="Ubicación del Lugar">${request.Ubicacion_Lugar || 'N/A'}</td> <!-- Usar request.Ubicacion_Lugar del backend -->
+                            <td data-label="Asientos">
+                                G: ${request.Asientos_General_Disp || '0'}<br>
+                                VIP: ${request.Asientos_VIP_Disp || '0'}<br>
+                                CONADIS: ${request.Asientos_Conadis_Disp || '0'}
+                            </td>
+                            <td data-label="Organizador">
+                                ${request.NombreProveedor || 'N/A'} ${request.ApellidoProveedor || ''}<br>
+                                (${request.EmailProveedor || 'N/A'})
+                            </td>
                             <td data-label="Estado Actual del Evento"><span class="admin-status-${request.Estado.toLowerCase()}">${request.Estado}</span></td>
                             <td data-label="Estado Solicitud Destacar"><span class="${statusClass}">${request.SolicitudDestacar}</span></td>
                             <td class="admin-actions-cell">
@@ -337,6 +355,7 @@
                 }
 
                 try {
+                    // Endpoint para destacar o rechazar una solicitud de destacar
                     const response = await fetch(`${API_URL}/api/admin/eventos/destacar/${eventId}/${action}`, {
                         method: 'PUT', // Use PUT to update resource state
                         headers: {

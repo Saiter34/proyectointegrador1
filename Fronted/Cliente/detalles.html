@@ -52,7 +52,8 @@
                         <p class="loading-message">Cargando precios...</p>
                     </div>
                     <!-- El botón de comprar se actualiza con el ID del evento -->
-                    <a id="buyTicketsBtn" href="pago1.html" class="btn-comprar">COMPRAR ENTRADAS</a>
+                    <!-- CAMBIO CLAVE AQUÍ: APUNTA A pago.html -->
+                    <a id="buyTicketsBtn" href="pago.html" class="btn-comprar">COMPRAR ENTRADAS</a>
                     <p class="nota-conadis">* Descuento CONADIS válido con carné vigente. Cupos limitados.</p>
                 </div>
             </div>
@@ -154,7 +155,7 @@
             const eventCategoryLocation = document.getElementById('eventCategoryLocation');
             const eventDate = document.getElementById('eventDate');
             const pricingTable = document.getElementById('pricingTable');
-            const buyTicketsBtn = document.getElementById('buyTicketsBtn');
+            const buyTicketsBtn = document.getElementById('buyTicketsBtn'); // Obtener referencia al botón
             const eventDescription = document.getElementById('eventDescription');
             const eventRules = document.getElementById('eventRules');
 
@@ -216,10 +217,14 @@
                 }
 
                 try {
-                    const response = await fetch(`${API_URL}/api/eventos/${eventId}`);
+                    // Asegúrate de que este endpoint sea accesible públicamente si no hay autenticación de cliente
+                    const response = await fetch(`${API_URL}/api/eventos/${eventId}`); 
                     const eventData = await response.json();
 
                     if (response.ok) {
+                        console.log('--- Datos COMPLETOS del evento recibidos del backend: ---');
+                        console.log(eventData); // LOG para depuración: Muestra todo el objeto
+                        console.log('----------------------------------------------------');
                         renderEventDetails(eventData);
                     } else {
                         showModal(`Error al cargar detalles del evento: ${eventData.message || 'Error desconocido'}`, 'error');
@@ -243,17 +248,29 @@
              * @param {Object} event - The event data object from the API.
              */
             function renderEventDetails(event) {
-                // Actualizar imágenes (usando placeholders si no hay URL)
-                // Asegúrate de que event.URL_Imagen y event.URL_Mapa sean rutas relativas al servidor
-                eventImage.src = event.URL_Imagen ? `${API_URL}${event.URL_Imagen}` : 'https://placehold.co/600x400/cccccc/000000?text=Imagen+No+Disponible';
-                venueMap.src = event.URL_Mapa ? `${API_URL}${event.URL_Mapa}` : 'https://placehold.co/300x200/cccccc/000000?text=Mapa+No+Disponible';
+                // Update images (using placeholders if no URL)
+                const eventImageUrl = event.URL_Imagen_Evento ? `${API_URL}${event.URL_Imagen_Evento}` : 'https://placehold.co/600x400/cccccc/000000?text=Imagen+No+Disponible';
+                console.log(`Final Event Image URL: ${eventImageUrl}`);
+                eventImage.src = eventImageUrl;
+                
+                // Use event.URL_Imagen_Asientos for the venue map.
+                // If it's not present, fall back to a placeholder.
+                let venueMapUrl;
+                if (event.URL_Imagen_Asientos) {
+                    venueMapUrl = `${API_URL}${event.URL_Imagen_Asientos}`;
+                } else {
+                    venueMapUrl = 'https://placehold.co/300x200/cccccc/000000?text=Mapa+No+Disponible';
+                    console.warn("URL_Imagen_Asientos not found in event data. Using a placeholder for the venue map. Please ensure this field is populated in your database for the associated Lugar.");
+                }
+                console.log(`Final Seat Map URL: ${venueMapUrl}`);
+                venueMap.src = venueMapUrl;
 
-                // Actualizar texto del evento
-                eventName.textContent = event.Nom_Evento || 'Evento Desconocido';
-                eventCategoryLocation.textContent = `${event.Categoria || 'Categoría Desconocida'} / ${event.Ubicacion || 'Ubicación Desconocida'}`;
-                eventDate.textContent = event.Fecha ? new Date(event.Fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Fecha Desconocida';
+                // Update event text
+                eventName.textContent = event.Nom_Evento || 'Unknown Event';
+                eventCategoryLocation.textContent = `${event.Categoria || 'Unknown Category'} / ${event.Ubicacion || 'Unknown Location'}`; // Usar event.Ubicacion
+                eventDate.textContent = event.Fecha ? new Date(event.Fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Unknown Date';
 
-                // Renderizar tabla de precios (asumiendo que event.Precios es un array de objetos {zona, regular, conadis, preventa})
+                // Render pricing table using the 'Precios' array
                 let pricingHtml = `
                     <div class="fila tabla-encabezado">
                         <div>Zona</div>
@@ -262,14 +279,15 @@
                         <div>Preventa</div>
                     </div>
                 `;
+                
                 if (event.Precios && event.Precios.length > 0) {
                     event.Precios.forEach(price => {
                         pricingHtml += `
                             <div class="fila">
-                                <div>${price.zona}</div>
-                                <div>S/. ${price.regular}</div>
-                                <div>S/. ${price.conadis}</div>
-                                <div>S/. ${price.preventa}</div>
+                                <div>${price.zona || 'N/A'}</div>
+                                <div>S/. ${parseFloat(price.regular || 0).toFixed(2)}</div>
+                                <div>S/. ${parseFloat(price.conadis || 0).toFixed(2)}</div>
+                                <div>S/. ${parseFloat(price.preventa || 0).toFixed(2)}</div>
                             </div>
                         `;
                     });
@@ -278,25 +296,42 @@
                 }
                 pricingTable.innerHTML = pricingHtml;
 
-                // Actualizar descripción e historia
-                eventDescription.textContent = event.Descripcion || 'No hay descripción disponible para este evento.';
 
-                // Renderizar reglas (asumiendo event.Reglas es un array de strings)
+                // Update description and history
+                eventDescription.textContent = event.Descripcion || 'No description available for this event.';
+
+                // Render rules (asumiendo event.Reglas es un array de strings o un string JSON)
                 let rulesHtml = '';
-                if (event.Reglas && event.Reglas.length > 0) {
-                    event.Reglas.forEach(rule => {
-                        rulesHtml += `<li>${rule}</li>`;
-                    });
+                if (event.Reglas) {
+                    let rulesArray = event.Reglas;
+                    if (typeof event.Reglas === 'string') {
+                        try {
+                            rulesArray = JSON.parse(event.Reglas);
+                        } catch (e) {
+                            console.error("Error parsing event.Reglas:", e);
+                            rulesArray = [event.Reglas]; // Treat as a single string if parsing fails
+                        }
+                    }
+                    
+                    if (Array.isArray(rulesArray) && rulesArray.length > 0) {
+                        rulesArray.forEach(rule => {
+                            rulesHtml += `<li>${rule}</li>`;
+                        });
+                    } else if (typeof rulesArray === 'string' && rulesArray.length > 0) { // If it's a non-empty string that couldn't be parsed as an array
+                        rulesHtml = `<li>${rulesArray}</li>`;
+                    } else {
+                        rulesHtml = `<li>No specific rules for this event.</li>`;
+                    }
                 } else {
-                    rulesHtml = `<li>No hay reglas específicas para este evento.</li>`;
+                    rulesHtml = `<li>No specific rules for this event.</li>`;
                 }
                 eventRules.innerHTML = rulesHtml;
 
-                // Actualizar el enlace del botón comprar entradas para incluir el eventId
-                buyTicketsBtn.href = `pago1.html?eventId=${event.Id_Evento}`;
+                // Update the buy tickets button link to include the eventId
+                buyTicketsBtn.href = `pago.html?eventId=${event.Id_Evento}`; // <-- CAMBIO CLAVE AQUÍ
             }
 
-            // Iniciar la carga de detalles del evento
+            // Start fetching event details
             fetchEventDetails();
         });
     </script>

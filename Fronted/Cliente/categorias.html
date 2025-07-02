@@ -10,39 +10,50 @@
 </head>
 <body>
     <header class="encabezado">
-        <div class="barra-logo">
-            <!-- Ruta corregida a la imagen del logo: desde Clientes/ a img/ -->
-            <img src="../img/logo.png" alt="Logo Teycketan" class="logo" />
+        <div class="logo">
+            <img src="../img/logo.png" alt="Logo de Teycketan">
         </div>
-        <div class="barra-pasos">
-            <!-- Ruta corregida a principal.html: desde Clientes/ a la raíz Fronted/ -->
-            <a href="cliente.html" class="paso activo">
-                <div class="circulo">1</div>
-                <span>INICIO</span>
-            </a>
-        </div>
-        
-                <!-- Dropdown de Categorías -->
-                <div class="nav-box dropdown">
-                    <button>Categorías</button>
-                    <div class="dropdown-content">
-                        <!-- Rutas corregidas para apuntar a categorias.html dentro de la misma carpeta Clientes/ -->
-                        <a href="categorias.html?categoria=Conciertos">Conciertos</a>
-                        <a href="categorias.html?categoria=Teatro">Teatro</a>
-                        <a href="categorias.html?categoria=Deportes">Deportes</a>
-                    </div>
-                </div>
+        <nav>
+            <div class="nav-box" id="organizerLinkContainer">
+                <a href="../Proveedor/bienvenidoprov.html" id="organizerLink">¿Quieres ser organizador?</a>
+            </div>
 
-                <!-- Dropdown de Mi Cuenta (para usuarios logueados) -->
-                <div class="nav-box dropdown" id="miCuentaContainer">
-                    <button id="miCuentaButton">Mi Cuenta</button>
-                    <div class="dropdown-content" id="miCuentaDropdownContent">
-                        <a href="#" id="viewProfileLink">Ver Perfil</a>
-                        <a href="#" id="logoutLink">Cerrar Sesión</a>
-                    </div>
+            <div class="nav-box dropdown">
+                <button>Categorías</button>
+                <div class="dropdown-content">
+                    <!-- Nombres de categorías ajustados según tu posible backend -->
+                    <a href="categorias.html?categoria=Conciertos">Conciertos</a>
+                    <a href="categorias.html?categoria=Teatro">Teatro</a>
+                    <a href="categorias.html?categoria=Deportiva">Deportes</a> <!-- Cambiado a 'Deportiva' -->
+                    <!-- Agrega más categorías aquí si existen en tu backend -->
                 </div>
+            </div>
 
+            <div class="nav-box dropdown" id="miCuentaContainer">
+                <button id="miCuentaButton">Mi Cuenta</button>
+                <div class="dropdown-content" id="miCuentaDropdownContent">
+                    <a href="#" id="viewProfileLink">Ver Perfil</a>
+                    <a href="#" id="logoutLink">Cerrar Sesión</a>
+                </div>
+            </div>
+
+            <div class="client-notif-wrapper">
+                <button class="client-notif-btn" id="clientNotifToggle">
+                    <i class="fas fa-bell"></i>
+                    <span class="client-notif-dot"></span>
+                </button>
+                <div class="client-notif-dropdown" id="clientNotifDropdown">
+                    <p class="client-notif-title">Notificaciones</p>
+                    <ul>
+                        <li>Tu compra de "Concierto XYZ" fue exitosa!</li>
+                        <li>Recordatorio: "Evento ABC" es mañana.</li>
+                        <li>Nuevo evento "Festival de Verano" disponible.</li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
     </header>
+
 
     <main>
         <!-- El título H2 se actualizará con JavaScript -->
@@ -160,8 +171,10 @@
                 let eventsHtml = '';
                 events.forEach(event => {
                     const formattedDate = new Date(event.Fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
-                    // Asegúrate de que URL_Imagen es una ruta relativa que debe ser prefijada por API_URL
-                    const imageUrl = event.URL_Imagen ? `${API_URL}${event.URL_Imagen}` : 'https://placehold.co/150x100/cccccc/000000?text=No+Img';
+                    // Depuración: Log el valor crudo de event.URL_Imagen_Evento
+                    console.log(`Valor de event.URL_Imagen_Evento (categorías):`, event.URL_Imagen_Evento); 
+                    const imageUrl = event.URL_Imagen_Evento ? `${API_URL}${event.URL_Imagen_Evento}` : 'https://placehold.co/150x100/cccccc/000000?text=No+Img';
+                    console.log(`URL final de imagen para categorías: ${imageUrl}`); 
 
                     eventsHtml += `
                         <!-- Ruta corregida a detalles.html dentro de la misma carpeta Clientes/ -->
@@ -170,7 +183,7 @@
                                 <img src="${imageUrl}" alt="${event.Nom_Evento}">
                                 <div class="evento-info">
                                     <h4>${event.Nom_Evento}</h4>
-                                    <p>${event.Ubicacion}</p>
+                                    <p>${event.Ubicacion || 'Ubicación Desconocida'}</p>
                                     <p>${formattedDate}</p>
                                 </div>
                             </div>
