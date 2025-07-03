@@ -259,11 +259,11 @@ main {
 /* --- CONTENIDO PRINCIPAL DE DOS COLUMNAS (Eventos y Destacados) --- */
 .contenido-principal-doscolumnas {
     display: flex;
-    gap: 2rem;
-    padding: 0 2rem; /* Ajuste para el padding lateral */
+    gap: 2rem; /* Espacio que tenías */
+    padding: 2rem; /* Padding que tenías */
     justify-content: space-between;
     align-items: flex-start;
-    flex-wrap: wrap; /* Permite que las columnas se apilen en pantallas pequeñas */
+    flex-wrap: wrap; /* Permite que las columnas se apilen */
     max-width: 1400px;
     margin-left: auto;
     margin-right: auto;

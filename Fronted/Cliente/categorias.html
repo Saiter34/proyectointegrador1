@@ -1,22 +1,44 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cargando Categoría...</title> <!-- Título inicial, se actualizará con JS -->
-    <link rel="stylesheet" href="categorias.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <title>Teycketan - Vende con Nosotros</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="categorias.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 <body>
+      <!-- Fondos -->
+  <div class="fondo-overlay-extra"></div>
+  <div class="fondo-overlay"></div>
     <header class="encabezado">
         <div class="logo">
             <img src="../img/logo.png" alt="Logo de Teycketan">
         </div>
+
         <nav>
             <div class="nav-box" id="organizerLinkContainer">
                 <a href="../Proveedor/bienvenidoprov.html" id="organizerLink">¿Quieres ser organizador?</a>
             </div>
+
+        <div class="barra-pasos">
+            <!-- Ruta corregida a principal.html: desde Clientes/ a la raíz Fronted/ -->
+      <a href="cliente.html" class="paso activo no-subrayado">
+        <span>INICIO</span>
+            </a>
+        </div>
+        
+                <!-- Dropdown de Categorías -->
+                <div class="nav-box dropdown">
+                    <button>Categorías</button>
+                    <div class="dropdown-content">
+                        <!-- Rutas corregidas para apuntar a categorias.html dentro de la misma carpeta Clientes/ -->
+                        <a href="categorias.html?categoria=Conciertos">Conciertos</a>
+                        <a href="categorias.html?categoria=Teatro">Teatro</a>
+                        <a href="categorias.html?categoria=Deportes">Deportes</a>
+                    </div>
+                </div>
 
             <div class="nav-box dropdown">
                 <button>Categorías</button>
