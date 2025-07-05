@@ -31,6 +31,8 @@ body {
 h1, h2, h3, h4 {
     font-family: 'Orbitron', sans-serif; /* Orbitron para los títulos */
     color: #ff3333; /* Rojo brillante para los títulos */
+    justify-self: center;
+    font-size: 50px;
 }
 
 /* --- CAPAS DE FONDO --- */
@@ -832,4 +834,61 @@ main {
         width: 70px;
         height: 70px;
     }
+}
+.encabezado .barra-pasos {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.encabezado .barra-pasos .paso {
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  font-size: 1rem;
+  padding: 8px 15px;
+  border-radius: 8px;
+ transform: translateX(-20px);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.encabezado .barra-pasos .paso:hover {
+  background-color: rgba(255, 0, 0, 0.2);
+}
+
+.encabezado .barra-pasos .paso.activo {
+  background-color: #700a0a;
+  color: #fff;
+}
+
+.encabezado .barra-pasos .no-subrayado {
+  text-decoration: none;
+}
+.encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70px; /* Altura que tenías */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 100;
+  backdrop-filter: blur(6px); /* Blur que tenías */
+  transition: all 0.3s ease-in-out;
+}
+
+.logo img {
+  height: 48px; /* Altura del logo que tenías */
+  background-color: #4c0000;
+  padding: 10px 30px;
+  position: relative;
+  z-index: 1;
+}
+
+.barra-logo .logo {
+  height: 45px;
 }
