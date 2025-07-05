@@ -48,7 +48,7 @@ h1, h2, h3, h4 {
 header.encabezado {
   background-color: #4c0000; /* Color de fondo que tenías */
   padding: 10px 30px; /* Padding que tenías */
-=======
+}
 .fondo-overlay {
   position: fixed;
   top: 0;
@@ -61,7 +61,6 @@ header.encabezado {
 }
 /* Encabezado */
 .encabezado {
->>>>>>> 66b1856 (Registro prov y categorias listas)
   display: flex;
   justify-content: space-between;
   align-items: center;
