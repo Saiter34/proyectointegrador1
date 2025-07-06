@@ -1,54 +1,47 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cargando Categoría...</title> <!-- Título inicial, se actualizará con JS -->
-    <link rel="stylesheet" href="categorias.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <title>Teycketan - Vende con Nosotros</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="categorias.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 <body>
-    <header class="encabezado">
-        <div class="logo">
-            <img src="../img/logo.png" alt="Logo de Teycketan">
+      <!-- Fondos -->
+  <div class="fondo-overlay-extra"></div>
+  <div class="fondo-overlay"></div>
+<header class="encabezado">
+        <div class="barra-logo">
+            <!-- Ruta al logo desde Fronted/ (correcta) -->
+            <img src="../img/logo.png" alt="Logo Teycketan" class="logo" />
+        </div>
+        <div class="barra-pasos">
+            <!-- Enlace a principal.html desde Fronted/ (correcta) -->
+            <a href="principal.html" class="paso activo">
+                <span>INICIO</span>
+            </a>
         </div>
         <nav>
-            <div class="nav-box" id="organizerLinkContainer">
-                <a href="../Proveedor/bienvenidoprov.html" id="organizerLink">¿Quieres ser organizador?</a>
-            </div>
-
+            <!-- Dropdown de Categorías para el público -->
             <div class="nav-box dropdown">
                 <button>Categorías</button>
                 <div class="dropdown-content">
-                    <!-- Nombres de categorías ajustados según tu posible backend -->
-                    <a href="categorias.html?categoria=Conciertos">Conciertos</a>
-                    <a href="categorias.html?categoria=Teatro">Teatro</a>
-                    <a href="categorias.html?categoria=Deportiva">Deportes</a> <!-- Cambiado a 'Deportiva' -->
-                    <!-- Agrega más categorías aquí si existen en tu backend -->
+                    <!-- Enlaces a esta misma página con diferentes categorías (dentro de Fronted/) -->
+                    <a href="categoriasprincipal.html?categoria=Conciertos">Conciertos</a>
+                    <a href="categoriasprincipal.html?categoria=Teatro">Teatro</a>
+                    <a href="categoriasprincipal.html?categoria=Deportes">Deportes</a>
                 </div>
             </div>
-
-            <div class="nav-box dropdown" id="miCuentaContainer">
+            <!-- Dropdown de Mi Cuenta (comportamiento para usuario no logueado) -->
+            <div class="nav-box dropdown" id="miCuentaContainer"> 
                 <button id="miCuentaButton">Mi Cuenta</button>
                 <div class="dropdown-content" id="miCuentaDropdownContent">
-                    <a href="#" id="viewProfileLink">Ver Perfil</a>
-                    <a href="#" id="logoutLink">Cerrar Sesión</a>
-                </div>
-            </div>
-
-            <div class="client-notif-wrapper">
-                <button class="client-notif-btn" id="clientNotifToggle">
-                    <i class="fas fa-bell"></i>
-                    <span class="client-notif-dot"></span>
-                </button>
-                <div class="client-notif-dropdown" id="clientNotifDropdown">
-                    <p class="client-notif-title">Notificaciones</p>
-                    <ul>
-                        <li>Tu compra de "Concierto XYZ" fue exitosa!</li>
-                        <li>Recordatorio: "Evento ABC" es mañana.</li>
-                        <li>Nuevo evento "Festival de Verano" disponible.</li>
-                    </ul>
+                    <!-- Rutas a login/registro desde Fronted/ (correctas) -->
+                    <a href="login.html" id="loginLink">Iniciar Sesión</a>
+                    <a href="registro.html" id="registerLink">Registrarse</a>
+                    <!-- Opciones para usuario logueado (añadidas por JS si aplica) -->
                 </div>
             </div>
         </nav>

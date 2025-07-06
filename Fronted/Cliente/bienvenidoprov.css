@@ -1,0 +1,177 @@
+/* Importación de fuentes de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap');
+
+/* Reset general */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Poppins', sans-serif;
+  background-color: #000;
+  color: #eee;
+  overflow-x: hidden;
+}
+
+/* Fondo principal metálico */
+body {
+  display: flex;
+  flex-direction: column;
+  background: url("../img/fmetal.jpg") no-repeat center center fixed;
+  background-size: cover;
+  position: relative;
+  z-index: 1;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Orbitron', sans-serif;
+  color: #ff3333;
+}
+
+/* --- Capas de fondo --- */
+.fondo-overlay-extra {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("../img/fondodetalles.jpg") repeat;
+  opacity: 0.5;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.fondo-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* --- Encabezado --- */
+header.encabezado {
+  background-color: #4c0000;
+  padding: 10px 30px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  height: 70px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 100;
+  backdrop-filter: blur(6px);
+  transition: all 0.3s ease-in-out;
+  gap: 30px;
+}
+
+.encabezado .barra-logo img.logo {
+  height: 48px;
+}
+
+.encabezado .barra-pasos {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.encabezado .barra-pasos .paso {
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  font-size: 1rem;
+  padding: 8px 15px;
+  border-radius: 8px;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.encabezado .barra-pasos .paso:hover {
+  background-color: rgba(255, 0, 0, 0.2);
+}
+
+.encabezado .barra-pasos .paso.activo {
+  background-color: #700a0a;
+  color: #fff;
+}
+
+.encabezado .barra-pasos .no-subrayado {
+  text-decoration: none;
+}
+
+/* --- Contenido principal --- */
+.bp-contenedor {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 100px;
+  padding-bottom: 40px;
+}
+
+/* Caja central */
+.bp-mensaje-prov {
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 40px 30px;
+  border-radius: 15px;
+  text-align: center;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+}
+
+.bp-mensaje-prov h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.bp-mensaje-prov p {
+  font-size: 1rem;
+  margin-bottom: 15px;
+  color: #f0f0f0;
+}
+
+.bp-mensaje-de-seguro {
+  margin: 20px 0;
+  font-size: 0.95rem;
+  color: #ccc;
+}
+
+/* Botón siguiente */
+.bp-btn-siguiente {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 30px;
+  background-color: #4c0000;
+  color: white;
+  text-decoration: none;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: bold;
+  border-radius: 10px;
+  transition: 0.3s ease;
+}
+
+.bp-btn-siguiente:hover {
+  background-color: #7a0000;
+  box-shadow: 0 0 10px #ff0000;
+}
+
+/* --- Footer --- */
+.bp-footer {
+  text-align: center;
+  padding: 20px;
+}
+
+.bp-logo-footer {
+  height: 50px;
+}

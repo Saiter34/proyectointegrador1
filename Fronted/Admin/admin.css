@@ -207,7 +207,7 @@ body {
 
 /* GENERAL BUTTON STYLES (for logout and other primary actions) */
 .admin-btn-logout { /* Clase específica para el botón de cerrar sesión */
-    background-color: #dc3545; /* Rojo fuerte */
+    background-color: #c10000; /* Rojo fuerte */
     color: #fff;
     border: none;
     padding: 10px 18px; /* Más padding */
@@ -1238,4 +1238,51 @@ body {
 }
 .error-message {
     color: #f44336;
+}
+/*Reclamos*/
+.admin-tabla-container {
+  padding: 30px;
+  overflow-x: auto;
+}
+
+.admin-tabla-reclamos {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #1a1a1a;
+  box-shadow: 0 0 15px rgb(73, 3, 3);
+  color: #f0f0f0;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.admin-tabla-reclamos th,
+.admin-tabla-reclamos td {
+  padding: 14px 16px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.admin-tabla-reclamos th {
+  background-color: #c10000;
+  text-transform: uppercase;
+}
+
+.admin-tabla-reclamos td img.admin-img-evidencia {
+  width: 100px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.admin-btn-resuelto {
+  background-color: #007700;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.admin-btn-resuelto:hover {
+  background-color: #00cc00;
 }
