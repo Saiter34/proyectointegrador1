@@ -3,3 +3,10 @@
 
 # Ignorar directorio de módulos de Node.js
 node_modules/
+# Ignorar archivos temporales zzz específicos
+Fronted/zzz1.css
+Fronted/zzz1.html
+Fronted/zzz2.css
+Fronted/zzz2.html
+Fronted/zzz3.css
+Fronted/zzz3.html
