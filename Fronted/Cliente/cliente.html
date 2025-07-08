@@ -37,7 +37,7 @@
                 <div class="nav-box dropdown" id="miCuentaContainer">
                     <button id="miCuentaButton">Mi Cuenta</button>
                     <div class="dropdown-content" id="miCuentaDropdownContent">
-                        <a href="#" id="viewProfileLink">Ver Perfil</a>
+                        <a href="perfil.html" id="viewProfileLink">Ver Perfil</a>
                         <a href="#" id="logoutLink">Cerrar Sesión</a>
                     </div>
                 </div>
@@ -258,7 +258,7 @@
                             renderFeaturedEvents(events);
                             initCarousel(); // Inicializar carrusel después de renderizar
                         } else {
-                             carruselEventosDestacados.innerHTML = `<p class="error-message">Formato de datos inesperado para eventos destacados.</p>`;
+                            carruselEventosDestacados.innerHTML = `<p class="error-message">Formato de datos inesperado para eventos destacados.</p>`;
                              console.error('Unexpected data format for featured events:', data);
                         }
                     } else {

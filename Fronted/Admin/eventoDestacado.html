@@ -26,8 +26,7 @@
             <li><a href="eventoDestacado.html" class="admin-nav-item active"><i class="fas fa-star"></i><span>Eventos destacados</span></a></li>
             <li><a href="solicitudDestacar.html" class="admin-nav-item"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
             <li><a href="catalogoDeLugares.html" class="admin-nav-item"><i class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
-            <li><a href="reclamos.html" class="admin-nav-item"><i  class="fas fa-envelope"></i><span>Reclamos</span></a></li>
-
+            <li><a href="reclamos.html" class="admin-nav-item"><i class="fas fa-envelope"></i><span>Reclamos</span></a></li>
         </ul>
     </div>
 
@@ -87,9 +86,9 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta
+        const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta
 
+        document.addEventListener('DOMContentLoaded', async () => {
             // --- Lógica de Autenticación al cargar la página ---
             const token = localStorage.getItem('jwtToken');
             const userRole = localStorage.getItem('userRole');
@@ -182,6 +181,7 @@
                 if (confirmLogout) {
                     localStorage.removeItem('jwtToken');
                     localStorage.removeItem('userName');
+                    localStorage.removeItem('userEmail');
                     localStorage.removeItem('userRole');
                     localStorage.removeItem('isOrganizer');
                     localStorage.removeItem('userId');
@@ -224,10 +224,12 @@
                 noFeaturedEventsMessage.style.display = 'none';
 
                 try {
-                    const response = await fetch(`${API_URL}/api/admin/eventos/destacados`, {
+                    // <<-- CAMBIO CLAVE AQUÍ -->>
+                    // Llama a la ruta pública de eventos destacados. No requiere token per se, pero se envía por consistencia.
+                    const response = await fetch(`${API_URL}/api/eventos/destacados`, { 
                         method: 'GET',
                         headers: {
-                            'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${token}` // Se envía el token, aunque la ruta sea pública
                         }
                     });
                     const data = await response.json();
@@ -238,6 +240,7 @@
                         } else {
                             featuredEventsGrid.innerHTML = ''; // Clear loading message
                             noFeaturedEventsMessage.style.display = 'block';
+                            noFeaturedEventsMessage.textContent = 'No hay eventos destacados en este momento.';
                         }
                     } else {
                         showAdminMessageModal(`Error al cargar eventos destacados: ${data.message || 'Error desconocido'}`, 'error');
@@ -298,7 +301,8 @@
                                 <li>VIP: ${formattedPrecioVIP}</li>
                                 <li>Conadis: ${formattedPrecioConadis}</li>
                             </ul>
-                            <p><strong>Organizador:</strong> ${event.NombreProveedor || 'N/A'} ${event.ApellidoProveedor || ''} (${event.EmailProveedor || 'N/A'})</p>
+                            <p><strong>Organizador:</strong> ${event.NombreEmpresaOrganizador || 'N/A'}</p>
+                            <p><strong>Estado:</strong> ${event.Estado}</p>
                             ${event.URL_Mapa ? `<p><strong>Mapa:</strong> <a href="${event.URL_Mapa}" target="_blank">Ver Mapa</a></p>` : ''}
                             ${event.Reglas && event.Reglas.length > 0 ? `<p><strong>Reglas:</strong></p><ul>${event.Reglas.map(rule => `<li>${rule}</li>`).join('')}</ul>` : '<p><strong>Reglas:</strong> No especificadas.</p>'}
                         </div>
@@ -341,7 +345,10 @@
                 }
 
                 try {
-                    const response = await fetch(`${API_URL}/api/admin/eventos/${eventId}/quitar-destacado`, {
+                    // Endpoint para cambiar SolicitudDestacar a 'rechazado' o 'pendiente'
+                    // Asumo que tienes una ruta PUT en /api/admin/eventos/:id/rechazar-destacado
+                    // O que simplemente lo cambias a 'pendiente' para una nueva revisión
+                    const response = await fetch(`${API_URL}/api/admin/eventos/${eventId}/rechazar-destacar`, { // <<-- ASUMO ESTA RUTA EN TU BACKEND
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
@@ -355,13 +362,14 @@
                         showAdminMessageModal(data.message, 'success');
                         fetchFeaturedEvents(); // Reload data after action
                     } else {
-                        showAdminMessageModal(`Error al quitar el destacado: ${data.message || data.error || 'Error desconocido'}`, 'error');
+                        showAdminMessageModal(`Error al dejar de destacar el evento: ${data.message || data.error || 'Error desconocido'}`, 'error');
                     }
                 } catch (error) {
                     console.error(`Error al quitar el estado de destacado al evento:`, error);
                     showAdminMessageModal(`Error de conexión con el servidor al quitar destacado.`, 'error');
                 }
             }
+
 
             // Cargar eventos destacados al cargar la página
             fetchFeaturedEvents();

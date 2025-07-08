@@ -1,7 +1,7 @@
 body { 
   margin: 0;
   font-family: 'Poppins', sans-serif;
-  background: url('img/fondometal.jpg') repeat;
+  background: url('../img/fondometal.jpg') repeat; /* Ruta relativa ajustada */
   background-size: cover;
   position: relative;
   color: white;
@@ -11,7 +11,7 @@ body::before {
   content: "";
   position: fixed; 
   inset: 0;
-  background: url('img/fondodetalles.jpg') no-repeat center;
+  background: url('../img/fondodetalles.jpg') no-repeat center; /* Ruta relativa ajustada */
   background-size: cover;
   opacity: 0.5;
   z-index: 0;
@@ -92,6 +92,29 @@ main.contenedor {
   color: #ff4d4d;
   font-size: 1.4rem;
 }
+
+/* Nueva sección para el resumen del evento en pago2.html */
+.event-info-summary {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 15px 20px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+  color: #f7f7f7;
+}
+
+.event-info-summary h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-family: 'Orbitron', sans-serif;
+  color: #ff6666;
+  font-size: 1.1rem;
+}
+
+.event-info-summary p {
+  margin: 5px 0;
+  font-size: 0.95rem;
+}
+
 
 .metodos-pago {
   display: flex;
@@ -176,7 +199,7 @@ footer {
 }
 
 .logo-footer {
-  height: 50px;
+  height: 50px; /* Ajustado para consistencia */
 }
 /* Sección de puntos Teycketan */
 .puntos-section {
@@ -233,3 +256,93 @@ footer {
   color: yellow;
 }
 
+/* Estilos para el modal personalizado (movidos de HTML) */
+.client-modal {
+  display: none; /* Oculto por defecto */
+  position: fixed; /* Permanece en la misma posición al desplazarse */
+  z-index: 1000; /* Se superpone a todo */
+  left: 0;
+  top: 0;
+  width: 100%; /* Ancho completo */
+  height: 100%; /* Alto completo */
+  overflow: auto; /* Habilitar desplazamiento si es necesario */
+  background-color: rgba(0,0,0,0.7); /* Fondo oscuro semitransparente */
+  justify-content: center; /* Centrar horizontalmente */
+  align-items: center; /* Centrar verticalmente */
+}
+
+.client-modal-content {
+  background-color: #2a2a2a; /* Fondo oscuro similar al tema */
+  margin: auto;
+  padding: 25px;
+  border: 1px solid #888;
+  width: 80%; /* Ancho responsivo */
+  max-width: 400px; /* Ancho máximo */
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  position: relative;
+  text-align: center;
+  color: #eee; /* Texto claro */
+}
+
+.client-close-button {
+  color: #aaa;
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.client-close-button:hover,
+.client-close-button:focus {
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.client-message-text {
+  margin-bottom: 20px;
+  font-size: 1.1em;
+}
+
+.client-message-error {
+  color: #ff6b6b; /* Rojo para errores */
+}
+
+.client-message-warning {
+  color: #ffd166; /* Amarillo para advertencias */
+}
+
+.client-message-info {
+  color: #66b3ff; /* Azul para información */
+}
+
+.client-message-success {
+  color: #66ff99; /* Verde para éxito */
+}
+
+.client-modal-btn {
+  background-color: #e50914; /* Rojo de Teycketan */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  margin: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.client-modal-btn:hover {
+  background-color: #ff0000;
+}
+
+.client-modal-confirm {
+  background-color: #4CAF50; /* Verde para confirmación */
+}
+
+.client-modal-confirm:hover {
+  background-color: #45a049;
+}

@@ -2,10 +2,9 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db'); 
-const bcrypt = require('bcryptjs'); // <-- CORRECCIÓN AQUÍ
+const bcrypt = require('bcryptjs'); 
 const jwt = require('jsonwebtoken');
 
-// Importa el middleware de autenticación desde authMiddleware.js
 const { authenticateToken, authorizeRole } = require('../middleware/authMiddleware'); 
 
 router.post('/registro', async (req, res) => {
@@ -33,9 +32,10 @@ router.post('/registro', async (req, res) => {
                 "ES_Organizador",
                 "Autenticacion_2fa",
                 "Rol_Usuario",
-                "Puntos_Teycketan" 
-            ) VALUES ($1, $2, $3, $4, $5, $6, NOW(), false, false, 'cliente', 0) 
-            RETURNING "id", "Nom_Usuario", "Correo_Usuario", "Rol_Usuario"`,
+                "Puntos_Teycketan",
+                "Usado_Primera_Compra" // Añadir este campo aquí
+            ) VALUES ($1, $2, $3, $4, $5, $6, NOW(), false, false, 'cliente', 0, FALSE) 
+            RETURNING "id", "Nom_Usuario", "Correo_Usuario", "Rol_Usuario", "Puntos_Teycketan", "Usado_Primera_Compra"`, // Y aquí
             [nombre, apellido, email, password_hash, telefono, fecha_nacimiento]
         );
 
@@ -80,7 +80,7 @@ router.post('/login', async (req, res) => {
                 rol: user.Rol_Usuario 
             },
             process.env.JWT_SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: '1d' }
         );
 
         res.status(200).json({
@@ -92,7 +92,9 @@ router.post('/login', async (req, res) => {
                 apellido: user.Ape_Usuario,
                 email: user.Correo_Usuario,
                 isOrganizer: user.ES_Organizador, 
-                rol: user.Rol_Usuario 
+                rol: user.Rol_Usuario,
+                puntos: user.Puntos_Teycketan, // Asegúrate de que los puntos se envíen
+                usadoPrimeraCompra: user.Usado_Primera_Compra // Asegúrate de que esto se envíe
             }
         });
 
@@ -105,7 +107,7 @@ router.post('/login', async (req, res) => {
 router.get('/me', authenticateToken, async (req, res) => {
     try {
         const result = await pool.query(
-            'SELECT "id", "Nom_Usuario", "Ape_Usuario", "Correo_Usuario", "Tlf_Usuario", "Fecha_Nacimiento", "ES_Organizador", "Rol_Usuario", "Puntos_Teycketan" FROM "Usuarios" WHERE "id" = $1',
+            'SELECT "id", "Nom_Usuario", "Ape_Usuario", "Correo_Usuario", "Tlf_Usuario", "Fecha_Nacimiento", "ES_Organizador", "Rol_Usuario", "Puntos_Teycketan", "Usado_Primera_Compra" FROM "Usuarios" WHERE "id" = $1', // Añadir Usado_Primera_Compra aquí
             [req.user.id]
         );
         const user = result.rows[0];
@@ -121,22 +123,18 @@ router.get('/me', authenticateToken, async (req, res) => {
     }
 });
 
-/**
- * @route GET /:id/points
- * @description Obtiene los puntos Teycketan de un usuario específico.
- * @access Protegido (solo el propio usuario o un admin)
- */
-router.get('/:id/points', authenticateToken, async (req, res) => {
+// Nuevo endpoint para actualizar Usado_Primera_Compra (llamado después de la primera compra con descuento)
+router.put('/:id/mark-first-purchase-used', authenticateToken, async (req, res) => {
     const { id } = req.params;
-    const requestingUserId = req.user.id; 
+    const requestingUserId = req.user.id;
 
     if (id != requestingUserId && req.user.rol !== 'admin') {
-        return res.status(403).json({ message: 'Acceso denegado. No tienes permiso para ver los puntos de este usuario.' });
+        return res.status(403).json({ message: 'Acceso denegado. No tienes permiso para actualizar este usuario.' });
     }
 
     try {
         const result = await pool.query(
-            `SELECT "Puntos_Teycketan" FROM "Usuarios" WHERE "id" = $1`,
+            `UPDATE "Usuarios" SET "Usado_Primera_Compra" = TRUE WHERE "id" = $1 RETURNING "id", "Usado_Primera_Compra"`,
             [id]
         );
 
@@ -144,12 +142,11 @@ router.get('/:id/points', authenticateToken, async (req, res) => {
             return res.status(404).json({ message: 'Usuario no encontrado.' });
         }
 
-        res.status(200).json({ points: result.rows[0].Puntos_Teycketan || 0 });
+        res.status(200).json({ message: 'Estado de primera compra actualizado exitosamente.', user: result.rows[0] });
     } catch (error) {
-        console.error('Error al obtener puntos del usuario:', error.message);
-        res.status(500).json({ message: 'Error interno del servidor al obtener puntos.' });
+        console.error('Error al actualizar estado de primera compra:', error);
+        res.status(500).json({ message: 'Error interno del servidor al actualizar estado de primera compra.' });
     }
 });
-
 
 module.exports = router;

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Selecciona tu ubicación - TEYCKETAN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="pago1.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <!-- Capas de fondo -->
+    <div class="fondo-overlay-extra"></div>
+    <div class="fondo-overlay"></div>
+
+    <!-- Header estilo detalles -->
+    <header class="encabezado">
+        <div class="barra-logo">
+            <img src="../img/logo.png" alt="Logo Teycketan" class="logo" />
+        </div>
+        <div class="barra-pasos">
+            <div class="paso activo">
+                <div class="circulo">1</div>
+                <span>SELECCIÓN</span>
+            </div>
+            <div class="paso">
+                <div class="circulo">2</div>
+                <span>DATOS DE COMPRA</span>
+            </div>
+            <div class="paso">
+                <div class="circulo">3</div>
+                <span>CONFIRMACIÓN</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="precios">
+            <div class="precios-box">
+                <div class="lado-imagen">
+                    <!-- La imagen del evento se cargará dinámicamente aquí -->
+                    <img id="eventImage" src="https://placehold.co/600x400/cccccc/000000?text=Cargando+Imagen" alt="Imagen del Evento" /> 
+                </div>
+                <div class="lado-precios">
+                    <h2 id="eventName" class="event-title">Cargando Nombre del Evento...</h2> 
+                    <p id="eventCategoryLocation" class="event-subtitle">Cargando Categoría y Ubicación...</p> 
+                    <p id="eventDate" class="event-date">Cargando Fecha...</p> 
+
+                    <div class="tabla-precios" id="pricingTable">
+                        <div class="fila tabla-encabezado">
+                            <div>Zona</div>
+                            <div>Precio</div>
+                            <div>Cantidad</div>
+                        </div>
+                        <!-- Las filas de precios y cantidad se cargarán dinámicamente aquí -->
+                        <p class="loading-message">Cargando precios...</p>
+                    </div>
+
+                    <button id="btnSiguiente" class="btn-comprar">SIGUIENTE</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer estilo detalles -->
+    <footer class="footer-completo">
+        <div class="container-footer">
+            <div class="footer-row">
+                <div class="footer-col">
+                    <h4>Síguenos</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Compañía</h4>
+                    <ul>
+                        <li><a href="#">Nosotros</a></li>
+                        <li><a href="#">Servicios</a></li>
+                        <li><a href="#">Política de Privacidad</a></li>
+                        <li><a href="#">Califícanos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Ayuda</h4>
+                    <ul>
+                        <li><a href="#">Teléfono: (999-999-999)</a></li>
+                        <li><a href="#">Correo: Teycketan@gmail.com</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Métodos de pago</h4>
+                    <div class="payment-methods">
+                        <img src="../img/logo-yape.jpg" alt="Logo Yape"> 
+                        <img src="../img/logo-plin.jpg" alt="Logo Plin"> 
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <small>&copy; 2024 <b>Teycketan</b> - Todos los Derechos Reservados.</small>
+            </div>
+        </div>
+        <img src="../img/logo.png" alt="Logo Teycketan" class="logo-footer"/> 
+    </footer>
+
+    <!-- Custom Modal for Alerts/Confirmations -->
+    <div id="clientModal" class="client-modal">
+        <div class="client-modal-content">
+            <span class="client-close-button">&times;</span>
+            <p id="clientModalMessage" class="client-message-text"></p>
+            <div id="clientModalActions">
+                <!-- Buttons are added here dynamically -->
+            </div>
+        </div>
+    </div>
+
+<script>
+    const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta
+    const MAX_TICKETS_PER_PERSON = 5; // Límite total de tickets por persona
+
+    // Global variables to store fetched data
+    let currentEventData = null;
+    let currentUserData = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get('eventId'); // Obtener el ID del evento de la URL
+
+        // DOM elements
+        const eventImage = document.getElementById('eventImage');
+        const eventNameElem = document.getElementById('eventName'); 
+        const eventCategoryLocation = document.getElementById('eventCategoryLocation');
+        const eventDateElem = document.getElementById('eventDate'); 
+        const pricingTable = document.getElementById('pricingTable');
+        const btnSiguiente = document.getElementById('btnSiguiente');
+
+        // Modal elements
+        const clientModal = document.getElementById('clientModal');
+        const clientModalMessage = document.getElementById('clientModalMessage');
+        const clientModalActions = document.getElementById('clientModalActions');
+        const clientCloseButton = document.querySelector('.client-modal-content .client-close-button');
+
+        // Function to show custom modal
+        function showModal(message, type = 'info', actions = []) {
+            clientModalMessage.textContent = message;
+            clientModalMessage.className = `client-message-text client-message-${type}`;
+            clientModalActions.innerHTML = ''; // Clear previous actions
+
+            if (actions.length > 0) {
+                actions.forEach(action => {
+                    const button = document.createElement('button');
+                    button.textContent = action.text;
+                    button.className = `client-modal-btn client-modal-${action.type}`;
+                    button.onclick = () => {
+                        clientModal.style.display = 'none';
+                        if (action.handler) {
+                            action.handler();
+                        }
+                    };
+                    clientModalActions.appendChild(button);
+                });
+            } else {
+                const okButton = document.createElement('button');
+                okButton.textContent = 'OK';
+                okButton.className = 'client-modal-btn';
+                okButton.onclick = () => clientModal.style.display = 'none';
+                clientModalActions.appendChild(okButton);
+            }
+            clientModal.style.display = 'flex'; 
+        }
+
+        clientCloseButton.onclick = () => {
+            clientModal.style.display = 'none';
+        };
+        window.onclick = (event) => {
+            if (event.target === clientModal) {
+                clientModal.style.display = 'none';
+            }
+        };
+
+        // --- Autenticación y Carga de Datos del Usuario ---
+        const token = localStorage.getItem('jwtToken');
+        const userId = localStorage.getItem('userId');
+
+        if (!token || !userId) {
+            showModal('Debes iniciar sesión para comprar entradas.', 'error', [{
+                text: 'Ir a Iniciar Sesión',
+                type: 'confirm',
+                handler: () => window.location.replace('../login.html') 
+            }]);
+            return; // Detener la ejecución si no hay token o userId
+        }
+
+        /**
+         * @brief Fetches user details from the API.
+         */
+        async function fetchUserData() {
+            try {
+                const response = await fetch(`${API_URL}/api/usuarios/me`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    }
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    currentUserData = data.usuario; // Store user data globally
+                    console.log('Datos del usuario cargados:', currentUserData);
+                } else {
+                    showModal(`Error al cargar datos del usuario: ${data.mensaje || 'Error desconocido'}`, 'error');
+                    console.error('Error fetching user data:', data);
+                }
+            } catch (error) {
+                showModal('Error de conexión al cargar datos del usuario.', 'error');
+                console.error('Network error fetching user data:', error);
+            }
+        }
+
+        /**
+         * @brief Fetches event details from the API based on eventId and renders them.
+         */
+        async function fetchEventDetails() {
+            if (!eventId) {
+                showModal('Error: ID de evento no proporcionado en la URL.', 'error', [{
+                    text: 'Ir a Inicio',
+                    type: 'confirm',
+                    handler: () => window.location.replace('cliente.html')
+                }]);
+                console.error('Error: eventId missing in URL');
+                return;
+            }
+
+            try {
+                // Endpoint para obtener eventos públicos
+                const response = await fetch(`${API_URL}/api/eventos/${eventId}`); 
+                const eventData = await response.json();
+
+                if (response.ok) {
+                    currentEventData = eventData; // Store event data globally
+                    renderEventDetails(eventData);
+                } else {
+                    showModal(`Error al cargar detalles del evento: ${eventData.message || 'Error desconocido'}`, 'error', [{
+                        text: 'Aceptar',
+                        type: 'confirm',
+                        handler: () => window.location.replace('cliente.html') 
+                    }]);
+                    console.error('Error fetching event details:', eventData);
+                    document.querySelector('.precios-box').innerHTML = '<p class="error-message">No se pudieron cargar los detalles del evento.</p>';
+                }
+            } catch (error) {
+                showModal('Error de conexión con el servidor. No se pudieron cargar los detalles del evento.', 'error', [{
+                    text: 'Aceptar',
+                    type: 'confirm',
+                    handler: () => window.location.replace('cliente.html') 
+                }]);
+                console.error('Network error fetching event details:', error);
+                document.querySelector('.precios-box').innerHTML = '<p class="error-message">Error de conexión con el servidor.</p>';
+            }
+        }
+
+        /**
+         * @brief Renders the fetched event details onto the page.
+         * @param {Object} event - The event data object from the API.
+         */
+        function renderEventDetails(event) {
+            // Update event image
+            const eventImageUrl = event.URL_Imagen_Evento ? `${API_URL}${event.URL_Imagen_Evento}` : 'https://placehold.co/600x400/cccccc/000000?text=Imagen+No+Disponible';
+            eventImage.src = eventImageUrl;
+            
+            // Update event text
+            eventNameElem.textContent = event.Nom_Evento || 'Unknown Event';
+            eventCategoryLocation.textContent = `${event.Categoria || 'Unknown Category'} / ${event.Ubicacion || 'Unknown Location'}`; 
+            
+            // Format date and time
+            const eventDate = new Date(event.Fecha);
+            const formattedDate = eventDate.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            eventDateElem.textContent = `${formattedDate}, ${event.Horario_Inicio} - ${event.Horario_Fin}`;
+
+            // Clear existing rows except the header
+            let pricingHtml = `
+                <div class="fila tabla-encabezado">
+                    <div>Zona</div>
+                    <div>Precio</div>
+                    <div>Cantidad</div>
+                </div>
+            `;
+            
+            // Render pricing table rows dynamically
+            if (event.CategoriasDeEntradas && event.CategoriasDeEntradas.length > 0) {
+                event.CategoriasDeEntradas.forEach(category => {
+                    const precioRegular = parseFloat(category.precioRegular || 0);
+                    const stockDisponible = parseInt(category.stockDisponible || 0);
+
+                    // Determinar qué precio mostrar (Regular, Conadis, Preventa)
+                    // Por simplicidad, y para coincidir con la imagen, mostraremos solo un precio.
+                    // Si necesitas lógica para elegir, se requerirían radio buttons por fila.
+                    const displayPrice = precioRegular; // Asumimos precio regular por defecto para mostrar
+
+                    pricingHtml += `
+                        <div class="fila">
+                            <div>${category.Nom_Categoria || 'N/A'}</div>
+                            <div>S/. ${displayPrice.toFixed(2)}</div>
+                            <div class="cantidad">
+                                <button class="btn-menos" data-category-id="${category.id_categoria}">-</button>
+                                <input type="number" value="0" class="cantidad-input" 
+                                       data-category-id="${category.id_categoria}" 
+                                       data-zone-name="${category.Nom_Categoria}"
+                                       data-price-regular="${precioRegular.toFixed(2)}"
+                                       data-price-conadis="${parseFloat(category.precioConadis || 0).toFixed(2)}"
+                                       data-price-preventa="${parseFloat(category.precioPreventa || 0).toFixed(2)}"
+                                       data-max-stock="${stockDisponible}"
+                                       min="0" max="${stockDisponible}" readonly />
+                                <button class="btn-mas" data-category-id="${category.id_categoria}">+</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                pricingHtml += `<p class="no-data-message">Precios y stock no disponibles para este evento.</p>`;
+            }
+            pricingTable.innerHTML = pricingHtml;
+
+            // Re-attach event listeners to dynamically created buttons
+            attachQuantityButtonListeners();
+        }
+
+        /**
+         * @brief Calculates the total number of tickets selected across all categories.
+         * @returns {number} The total quantity of tickets selected.
+         */
+        function calculateTotalSelectedTickets() {
+            let total = 0;
+            document.querySelectorAll('.cantidad-input').forEach(input => {
+                total += parseInt(input.value) || 0;
+            });
+            return total;
+        }
+
+        /**
+         * @brief Attaches event listeners to the + and - buttons for quantity inputs.
+         */
+        function attachQuantityButtonListeners() {
+            document.querySelectorAll('.btn-mas').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const input = event.target.previousElementSibling;
+                    let currentValue = parseInt(input.value) || 0;
+                    const maxStock = parseInt(input.dataset.maxStock);
+                    const totalSelected = calculateTotalSelectedTickets();
+
+                    // Check global limit first
+                    if (totalSelected >= MAX_TICKETS_PER_PERSON) {
+                        showModal(`Solo puedes seleccionar un máximo de ${MAX_TICKETS_PER_PERSON} tickets en total.`, 'warning');
+                        return;
+                    }
+
+                    // Check individual stock
+                    if (currentValue < maxStock) {
+                        input.value = currentValue + 1;
+                    } else {
+                        showModal(`Has alcanzado el stock máximo para la zona ${input.dataset.zoneName}.`, 'warning');
+                    }
+                });
+            });
+
+            document.querySelectorAll('.btn-menos').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const input = event.target.nextElementSibling;
+                    let currentValue = parseInt(input.value) || 0;
+                    if (currentValue > 0) {
+                        input.value = currentValue - 1;
+                    }
+                });
+            });
+
+            // Optional: Add change listener for direct input (though readonly is set)
+            document.querySelectorAll('.cantidad-input').forEach(input => {
+                input.addEventListener('change', (event) => {
+                    let value = parseInt(event.target.value) || 0;
+                    const maxStock = parseInt(event.target.dataset.maxStock);
+                    const oldTotal = calculateTotalSelectedTickets(); // Total BEFORE this input's value potentially changes
+                    const oldValue = parseInt(event.target.dataset.oldValue || 0); // Store old value to adjust total calculation
+
+                    // Ensure not negative
+                    if (value < 0) {
+                        value = 0;
+                    }
+
+                    // Validate against individual stock
+                    if (value > maxStock) {
+                        value = maxStock;
+                        showModal(`Has superado el stock disponible para ${event.target.dataset.zoneName}. Máximo: ${maxStock}.`, 'warning');
+                    }
+                    
+                    // Temporarily set value to calculate total after this change
+                    event.target.value = value; 
+                    const newTotal = calculateTotalSelectedTickets();
+
+                    // Validate against total limit
+                    if (newTotal > MAX_TICKETS_PER_PERSON) {
+                        // Calculate how much this input needs to be reduced to fit the limit
+                        const diff = newTotal - MAX_TICKETS_PER_PERSON;
+                        value = value - diff; 
+                        if (value < 0) value = 0; // Ensure it doesn't go negative
+                        showModal(`Solo puedes seleccionar un máximo de ${MAX_TICKETS_PER_PERSON} tickets en total.`, 'warning');
+                    }
+
+                    event.target.value = value; // Set final validated value
+                    event.target.dataset.oldValue = value; // Update oldValue for next change event
+                });
+            });
+        }
+
+        /**
+         * @brief Handles the click event for the "SIGUIENTE" button.
+         * Collects selected tickets, applies discount if applicable, and stores them in localStorage.
+         */
+        btnSiguiente.addEventListener('click', () => {
+            const selectedTickets = [];
+            let totalAmount = 0;
+            let totalQuantitySelected = 0;
+
+            // Iterate over all quantity inputs to find selected tickets
+            document.querySelectorAll('.cantidad-input').forEach(input => {
+                const quantity = parseInt(input.value) || 0;
+                if (quantity > 0) {
+                    const categoryId = input.dataset.categoryId;
+                    const zoneName = input.dataset.zoneName;
+                    const priceRegular = parseFloat(input.dataset.priceRegular);
+                    const priceConadis = parseFloat(input.dataset.priceConadis);
+                    const pricePreventa = parseFloat(input.dataset.pricePreventa);
+                    const maxStock = parseInt(input.dataset.maxStock);
+
+                    // Re-validate against max stock (redundant but safe)
+                    if (quantity > maxStock) {
+                        showModal(`Error: Has seleccionado ${quantity} tickets para ${zoneName}, pero solo hay ${maxStock} disponibles. Por favor, corrige tu selección.`, 'error');
+                        selectedTickets.length = 0; // Clear selection
+                        totalAmount = 0;
+                        totalQuantitySelected = 0;
+                        return; // Stop processing
+                    }
+                    
+                    selectedTickets.push({
+                        categoryId: categoryId,
+                        zone: zoneName,
+                        quantity: quantity,
+                        priceRegular: priceRegular,
+                        priceConadis: priceConadis,
+                        pricePreventa: pricePreventa,
+                        unitPrice: priceRegular // Default to regular price for initial total
+                    });
+                    totalAmount += (priceRegular * quantity);
+                    totalQuantitySelected += quantity;
+                }
+            });
+
+            if (selectedTickets.length === 0) {
+                showModal('Por favor, selecciona al menos un ticket para continuar.', 'warning');
+                return;
+            }
+
+            // Final validation against total limit
+            if (totalQuantitySelected > MAX_TICKETS_PER_PERSON) {
+                showModal(`Error: Solo puedes seleccionar un máximo de ${MAX_TICKETS_PER_PERSON} tickets en total. Has seleccionado ${totalQuantitySelected}.`, 'error');
+                return;
+            }
+
+            let discountApplied = false;
+            // --- Lógica para el descuento del 15% en la primera compra ---
+            // Solo aplica si el usuario es cliente y no ha usado el descuento de primera compra
+            if (currentUserData && currentUserData.Rol_Usuario === 'cliente' && currentUserData.Usado_Primera_Compra === false) {
+                const discountPercentage = 0.15;
+                const discountAmount = totalAmount * discountPercentage;
+                totalAmount -= discountAmount;
+                discountApplied = true;
+                // showModal(`¡Felicidades! Se ha aplicado un descuento del 15% por tu primera compra.`, 'success'); // This modal will show before redirect, might be better to show on pago2.html
+            }
+
+            // Store purchase details in localStorage
+            localStorage.setItem('purchaseDetails', JSON.stringify({
+                eventId: eventId,
+                eventName: currentEventData.Nom_Evento,
+                tickets: selectedTickets,
+                totalAmount: totalAmount.toFixed(2),
+                discountApplied: discountApplied, // Indicate if discount was applied
+                // Add other relevant event details if needed for pago2.html
+                eventDate: currentEventData.Fecha,
+                eventTime: currentEventData.Horario_Inicio,
+                eventLocation: currentEventData.Ubicacion,
+                eventImageUrl: currentEventData.URL_Imagen_Evento,
+                // User data to pass for display in pago2.html (or for backend validation)
+                userName: currentUserData ? currentUserData.Nom_Usuario : 'Invitado',
+                userPoints: currentUserData ? currentUserData.Puntos_Teycketan : 0,
+                // Pass the current Usado_Primera_Compra status to pago2.html
+                // This is important for the final backend call to mark it as used.
+                userUsedFirstPurchase: currentUserData ? currentUserData.Usado_Primera_Compra : true 
+            }));
+
+            // Redirect to pago2.html
+            window.location.href = 'pago2.html';
+        });
+
+        // Initial fetches
+        // Fetch user data first, then event details
+        await fetchUserData(); 
+        await fetchEventDetails();
+    });
+</script>
+</body>
+</html>

@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 <body>
-      <!-- Fondos -->
+    <!-- Fondos -->
   <div class="fondo-overlay-extra"></div>
   <div class="fondo-overlay"></div>
 <header class="encabezado">
@@ -19,7 +19,7 @@
         </div>
         <div class="barra-pasos">
             <!-- Enlace a principal.html desde Fronted/ (correcta) -->
-            <a href="principal.html" class="paso activo">
+            <a href="cliente.html" class="paso activo">
                 <span>INICIO</span>
             </a>
         </div>
@@ -31,7 +31,7 @@
                     <!-- Enlaces a esta misma página con diferentes categorías (dentro de Fronted/) -->
                     <a href="categoriasprincipal.html?categoria=Conciertos">Conciertos</a>
                     <a href="categoriasprincipal.html?categoria=Teatro">Teatro</a>
-                    <a href="categoriasprincipal.html?categoria=Deportes">Deportes</a>
+                    <a href="categoriasprincipal.html?categoria=Deportiva">Deportiva</a>
                 </div>
             </div>
             <!-- Dropdown de Mi Cuenta (comportamiento para usuario no logueado) -->
@@ -65,6 +65,17 @@
         <img src="../img/logo.png" alt="Logo Footer" class="logo-footer"/>
     </footer>
 
+    <!-- Custom Modal for Alerts/Confirmations (re-added for this page) -->
+    <div id="clientModal" class="client-modal">
+        <div class="client-modal-content">
+            <span class="client-close-button">&times;</span>
+            <p id="clientModalMessage" class="client-message-text"></p>
+            <div id="clientModalActions">
+                <!-- Buttons are added here dynamically -->
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta para tu backend
 
@@ -74,6 +85,51 @@
             const miCuentaContainer = document.getElementById('miCuentaContainer');
             const miCuentaButton = document.getElementById('miCuentaButton');
             const miCuentaDropdownContent = document.getElementById('miCuentaDropdownContent');
+
+            // Modal elements (re-declare for this page)
+            const clientModal = document.getElementById('clientModal');
+            const clientModalMessage = document.getElementById('clientModalMessage');
+            const clientModalActions = document.getElementById('clientModalActions');
+            const clientCloseButton = document.querySelector('.client-modal-content .client-close-button');
+
+            // Function to show custom modal
+            function showModal(message, type = 'info', actions = []) {
+                clientModalMessage.textContent = message;
+                clientModalMessage.className = `client-message-text ${type ? 'client-message-' + type : ''}`;
+                clientModalActions.innerHTML = ''; // Clear previous actions
+
+                if (actions.length > 0) {
+                    actions.forEach(action => {
+                        const button = document.createElement('button');
+                        button.textContent = action.text;
+                        button.className = `client-modal-btn client-modal-${action.type}`;
+                        button.onclick = () => {
+                            clientModal.style.display = 'none';
+                            if (action.handler) {
+                                action.handler();
+                            }
+                        };
+                        clientModalActions.appendChild(button);
+                    });
+                } else {
+                    const okButton = document.createElement('button');
+                    okButton.textContent = 'OK';
+                    okButton.className = 'client-modal-btn';
+                    okButton.onclick = () => clientModal.style.display = 'none';
+                    clientModalActions.appendChild(okButton);
+                }
+                clientModal.style.display = 'flex'; 
+            }
+
+            clientCloseButton.onclick = () => {
+                clientModal.style.display = 'none';
+            };
+            window.onclick = (event) => {
+                if (event.target === clientModal) {
+                    clientModal.style.display = 'none';
+                }
+            };
+
 
             // --- Lógica de Manejo de Sesión (para el menú "Mi Cuenta" si lo incluyes) ---
             const token = localStorage.getItem('jwtToken');
@@ -124,35 +180,27 @@
                 categoryTitleElement.textContent = category; // Actualizar el título de la página y el h2
 
                 try {
-                    // Llama a la ruta pública que trae TODOS los eventos aprobados
-                    const response = await fetch(`${API_URL}/api/eventos/aprobados-para-cliente`);
+                    // Llama a la nueva ruta pública para obtener eventos por categoría
+                    const response = await fetch(`${API_URL}/api/eventos/por-categoria/${encodeURIComponent(category)}`);
                     const data = await response.json(); 
 
                     if (response.ok) {
-                        const allEvents = data.events; // El backend devuelve { events: [...] }
-                        if (allEvents) {
-                            // Filtra los eventos por la categoría obtenida de la URL
-                            const filteredEvents = allEvents.filter(event => 
-                                event.Categoria && event.Categoria.toLowerCase() === category.toLowerCase()
-                            );
-
-                            if (filteredEvents.length === 0) {
-                                categoryEventsGrid.innerHTML = `<p class="no-events-found-message">No hay eventos disponibles en la categoría "${category}" por el momento. ¡Vuelve pronto!</p>`;
-                            } else {
-                                renderEvents(filteredEvents); // Renderiza solo los eventos filtrados
-                            }
+                        const events = data.events; // El backend ahora devuelve { events: [...] }
+                        if (events && events.length > 0) {
+                            console.log('Categoría de la URL:', category);
+                            console.log('Eventos filtrados recibidos:', events);
+                            renderEvents(events); // Renderiza los eventos recibidos
                         } else {
-                            categoryEventsGrid.innerHTML = `<p class="error-message">Formato de datos inesperado para eventos.</p>`;
-                            console.error('Unexpected data format for approved events:', data);
+                            categoryEventsGrid.innerHTML = `<p class="no-events-found-message">No hay eventos disponibles en la categoría "${category}" por el momento. ¡Vuelve pronto!</p>`;
                         }
                     } else {
                         categoryEventsGrid.innerHTML = `<p class="error-message">Error al cargar eventos: ${data.message || 'Error desconocido'}</p>`;
-                        console.error('Error fetching approved events:', data);
+                        console.error('Error fetching events by category:', data);
                     }
                 }
                 catch (error) {
                     categoryEventsGrid.innerHTML = '<p class="error-message">Error de conexión con el servidor. No se pudieron cargar los eventos.</p>';
-                    console.error('Network error fetching approved events:', error);
+                    console.error('Network error fetching events by category:', error);
                 }
             }
 
@@ -164,10 +212,7 @@
                 let eventsHtml = '';
                 events.forEach(event => {
                     const formattedDate = new Date(event.Fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
-                    // Depuración: Log el valor crudo de event.URL_Imagen_Evento
-                    console.log(`Valor de event.URL_Imagen_Evento (categorías):`, event.URL_Imagen_Evento); 
                     const imageUrl = event.URL_Imagen_Evento ? `${API_URL}${event.URL_Imagen_Evento}` : 'https://placehold.co/150x100/cccccc/000000?text=No+Img';
-                    console.log(`URL final de imagen para categorías: ${imageUrl}`); 
 
                     eventsHtml += `
                         <!-- Ruta corregida a detalles.html dentro de la misma carpeta Clientes/ -->

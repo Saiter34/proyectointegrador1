@@ -1,31 +1,36 @@
 // Backend/routes/eventos.js
-// Este archivo ahora contiene rutas para administradores y rutas públicas para el cliente.
+// Contiene rutas para la gestión de eventos por parte del ADMINISTRADOR.
+// Estas rutas requieren autenticación y autorización de rol 'admin'.
 
 const express = require('express');
 const router = express.Router();
-const pool = require('../db');
+const pool = require('../db'); // Importa la configuración de conexión a PostgreSQL.
+const { authenticateToken, authorizeRole } = require('../middleware/authMiddleware'); // Importa los middlewares
+
+// Importa multer y path para la subida de imágenes
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs'); // Para manejar archivos
 
-// Directorio donde se guardarán las imágenes de los eventos
-const eventImagesDir = path.join(__dirname, '..', '..', 'Fronted', 'img', 'event_images');
+// Directorio para guardar las imágenes (asegúrate de que exista o créalo)
+const eventImagesDir = path.join(__dirname, '../../Fronted/img/event_images');
 
-// Configuración de Multer para la subida de imágenes de eventos (usado en rutas de admin si aplican)
-const uploadMiddleware = multer({
-    storage: multer.diskStorage({
-        destination: (req, file, cb) => {
-            if (!fs.existsSync(eventImagesDir)) {
-                fs.mkdirSync(eventImagesDir, { recursive: true });
-            }
-            cb(null, eventImagesDir);
-        },
-        filename: (req, file, cb) => {
-            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-            cb(null, `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`);
+// Configuración de almacenamiento de Multer
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        // Asegurarse de que el directorio exista
+        if (!fs.existsSync(eventImagesDir)) {
+            fs.mkdirSync(eventImagesDir, { recursive: true });
         }
-    })
-}).single('imagenEvento');
+        cb(null, eventImagesDir);
+    },
+    filename: (req, file, cb) => {
+        // Generar un nombre de archivo único con la extensión original
+        cb(null, `${Date.now()}-${file.originalname}`);
+    }
+});
+
+const upload = multer({ storage: storage });
 
 // --- Listas permitidas para validación (Consistentes con eventosprov.js) ---
 const CATEGORIAS_VALIDAS = [
@@ -35,16 +40,56 @@ const CATEGORIAS_VALIDAS = [
 const UBICACIONES_VALIDAS = ['San Marcos', 'Teatro Canut', 'Teatro Nacional', 'Estadio Nacional', 'Parque de la Exposición', 'Centro de Convenciones'];
 
 
-// --- RUTAS PARA ADMINISTRADORES ---
-// Estas rutas se montarán en index.js bajo '/api/admin/eventos' con el middleware de rol 'admin'.
+/* --- RUTAS PARA ADMINISTRADORES --- */
+
+/**
+ * @route POST /
+ * @description Crea un nuevo evento (accesible solo para administradores).
+ * @access Privado (administrador)
+ */
+router.post('/', authenticateToken, authorizeRole(['admin']), upload.single('imagen_evento'), async (req, res) => {
+    const {
+        Nom_Evento, Descripcion, Fecha, Horario_Inicio, Horario_Fin, Categoria,
+        PrecioGeneral, PrecioVIP, PrecioConadis, Id_Lugar, Reglas,
+        Asientos_General_Disponibles, Asientos_VIP_Disponibles, Asientos_Conadis_Disponibles
+    } = req.body;
+
+    const URL_Imagen_Evento = req.file ? `/img/event_images/${req.file.filename}` : null;
+    const Id_Organizador = req.user.id; // El admin es el organizador en este caso de creación directa
+
+    try {
+        const result = await pool.query(
+            `INSERT INTO "Eventos" (
+                "Nom_Evento", "Descripcion", "Fecha", "Horario_Inicio", "Horario_Fin", "Categoria",
+                "PrecioGeneral", "PrecioVIP", "PrecioConadis", "Id_Lugar", "URL_Imagen_Evento",
+                "Reglas", "Id_Organizador", "Estado", "fecha_creacion_evento",
+                "Asientos_General_Disponibles", "Asientos_VIP_Disponibles", "Asientos_CONADIS_Disponibles"
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'aprobado', CURRENT_TIMESTAMP, $14, $15, $16)
+            RETURNING "Id_Evento"`,
+            [
+                Nom_Evento, Descripcion, Fecha, Horario_Inicio, Horario_Fin, Categoria,
+                PrecioGeneral, PrecioVIP, PrecioConadis, Id_Lugar, URL_Imagen_Evento,
+                Reglas, Id_Organizador,
+                Asientos_General_Disponibles, Asientos_VIP_Disponibles, Asientos_Conadis_Disponibles
+            ]
+        );
+        const newEvent = result.rows[0];
+        res.status(201).json({ message: 'Evento creado y aprobado exitosamente', eventId: newEvent.Id_Evento });
+    } catch (error) {
+        console.error('Error al crear evento (Admin):', error.message);
+        res.status(500).json({ message: 'Error interno del servidor al crear el evento.' });
+    }
+});
 
 /**
  * @route GET /pendientes
  * @description Obtiene todos los eventos con estado 'pendiente' y su información de organizador y lugar.
  * @access Privado (Admin)
  */
-router.get('/pendientes', async (req, res) => {
+router.get('/pendientes', authenticateToken, authorizeRole(['admin']), async (req, res) => {
+    let client;
     try {
+        client = await pool.connect();
         const query = `
             SELECT
                 e."Id_Evento",
@@ -59,12 +104,9 @@ router.get('/pendientes', async (req, res) => {
                 e."PrecioVIP",
                 e."PrecioConadis",
                 e."Estado",
-                e."URL_Imagen_Evento", -- Usar directamente el nombre de la columna
+                e."URL_Imagen_Evento", 
                 e."URL_Mapa",
                 e."Reglas",
-                e."Asientos_General_Disp", 
-                e."Asientos_VIP_Disp", 
-                e."Asientos_Conadis_Disp", 
                 e."SolicitudDestacar",
                 l."Nom_Lugar", 
                 l."Ubicacion_Lugar" AS "Ubicacion", 
@@ -79,17 +121,43 @@ router.get('/pendientes', async (req, res) => {
             WHERE e."Estado" = 'pendiente'
             ORDER BY e."Fecha" ASC, e."Horario_Inicio" ASC;
         `;
-        const result = await pool.query(query);
+        const result = await client.query(query);
 
-        const eventsWithParsedData = result.rows.map(event => ({
-            ...event,
-            Reglas: event.Reglas || [] 
+        const eventsWithFullDetails = await Promise.all(result.rows.map(async (event) => {
+            const categoriasDeEntradasResult = await client.query(
+                `SELECT 
+                    "Nom_Categoria", 
+                    "Precio" AS "precioRegular", 
+                    "Stock_Total" AS "precioPreventa", 
+                    "Stock_Disponible" AS "precioConadis", 
+                    "Stock_Disponible" AS "stockDisponible" 
+                FROM "Categorías de entradas"
+                WHERE "Id_Evento" = $1
+                ORDER BY "Nom_Categoria" ASC;`,
+                [event.Id_Evento]
+            );
+
+            const categoriasDeEntradas = categoriasDeEntradasResult.rows.map(cat => ({
+                Nom_Categoria: cat.Nom_Categoria,
+                precioRegular: parseFloat(cat.precioRegular || 0).toFixed(2),
+                precioPreventa: parseFloat(cat.precioPreventa || 0).toFixed(2),
+                precioConadis: parseFloat(cat.precioConadis || 0).toFixed(2),
+                stockDisponible: parseInt(cat.stockDisponible || 0)
+            }));
+
+            return {
+                ...event,
+                Reglas: event.Reglas || [],
+                CategoriasDeEntradas: categoriasDeEntradas // Añadir las categorías de entradas con stock
+            };
         }));
 
-        res.status(200).json({ events: eventsWithParsedData });
+        res.status(200).json({ events: eventsWithFullDetails });
     } catch (error) {
         console.error('Error al obtener eventos pendientes (admin):', error.message);
         res.status(500).json({ message: 'Error interno del servidor al obtener solicitudes de eventos pendientes.' });
+    } finally {
+        if (client) client.release();
     }
 });
 
@@ -98,8 +166,10 @@ router.get('/pendientes', async (req, res) => {
  * @description Obtiene todos los eventos que están en estado 'aprobado' con su información de organizador y lugar.
  * @access Privado (Admin)
  */
-router.get('/aprobados', async (req, res) => {
+router.get('/aprobados', authenticateToken, authorizeRole(['admin']), async (req, res) => {
+    let client;
     try {
+        client = await pool.connect();
         const query = `
             SELECT
                 e."Id_Evento",
@@ -114,12 +184,9 @@ router.get('/aprobados', async (req, res) => {
                 e."PrecioVIP",
                 e."PrecioConadis",
                 e."Estado",
-                e."URL_Imagen_Evento", -- Usar directamente el nombre de la columna
+                e."URL_Imagen_Evento", 
                 e."URL_Mapa",
                 e."Reglas",
-                e."Asientos_General_Disp", 
-                e."Asientos_VIP_Disp", 
-                e."Asientos_Conadis_Disp", 
                 e."SolicitudDestacar",
                 l."Nom_Lugar", 
                 l."Ubicacion_Lugar" AS "Ubicacion", 
@@ -134,17 +201,43 @@ router.get('/aprobados', async (req, res) => {
             WHERE e."Estado" = 'aprobado'
             ORDER BY e."Fecha" DESC, e."Horario_Inicio" DESC;
         `;
-        const result = await pool.query(query);
+        const result = await client.query(query);
 
-        const eventsWithParsedData = result.rows.map(event => ({
-            ...event,
-            Reglas: event.Reglas || [] 
+        const eventsWithFullDetails = await Promise.all(result.rows.map(async (event) => {
+            const categoriasDeEntradasResult = await client.query(
+                `SELECT 
+                    "Nom_Categoria", 
+                    "Precio" AS "precioRegular", 
+                    "Stock_Total" AS "precioPreventa", 
+                    "Stock_Disponible" AS "precioConadis", 
+                    "Stock_Disponible" AS "stockDisponible" 
+                FROM "Categorías de entradas"
+                WHERE "Id_Evento" = $1
+                ORDER BY "Nom_Categoria" ASC;`,
+                [event.Id_Evento]
+            );
+
+            const categoriasDeEntradas = categoriasDeEntradasResult.rows.map(cat => ({
+                Nom_Categoria: cat.Nom_Categoria,
+                precioRegular: parseFloat(cat.precioRegular || 0).toFixed(2),
+                precioPreventa: parseFloat(cat.precioPreventa || 0).toFixed(2),
+                precioConadis: parseFloat(cat.precioConadis || 0).toFixed(2),
+                stockDisponible: parseInt(cat.stockDisponible || 0)
+            }));
+
+            return {
+                ...event,
+                Reglas: event.Reglas || [],
+                CategoriasDeEntradas: categoriasDeEntradas // Añadir las categorías de entradas con stock
+            };
         }));
 
-        res.status(200).json({ events: eventsWithParsedData });
+        res.status(200).json({ events: eventsWithFullDetails });
     } catch (error) {
         console.error('Error al obtener eventos aprobados para el administrador:', error.message);
         res.status(500).json({ message: 'Error interno del servidor al obtener eventos aprobados.' });
+    } finally {
+        if (client) client.release();
     }
 });
 
@@ -153,7 +246,7 @@ router.get('/aprobados', async (req, res) => {
  * @description Elimina un evento (sin importar su estado). Elimina también la imagen asociada.
  * @access Privado (Admin)
  */
-router.delete('/eliminar/:id', async (req, res) => {
+router.delete('/eliminar/:id', authenticateToken, authorizeRole(['admin']), async (req, res) => {
     const eventIdToDelete = req.params.id;
     let client;
     try {
@@ -170,6 +263,9 @@ router.delete('/eliminar/:id', async (req, res) => {
             return res.status(404).json({ message: 'Evento no encontrado.' });
         }
         const imageUrlToDelete = eventImageResult.rows[0].URL_Imagen_Evento; 
+
+        // --- Borrar primero las categorías de entradas asociadas a este evento ---
+        await client.query(`DELETE FROM "Categorías de entradas" WHERE "Id_Evento" = $1;`, [eventIdToDelete]);
 
         const deleteResult = await client.query(
             `DELETE FROM "Eventos" WHERE "Id_Evento" = $1 RETURNING *`,
@@ -208,7 +304,7 @@ router.delete('/eliminar/:id', async (req, res) => {
  * @description Aprueba un evento pendiente, cambiando su estado a 'aprobado'.
  * @access Privado (Admin)
  */
-router.put('/:id/aprobar', async (req, res) => {
+router.put('/:id/aprobar', authenticateToken, authorizeRole(['admin']), async (req, res) => {
     const eventIdToApprove = req.params.id;
     let client;
     try {
@@ -242,7 +338,7 @@ router.put('/:id/aprobar', async (req, res) => {
  * @description Rechaza un evento pendiente, cambiando su estado a 'rechazado'.
  * @access Privado (Admin)
  */
-router.put('/:id/rechazar', async (req, res) => {
+router.put('/:id/rechazar', authenticateToken, authorizeRole(['admin']), async (req, res) => {
     const eventIdToReject = req.params.id;
     let client;
     try {
@@ -276,7 +372,7 @@ router.put('/:id/rechazar', async (req, res) => {
  * @description Permite al administrador destacar un evento aprobado, cambiando su SolicitudDestacar a 'aprobado'.
  * @access Privado (Admin)
  */
-router.put('/:id/destacar', async (req, res) => {
+router.put('/:id/destacar', authenticateToken, authorizeRole(['admin']), async (req, res) => {
     const eventIdToHighlight = req.params.id;
     let client;
     try {
@@ -332,8 +428,10 @@ router.put('/:id/destacar', async (req, res) => {
  * @description Obtiene todas las solicitudes de eventos para destacar que están en estado 'pendiente'.
  * @access Privado (Admin)
  */
-router.get('/destacar/pendientes', async (req, res) => {
+router.get('/destacar/pendientes', authenticateToken, authorizeRole(['admin']), async (req, res) => {
+    let client;
     try {
+        client = await pool.connect();
         const query = `
             SELECT
                 e."Id_Evento",
@@ -348,12 +446,9 @@ router.get('/destacar/pendientes', async (req, res) => {
                 e."PrecioVIP",
                 e."PrecioConadis",
                 e."Estado",
-                e."URL_Imagen_Evento", -- Usar directamente el nombre de la columna
+                e."URL_Imagen_Evento", 
                 e."URL_Mapa",
                 e."Reglas",
-                e."Asientos_General_Disp", 
-                e."Asientos_VIP_Disp", 
-                e."Asientos_Conadis_Disp", 
                 e."SolicitudDestacar",
                 l."Nom_Lugar", 
                 l."Ubicacion_Lugar" AS "Ubicacion", 
@@ -368,254 +463,44 @@ router.get('/destacar/pendientes', async (req, res) => {
             WHERE e."SolicitudDestacar" = 'pendiente'
             ORDER BY e."Fecha" ASC, e."Horario_Inicio" ASC;
         `;
-        const result = await pool.query(query);
+        const result = await client.query(query);
 
-        const requestsWithParsedData = result.rows.map(request => ({
-            ...request,
-            Reglas: request.Reglas || [] 
+        const requestsWithFullDetails = await Promise.all(result.rows.map(async (request) => {
+            const categoriasDeEntradasResult = await client.query(
+                `SELECT 
+                    "Nom_Categoria", 
+                    "Precio" AS "precioRegular", 
+                    "Stock_Total" AS "precioPreventa", 
+                    "Stock_Disponible" AS "precioConadis", 
+                    "Stock_Disponible" AS "stockDisponible" 
+                FROM "Categorías de entradas"
+                WHERE "Id_Evento" = $1
+                ORDER BY "Nom_Categoria" ASC;`,
+                [request.Id_Evento]
+            );
+
+            const categoriasDeEntradas = categoriasDeEntradasResult.rows.map(cat => ({
+                Nom_Categoria: cat.Nom_Categoria,
+                precioRegular: parseFloat(cat.precioRegular || 0).toFixed(2),
+                precioPreventa: parseFloat(cat.precioPreventa || 0).toFixed(2),
+                precioConadis: parseFloat(cat.precioConadis || 0).toFixed(2),
+                stockDisponible: parseInt(cat.stockDisponible || 0)
+            }));
+
+            return {
+                ...request,
+                Reglas: request.Reglas || [],
+                CategoriasDeEntradas: categoriasDeEntradas // Añadir las categorías de entradas con stock
+            };
         }));
 
-        res.status(200).json({ requests: requestsWithParsedData });
+        res.status(200).json({ requests: requestsWithFullDetails });
     } catch (error) {
         console.error('Error al obtener solicitudes para destacar (admin):', error.message);
         res.status(500).json({ message: 'Error interno del servidor al obtener solicitudes para destacar.' });
-    }
-});
-
-/**
- * @route PUT /destacar/:id/aprobar
- * @description Aprueba una solicitud para destacar un evento, cambiando su SolicitudDestacar a 'aprobado'.
- * @access Privado (Admin)
- */
-router.put('/destacar/:id/aprobar', async (req, res) => {
-    const eventIdToApprove = req.params.id;
-    let client;
-    try {
-        client = await pool.connect();
-        await client.query('BEGIN');
-
-        const result = await client.query(
-            `UPDATE "Eventos" SET "SolicitudDestacar" = 'aprobado' WHERE "Id_Evento" = $1 AND "SolicitudDestacar" = 'pendiente' RETURNING *`,
-            [eventIdToApprove]
-        );
-
-        if (result.rowCount === 0) {
-            await client.query('ROLLBACK');
-            return res.status(404).json({ message: 'Solicitud para destacar pendiente no encontrada o ya ha sido procesada.' });
-        }
-
-        await client.query('COMMIT');
-        res.status(200).json({ message: `Solicitud para destacar el evento con ID ${eventIdToApprove} aprobada exitosamente.`, event: result.rows[0] });
-
-    } catch (error) {
-        if (client) await client.query('ROLLBACK');
-        console.error('Error al aprobar solicitud para destacar evento:', error.message);
-        res.status(500).json({ message: 'Error interno del servidor al aprobar solicitud para destacar evento.' });
     } finally {
         if (client) client.release();
     }
 });
-
-/**
- * @route PUT /destacar/:id/rechazar
- * @description Rechaza una solicitud para destacar un evento, cambiando su SolicitudDestacar a 'rechazado'.
- * @access Privado (Admin)
- */
-router.put('/destacar/:id/rechazar', async (req, res) => {
-    const eventIdToReject = req.params.id;
-    let client;
-    try {
-        client = await pool.connect();
-        await client.query('BEGIN');
-
-        const result = await client.query(
-            `UPDATE "Eventos" SET "SolicitudDestacar" = 'rechazado' WHERE "Id_Evento" = $1 AND "SolicitudDestacar" = 'pendiente' RETURNING *`,
-            [eventIdToReject]
-        );
-
-        if (result.rowCount === 0) {
-            await client.query('ROLLBACK');
-            return res.status(404).json({ message: 'Solicitud para destacar pendiente no encontrada o ya ha sido procesada.' });
-        }
-
-        await client.query('COMMIT');
-        res.status(200).json({ message: `Solicitud para destacar el evento con ID ${eventIdToReject} rechazada.` });
-
-    } catch (error) {
-        if (client) await client.query('ROLLBACK');
-        console.error('Error al rechazar solicitud para destacar evento:', error.message);
-        res.status(500).json({ message: 'Error interno del servidor al rechazar solicitud para destacar evento.' });
-    } finally {
-        if (client) client.release();
-    }
-});
-
-
-/**
- * @route GET /categorias
- * @description Obtiene una lista de todas las categorías únicas de eventos aprobados.
- * @access Privado (Admin)
- */
-router.get('/categorias', async (req, res) => {
-    try {
-        const result = await pool.query(
-            `SELECT DISTINCT "Categoria" FROM "Eventos" WHERE "Estado" = 'aprobado' AND "Categoria" IS NOT NULL ORDER BY "Categoria" ASC;`
-        );
-        const categories = result.rows.map(row => row.Categoria);
-        res.status(200).json({ categories: categories });
-    } catch (error) {
-        console.error('Error al obtener categorías de eventos:', error.message);
-        res.status(500).json({ message: 'Error interno del servidor al obtener categorías.' });
-    }
-});
-
-/**
- * @route GET /por-categoria/:categoryName
- * @description Obtiene todos los eventos aprobados de una categoría específica con su información de organizador y lugar.
- * @access Privado (Admin)
- */
-router.get('/por-categoria/:categoryName', async (req, res) => {
-    const { categoryName } = req.params;
-    try {
-        const query = `
-            SELECT
-                e."Id_Evento",
-                e."Nom_Evento",
-                e."Fecha",
-                e."Horario_Inicio",
-                e."Horario_Fin",
-                e."Categoria",
-                e."Id_Lugar", 
-                e."Descripcion",
-                e."PrecioGeneral",
-                e."PrecioVIP",
-                e."PrecioConadis",
-                e."Estado",
-                e."URL_Imagen_Evento", -- Usar directamente el nombre de la columna
-                e."URL_Mapa",
-                e."Reglas",
-                e."Asientos_General_Disp", 
-                e."Asientos_VIP_Disp", 
-                e."Asientos_Conadis_Disp", 
-                e."SolicitudDestacar",
-                l."Nom_Lugar", 
-                l."Ubicacion_Lugar" AS "Ubicacion", 
-                o."Nom_Empresa" AS "NombreEmpresaOrganizador",
-                u."Nom_Usuario" AS "NombreProveedor",
-                u."Ape_Usuario" AS "ApellidoProveedor",
-                u."Correo_Usuario" AS "EmailProveedor"
-            FROM "Eventos" e
-            LEFT JOIN "Lugares" l ON e."Id_Lugar" = l."Id_Lugar" 
-            JOIN "Organizadores" o ON e."Id_Organizador" = o."Id_Organizador"
-            JOIN "Usuarios" u ON o."Id_Usuario" = u.id
-            WHERE e."Estado" = 'aprobado' AND e."Categoria" = $1
-            ORDER BY e."Fecha" ASC, e."Horario_Inicio" ASC;
-        `;
-        const result = await pool.query(query, [categoryName]);
-
-        const eventsWithParsedData = result.rows.map(event => ({
-            ...event,
-            Reglas: event.Reglas || []
-        }));
-
-        res.status(200).json({ events: eventsWithParsedData });
-    } catch (error) {
-        console.error(`Error al obtener eventos para la categoría ${categoryName}:`, error.message);
-        res.status(500).json({ message: `Error interno del servidor al obtener eventos para la categoría ${categoryName}.` });
-    }
-});
-
-/* --- RUTAS PÚBLICAS PARA EL CLIENTE --- */
-// Estas rutas se montarán en index.js bajo '/api/eventos'
-
-/**
- * @route GET /aprobados-para-cliente
- * @description Obtiene todos los eventos aprobados para mostrar en la interfaz del cliente.
- * Incluye información del lugar para la ubicación.
- * @access Público
- */
-router.get('/aprobados-para-cliente', async (req, res) => {
-    try {
-        const query = `
-            SELECT
-                e."Id_Evento",
-                e."Nom_Evento",
-                e."Fecha",
-                e."Horario_Inicio",
-                e."Horario_Fin",
-                e."Categoria",
-                e."Descripcion",
-                e."PrecioGeneral",
-                e."PrecioVIP",
-                e."PrecioConadis",
-                e."Estado",
-                e."URL_Imagen_Evento", -- Usar directamente el nombre de la columna
-                e."URL_Mapa",
-                e."Reglas",
-                l."Nom_Lugar", 
-                l."Ubicacion_Lugar" AS "Ubicacion" 
-            FROM "Eventos" e
-            LEFT JOIN "Lugares" l ON e."Id_Lugar" = l."Id_Lugar"
-            WHERE e."Estado" = 'aprobado'
-            ORDER BY e."Fecha" ASC, e."Horario_Inicio" ASC;
-        `;
-        const result = await pool.query(query);
-
-        const eventsWithParsedData = result.rows.map(event => ({
-            ...event,
-            Reglas: event.Reglas || []
-        }));
-
-        res.status(200).json({ events: eventsWithParsedData });
-    } catch (error) {
-        console.error('Error al obtener eventos aprobados para el cliente:', error.message);
-        res.status(500).json({ message: 'Error interno del servidor al obtener eventos aprobados para el cliente.' });
-    }
-});
-
-/**
- * @route GET /destacados
- * @description Obtiene eventos aprobados que han sido marcados como 'destacado' para el carrusel principal.
- * @access Público
- */
-router.get('/destacados', async (req, res) => {
-    try {
-        const query = `
-            SELECT
-                e."Id_Evento",
-                e."Nom_Evento",
-                e."Fecha",
-                e."Horario_Inicio",
-                e."Horario_Fin",
-                e."Categoria",
-                e."Descripcion",
-                e."PrecioGeneral",
-                e."PrecioVIP",
-                e."PrecioConadis",
-                e."Estado",
-                e."URL_Imagen_Evento", -- Usar directamente el nombre de la columna
-                e."URL_Mapa",
-                e."Reglas",
-                l."Nom_Lugar", 
-                l."Ubicacion_Lugar" AS "Ubicacion" 
-            FROM "Eventos" e
-            LEFT JOIN "Lugares" l ON e."Id_Lugar" = l."Id_Lugar"
-            WHERE e."Estado" = 'aprobado' AND e."SolicitudDestacar" = 'aprobado'
-            ORDER BY e."Fecha" ASC, e."Horario_Inicio" ASC;
-        `;
-        const result = await pool.query(query);
-
-        const eventsWithParsedData = result.rows.map(event => ({
-            ...event,
-            Reglas: event.Reglas || []
-        }));
-
-        res.status(200).json({ events: eventsWithParsedData });
-    } catch (error) {
-        console.error('Error al obtener eventos destacados para el cliente:', error.message);
-        res.status(500).json({ message: 'Error interno del servidor al obtener eventos destacados.' });
-    }
-});
-
 
 module.exports = router;

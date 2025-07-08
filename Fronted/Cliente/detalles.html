@@ -15,27 +15,22 @@
 
     <header class="encabezado">
         <div class="barra-logo">
-            <!-- Ruta relativa desde 'Fronted/Cliente/' para acceder a 'Fronted/img/' -->
             <img src="../img/logo.png" alt="Logo Teycketan" class="logo" />
         </div>
         <div class="barra-pasos">
-            <!-- Ruta relativa desde 'Fronted/Cliente/' para acceder a 'Fronted/principal.html' -->
             <a href="cliente.html" class="paso activo no-subrayado">
                 <span>INICIO</span>
             </a>
-            <!-- Aquí puedes añadir más pasos si tu proceso de compra los tiene -->
         </div>
     </header>
 
-    <main class="main-content"> <!-- Contenedor principal para el contenido de la página -->
+    <main class="main-content">
         <section class="precios">
             <div class="precios-box">
                 <div class="lado-imagen">
-                    <!-- Imagen del Evento (se cargará dinámicamente) -->
                     <img id="eventImage" src="https://placehold.co/600x400/cccccc/000000?text=Cargando+Imagen" alt="Imagen del Evento" />
                 </div>
                 <div class="lado-precios">
-                    <!-- Mapa del Recinto (se cargará dinámicamente) -->
                     <img id="venueMap" src="https://placehold.co/300x200/cccccc/000000?text=Cargando+Mapa" alt="Mapa del Recinto" class="mapa-mini" />
                     <h2 id="eventName" class="event-title">Cargando Nombre del Evento...</h2>
                     <p id="eventCategoryLocation" class="event-subtitle">Cargando Categoría y Ubicación...</p>
@@ -48,12 +43,9 @@
                             <div>Conadis</div>
                             <div>Preventa</div>
                         </div>
-                        <!-- Las filas de precios se cargarán dinámicamente aquí -->
                         <p class="loading-message">Cargando precios...</p>
                     </div>
-                    <!-- El botón de comprar se actualiza con el ID del evento -->
-                    <!-- CAMBIO CLAVE AQUÍ: APUNTA A pago.html -->
-                    <a id="buyTicketsBtn" href="pago.html" class="btn-comprar">COMPRAR ENTRADAS</a>
+                    <a id="buyTicketsBtn" href="pago1.html" class="btn-comprar">COMPRAR ENTRADAS</a>
                     <p class="nota-conadis">* Descuento CONADIS válido con carné vigente. Cupos limitados.</p>
                 </div>
             </div>
@@ -79,7 +71,6 @@
                 <h2>Reglas del Evento</h2>
                 <ul id="eventRules">
                     <li>Cargando reglas del evento...</li>
-                    <!-- Las reglas se cargarán dinámicamente aquí -->
                 </ul>
             </div>
         </section>
@@ -117,7 +108,6 @@
                 <div class="footer-col">
                     <h4>Métodos de pago</h4>
                     <div class="payment-methods">
-                        <!-- Rutas relativas desde 'Fronted/Cliente/' para acceder a 'Fronted/img/' -->
                         <img src="../img/logo-yape.jpg" alt="Logo Yape">
                         <img src="../img/logo-plin.jpg" alt="Logo Plin">
                     </div>
@@ -127,17 +117,14 @@
                 <small>&copy; 2024 <b>SLee Dw</b> - Todos los Derechos Reservados.</small>
             </div>
         </div>
-        <!-- Ruta relativa desde 'Fronted/Cliente/' para acceder a 'Fronted/img/' -->
         <img src="../img/logo.png" alt="Logo Teycketan" class="logo-footer"/>
     </footer>
  
-    <!-- Custom Modal for Alerts/Confirmations (copiado de cliente.html para consistencia) -->
     <div id="clientModal" class="client-modal">
         <div class="client-modal-content">
             <span class="client-close-button">&times;</span>
             <p id="clientModalMessage" class="client-message-text"></p>
             <div id="clientModalActions">
-                <!-- Buttons are added here dynamically -->
             </div>
         </div>
     </div>
@@ -147,7 +134,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const eventId = urlParams.get('eventId'); // Obtener el ID del evento de la URL
+            const eventId = urlParams.get('eventId'); 
 
             const eventImage = document.getElementById('eventImage');
             const venueMap = document.getElementById('venueMap');
@@ -155,21 +142,19 @@
             const eventCategoryLocation = document.getElementById('eventCategoryLocation');
             const eventDate = document.getElementById('eventDate');
             const pricingTable = document.getElementById('pricingTable');
-            const buyTicketsBtn = document.getElementById('buyTicketsBtn'); // Obtener referencia al botón
+            const buyTicketsBtn = document.getElementById('buyTicketsBtn'); 
             const eventDescription = document.getElementById('eventDescription');
             const eventRules = document.getElementById('eventRules');
 
-            // Modal elements
             const clientModal = document.getElementById('clientModal');
             const clientModalMessage = document.getElementById('clientModalMessage');
             const clientModalActions = document.getElementById('clientModalActions');
             const clientCloseButton = document.querySelector('.client-modal-content .client-close-button');
 
-            // Function to show custom modal (similar to client.html)
             function showModal(message, type = 'info', actions = []) {
                 clientModalMessage.textContent = message;
                 clientModalMessage.className = `client-message-text client-message-${type}`;
-                clientModalActions.innerHTML = ''; // Clear previous actions
+                clientModalActions.innerHTML = ''; 
 
                 if (actions.length > 0) {
                     actions.forEach(action => {
@@ -185,14 +170,13 @@
                         clientModalActions.appendChild(button);
                     });
                 } else {
-                    // Default OK button if no actions are provided
                     const okButton = document.createElement('button');
                     okButton.textContent = 'OK';
                     okButton.className = 'client-modal-btn';
                     okButton.onclick = () => clientModal.style.display = 'none';
                     clientModalActions.appendChild(okButton);
                 }
-                clientModal.style.display = 'flex'; // Use flex to center
+                clientModal.style.display = 'flex'; 
             }
 
             clientCloseButton.onclick = () => {
@@ -211,25 +195,24 @@
                 if (!eventId) {
                     showModal('Error: ID de evento no proporcionado en la URL.', 'error');
                     console.error('Error: eventId missing in URL');
-                    // Redirigir a una página de error o principal si el ID no está
-                    window.location.replace('../principal.html');
+                    window.location.replace('principal.html');
                     return;
                 }
 
                 try {
-                    // Asegúrate de que este endpoint sea accesible públicamente si no hay autenticación de cliente
+                    // ¡¡¡ CAMBIO CLAVE AQUÍ !!!
+                    // Ahora llama a /api/eventospublicos/:eventId para coincidir con el montaje en index.js
                     const response = await fetch(`${API_URL}/api/eventos/${eventId}`); 
                     const eventData = await response.json();
 
                     if (response.ok) {
-                        console.log('--- Datos COMPLETOS del evento recibidos del backend: ---');
-                        console.log(eventData); // LOG para depuración: Muestra todo el objeto
+                        console.log('--- Datos COMPLETOS del evento recibidos del backend (detalles.html): ---');
+                        console.log(eventData); 
                         console.log('----------------------------------------------------');
                         renderEventDetails(eventData);
                     } else {
                         showModal(`Error al cargar detalles del evento: ${eventData.message || 'Error desconocido'}`, 'error');
                         console.error('Error fetching event details:', eventData);
-                        // Limpiar contenido o mostrar mensaje de error
                         document.querySelector('.precios-box').innerHTML = '<p class="error-message">No se pudieron cargar los detalles del evento.</p>';
                         document.querySelector('.historia-box').innerHTML = '';
                         document.querySelector('.reglas-box').innerHTML = '';
@@ -248,13 +231,10 @@
              * @param {Object} event - The event data object from the API.
              */
             function renderEventDetails(event) {
-                // Update images (using placeholders if no URL)
                 const eventImageUrl = event.URL_Imagen_Evento ? `${API_URL}${event.URL_Imagen_Evento}` : 'https://placehold.co/600x400/cccccc/000000?text=Imagen+No+Disponible';
                 console.log(`Final Event Image URL: ${eventImageUrl}`);
                 eventImage.src = eventImageUrl;
                 
-                // Use event.URL_Imagen_Asientos for the venue map.
-                // If it's not present, fall back to a placeholder.
                 let venueMapUrl;
                 if (event.URL_Imagen_Asientos) {
                     venueMapUrl = `${API_URL}${event.URL_Imagen_Asientos}`;
@@ -265,12 +245,10 @@
                 console.log(`Final Seat Map URL: ${venueMapUrl}`);
                 venueMap.src = venueMapUrl;
 
-                // Update event text
                 eventName.textContent = event.Nom_Evento || 'Unknown Event';
-                eventCategoryLocation.textContent = `${event.Categoria || 'Unknown Category'} / ${event.Ubicacion || 'Unknown Location'}`; // Usar event.Ubicacion
+                eventCategoryLocation.textContent = `${event.Categoria || 'Unknown Category'} / ${event.Ubicacion || 'Unknown Location'}`; 
                 eventDate.textContent = event.Fecha ? new Date(event.Fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Unknown Date';
 
-                // Render pricing table using the 'Precios' array
                 let pricingHtml = `
                     <div class="fila tabla-encabezado">
                         <div>Zona</div>
@@ -280,14 +258,16 @@
                     </div>
                 `;
                 
-                if (event.Precios && event.Precios.length > 0) {
-                    event.Precios.forEach(price => {
+                // Ahora renderizamos usando el array CategoriasDeEntradas que viene del backend
+                // Asegúrate de que event.CategoriasDeEntradas esté presente y sea un array
+                if (event.CategoriasDeEntradas && Array.isArray(event.CategoriasDeEntradas) && event.CategoriasDeEntradas.length > 0) {
+                    event.CategoriasDeEntradas.forEach(category => {
                         pricingHtml += `
                             <div class="fila">
-                                <div>${price.zona || 'N/A'}</div>
-                                <div>S/. ${parseFloat(price.regular || 0).toFixed(2)}</div>
-                                <div>S/. ${parseFloat(price.conadis || 0).toFixed(2)}</div>
-                                <div>S/. ${parseFloat(price.preventa || 0).toFixed(2)}</div>
+                                <div>${category.Nom_Categoria || 'N/A'}</div>
+                                <div>S/. ${parseFloat(category.precioRegular || 0).toFixed(2)}</div>
+                                <div>S/. ${parseFloat(category.precioConadis || 0).toFixed(2)}</div>
+                                <div>S/. ${parseFloat(category.precioPreventa || 0).toFixed(2)}</div>
                             </div>
                         `;
                     });
@@ -296,42 +276,22 @@
                 }
                 pricingTable.innerHTML = pricingHtml;
 
-
-                // Update description and history
                 eventDescription.textContent = event.Descripcion || 'No description available for this event.';
 
-                // Render rules (asumiendo event.Reglas es un array de strings o un string JSON)
                 let rulesHtml = '';
-                if (event.Reglas) {
-                    let rulesArray = event.Reglas;
-                    if (typeof event.Reglas === 'string') {
-                        try {
-                            rulesArray = JSON.parse(event.Reglas);
-                        } catch (e) {
-                            console.error("Error parsing event.Reglas:", e);
-                            rulesArray = [event.Reglas]; // Treat as a single string if parsing fails
-                        }
-                    }
-                    
-                    if (Array.isArray(rulesArray) && rulesArray.length > 0) {
-                        rulesArray.forEach(rule => {
-                            rulesHtml += `<li>${rule}</li>`;
-                        });
-                    } else if (typeof rulesArray === 'string' && rulesArray.length > 0) { // If it's a non-empty string that couldn't be parsed as an array
-                        rulesHtml = `<li>${rulesArray}</li>`;
-                    } else {
-                        rulesHtml = `<li>No specific rules for this event.</li>`;
-                    }
+                if (event.Reglas && Array.isArray(event.Reglas) && event.Reglas.length > 0) {
+                    event.Reglas.forEach(rule => {
+                        rulesHtml += `<li>${rule}</li>`;
+                    });
                 } else {
                     rulesHtml = `<li>No specific rules for this event.</li>`;
                 }
                 eventRules.innerHTML = rulesHtml;
 
                 // Update the buy tickets button link to include the eventId
-                buyTicketsBtn.href = `pago.html?eventId=${event.Id_Evento}`; // <-- CAMBIO CLAVE AQUÍ
+                buyTicketsBtn.href = `pago1.html?eventId=${event.Id_Evento}`; 
             }
 
-            // Start fetching event details
             fetchEventDetails();
         });
     </script>

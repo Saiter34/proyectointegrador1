@@ -23,13 +23,13 @@ const JWT_SECRET = process.env.JWT_SECRET || 'tu_secreto_jwt_super_seguro_y_larg
 const { authenticateToken, authorizeRole } = require('./middleware/authMiddleware');
 
 // --- Importa tus módulos de rutas ---
-const eventosAdminRoutes = require('./routes/eventos'); 
+const eventosAdminRoutes = require('./routes/eventos'); // Ahora solo contendrá rutas de admin
 const eventosProveedorRoutes = require('./routes/eventosprov'); 
 const intermediarioRoutes = require('./routes/intermediario');
-const publicEventsRoutes = require('./routes/eventospublicos');
+const publicEventsRoutes = require('./routes/eventospublicos'); // Contendrá las rutas públicas de eventos
 const lugaresRoutes = require('./routes/lugares'); // Rutas para el catálogo de lugares
-const comprasRoutes = require('./routes/compras'); // NUEVO: Importa las rutas de compras
-const usuariosRoutes = require('./routes/usuarios'); // NUEVO: Importa las rutas de usuarios (para puntos, etc.)
+const comprasRoutes = require('./routes/compras'); // Importa las rutas de compras
+const usuariosRoutes = require('./routes/usuarios'); // Importa las rutas de usuarios (para puntos, etc.)
 
 
 // --- Middlewares Globales de Express ---
@@ -50,7 +50,7 @@ if (!fs.existsSync(eventImagesDir)) {
     console.log(`Carpeta de imágenes de eventos creada en: ${eventImagesDir}`);
 }
 
-// NUEVO: Directorio para imágenes de lugares
+// Directorio para imágenes de lugares
 const placeImagesDir = path.join(__dirname, '..', 'Fronted', 'img', 'place_images');
 if (!fs.existsSync(placeImagesDir)) {
     fs.mkdirSync(placeImagesDir, { recursive: true });
@@ -68,7 +68,7 @@ app.use(express.static(path.join(__dirname, '../Fronted')));
 // Esto permite que las imágenes de eventos se sirvan directamente desde /img/event_images/
 app.use('/img/event_images', express.static(eventImagesDir));
 
-// NUEVO: Esto permite que las imágenes de lugares se sirvan directamente desde /img/place_images/
+// Esto permite que las imágenes de lugares se sirvan directamente desde /img/place_images/
 app.use('/img/place_images', express.static(placeImagesDir));
 
 
@@ -127,7 +127,7 @@ app.post('/login', async (req, res) => {
 
     try {
         const result = await pool.query(
-            'SELECT id, "password_hash", "ES_Organizador", "Nom_Usuario", "Rol_Usuario" FROM "Usuarios" WHERE "Correo_Usuario" = $1',
+            'SELECT id, "password_hash", "ES_Organizador", "Nom_Usuario", "Rol_Usuario", "Puntos_Teycketan", "Usado_Primera_Compra" FROM "Usuarios" WHERE "Correo_Usuario" = $1',
             [email]
         );
         const user = result.rows[0];
@@ -148,7 +148,7 @@ app.post('/login', async (req, res) => {
                 rol: user.Rol_Usuario
             },
             JWT_SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: '8h' } // Ajustado a 8 horas como se discutió
         );
 
         res.status(200).json({
@@ -157,7 +157,9 @@ app.post('/login', async (req, res) => {
             userName: user.Nom_Usuario,
             isOrganizer: user.ES_Organizador,
             userRole: user.Rol_Usuario,
-            token: token
+            token: token,
+            userPoints: user.Puntos_Teycketan, // Asegúrate de enviar los puntos
+            userUsedFirstPurchase: user.Usado_Primera_Compra // Asegúrate de enviar el estado de primera compra
         });
 
     } catch (error) {
@@ -236,16 +238,18 @@ app.use('/api/proveedor', authenticateToken, authorizeRole(['organizador']), eve
 // Monta las rutas para la gestión de solicitudes de organizador (protegidas para admin).
 app.use('/api/admin/solicitudes', authenticateToken, authorizeRole(['admin']), intermediarioRoutes);
 
-// MONTAJE CORRECTO: Monta las rutas públicas de eventos (accesibles sin autenticación).
-app.use('/api/eventos', publicEventsRoutes);
+// ¡¡¡ CAMBIO CLAVE AQUÍ !!!
+// Monta las rutas públicas de eventos (accesibles sin autenticación) en /api/eventos
+// para que coincida con las llamadas del frontend como /api/eventos/aprobados-para-cliente.
+app.use('/api/eventos', publicEventsRoutes); // <--- ¡ESTA ES LA LÍNEA CRÍTICA!
 
 // Monta las rutas de lugares, protegidas para administradores y organizadores.
 app.use('/api/lugares', authenticateToken, authorizeRole(['admin', 'organizador']), lugaresRoutes);
 
-// NUEVO: Monta las rutas de compras (protegidas para usuarios autenticados).
+// Monta las rutas de compras (protegidas para usuarios autenticados).
 app.use('/api/compras', authenticateToken, comprasRoutes); 
 
-// NUEVO: Monta las rutas de usuarios (protegidas para usuarios autenticados, para obtener puntos, etc.).
+// Monta las rutas de usuarios (protegidas para usuarios autenticados, para obtener puntos, etc.).
 app.use('/api/usuarios', authenticateToken, usuariosRoutes);
 
 

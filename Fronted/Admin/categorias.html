@@ -25,7 +25,7 @@
             <li><a href="eventoDestacado.html" class="admin-nav-item"><i class="fas fa-star"></i><span>Eventos Destacados</span></a></li>
             <li><a href="solicitudDestacar.html" class="admin-nav-item"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
             <li><a href="catalogoDeLugares.html" class="admin-nav-item"><i class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
-            <li><a href="reclamos.html" class="admin-nav-item"><i  class="fas fa-envelope"></i><span>Reclamos</span></a></li>
+            <li><a href="reclamos.html" class="admin-nav-item"><i class="fas fa-envelope"></i><span>Reclamos</span></a></li>
 
         </ul>
     </div>
@@ -178,6 +178,7 @@
                 if (confirmLogout) {
                     localStorage.removeItem('jwtToken');
                     localStorage.removeItem('userName');
+                    localStorage.removeItem('userEmail');
                     localStorage.removeItem('userRole');
                     localStorage.removeItem('isOrganizer');
                     localStorage.removeItem('userId');
@@ -220,10 +221,12 @@
                 noCategoriesMessage.style.display = 'none';
 
                 try {
-                    const response = await fetch(`${API_URL}/api/admin/eventos/categorias`, {
+                    // <<-- CAMBIO CLAVE AQUÍ -->>
+                    // Llama a la ruta pública de categorías. No requiere token per se, pero se envía por consistencia.
+                    const response = await fetch(`${API_URL}/api/eventos/categorias`, {
                         method: 'GET',
                         headers: {
-                            'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${token}` // Se envía el token, aunque la ruta sea pública
                         }
                     });
                     const data = await response.json();
@@ -300,10 +303,12 @@
                 contentBox.innerHTML = `<p class="admin-loading-message">Cargando eventos de ${categoryName}...</p>`;
 
                 try {
-                    const response = await fetch(`${API_URL}/api/admin/eventos/por-categoria/${encodeURIComponent(categoryName)}`, {
+                    // <<-- CAMBIO CLAVE AQUÍ -->>
+                    // Llama a la ruta pública para obtener eventos por categoría.
+                    const response = await fetch(`${API_URL}/api/eventos/por-categoria/${encodeURIComponent(categoryName)}`, {
                         method: 'GET',
                         headers: {
-                            'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${token}` // Se envía el token, aunque la ruta sea pública
                         }
                     });
                     const data = await response.json();
