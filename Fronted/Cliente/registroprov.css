@@ -1,0 +1,227 @@
+/* -------------------- FUENTES Y BASE -------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap');
+
+body {
+    background: url('../img/fondometal.jpg') repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    font-family: 'Poppins', sans-serif;
+    color: white;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+body::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('../img/fondodetalles.jpg') no-repeat center center;
+    background-size: cover;
+    opacity: 0.4;
+    z-index: 0;
+}
+.fondo-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* -------------------- ENCABEZADO -------------------- */
+.encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #4c0000;
+    padding: 10px 30px;
+    position: relative;
+    z-index: 2;
+}
+
+.barra-logo .logo {
+    height: 45px;
+}
+
+.barra-pasos {
+    display: flex;
+    gap: 40px;
+}
+
+.paso {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    opacity: 0.5;
+}
+
+.paso.activo {
+    opacity: 1;
+    color: #ff3b3b;
+}
+
+.circulo {
+    width: 30px;
+    height: 30px;
+    background-color: #400000;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* -------------------- CONTENEDOR PRINCIPAL -------------------- */
+.container-registro {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    backdrop-filter: blur(2px);
+    position: relative;
+    z-index: 1;
+    font-family: "Orbitron", sans-serif;
+}
+
+/* -------------------- FORMULARIO -------------------- */
+.form-box {
+    background-color: rgba(90, 0, 0, 0.8);
+    padding: 2rem;
+    border-radius: 15px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+}
+
+.form-box h3 {
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+    margin-bottom: 1.5rem;
+    color: #db5050;
+    font-size: 32px;
+}
+
+label {
+    display: block;
+    margin-top: 1rem;
+    color: white;
+    font-weight: 500;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+textarea {
+    width: 100%;
+    padding: 0.6rem;
+    margin-top: 0.3rem;
+    border: 1px solid #444;
+    border-radius: 8px;
+    font-family: "Orbitron", sans-serif;
+    background-color: #2a2a2a;
+    color: rgb(54, 50, 50);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #413f3f;
+}
+
+/* -------------------- BOTÓN -------------------- */
+button[type="submit"],
+#modalOkButton {
+    background-color: #610000;
+    color: white;
+    font-weight: bold;
+    font-family: "Orbitron", sans-serif;
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem;
+    margin-top: 1.5rem;
+    width: 100%;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover,
+#modalOkButton:hover {
+    background-color: #4c0000;
+    box-shadow: 0 0 10px #ff0000;
+}
+
+/* -------------------- PIE DE PÁGINA -------------------- */
+footer {
+    text-align: center;
+    padding: 20px;
+}
+
+.logo-footer {
+    height: 50px;
+}
+
+/* -------------------- MODAL -------------------- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+}
+
+.modal-content {
+    background-color: rgba(90, 0, 0, 0.9);
+    padding: 30px;
+    border: 2px solid #ff0000;
+    border-radius: 15px;
+    width: 80%;
+    max-width: 450px;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+    position: relative;
+    color: white;
+}
+
+.close-button {
+    color: #ccc;
+    float: right;
+    font-size: 30px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #ff3b3b;
+    text-decoration: none;
+}
+
+/* -------------------- TEXTO DEL MODAL -------------------- */
+#modalMessage {
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    line-height: 1.4;
+}

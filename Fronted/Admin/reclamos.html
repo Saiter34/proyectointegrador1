@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proveedores Aprobados - TEYCKETAN</title>
+    <!-- Usar el nuevo archivo CSS del panel de administración -->
+    <link rel="stylesheet" href="admin.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- SIDEBAR - Reutilizando la estructura del admin.html -->
+    <div class="admin-sidebar">
+        <div class="admin-barra-logo">
+            <!-- RUTA CORREGIDA: Acceso absoluto desde la raíz del servidor estático -->
+            <img src="../img/logo.png" alt="Logo Teycketan" class="admin-logo-img" />
+        </div>
+        <ul class="admin-nav-list">
+            <li><a href="admin.html" class="admin-nav-item"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
+            <li><a href="solicitud.html" class="admin-nav-item"><i class="fas fa-user-clock"></i><span>Solicitud de proveedores</span></a></li>
+            <li><a href="aprobados.html" class="admin-nav-item active"><i class="fas fa-user-check"></i><span>Proveedores aprobados</span></a></li>
+            <li><a href="eventos.html" class="admin-nav-item"><i class="fas fa-tasks"></i><span>Solicitud de eventos</span></a></li>
+            <li><a href="eventoApro.html" class="admin-nav-item"><i class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
+            <li><a href="categorias.html" class="admin-nav-item"><i class="fas fa-tags"></i><span>Eventos por categorias</span></a></li>
+            <li><a href="eventoDestacado.html" class="admin-nav-item"><i class="fas fa-star"></i><span>Eventos Destacados</span></a></li>
+            <li><a href="solicitudDestacar.html" class="admin-nav-item"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
+            <li><a href="catalogoDeLugares.html" class="admin-nav-item"><i  class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
+            <li><a href="reclamos.html" class="prov-nav-item active"><i  class="fas fa-envelope"></i><span>Reclamos</span></a></li>
+        </ul>
+    </div>
+
+    <body>
+
+    <!-- SIDEBAR - Reutilizando la estructura del admin.html -->
+    <div class="admin-sidebar">
+        <div class="admin-barra-logo">
+            <!-- RUTA CORREGIDA: Acceso absoluto desde la raíz del servidor estático -->
+            <img src="../img/logo.png" alt="Logo Teycketan" class="admin-logo-img" />
+        </div>
+        <ul class="admin-nav-list">
+            <li><a href="admin.html" class="admin-nav-item"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
+            <li><a href="solicitud.html" class="admin-nav-item"><i class="fas fa-user-clock"></i><span>Solicitud de proveedores</span></a></li>
+            <li><a href="aprobados.html" class="admin-nav-item"><i class="fas fa-user-check"></i><span>Proveedores aprobados</span></a></li>
+            <li><a href="eventos.html" class="admin-nav-item"><i class="fas fa-tasks"></i><span>Solicitud de eventos</span></a></li>
+            <li><a href="eventoApro.html" class="admin-nav-item"><i class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
+            <li><a href="categorias.html" class="admin-nav-item"><i class="fas fa-tags"></i><span>Eventos por categorias</span></a></li>
+            <li><a href="eventoDestacado.html" class="admin-nav-item"><i class="fas fa-star"></i><span>Eventos Destacados</span></a></li>
+            <li><a href="solicitudDestacar.html" class="admin-nav-item"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
+            <li><a href="catalogoDeLugares.html" class="admin-nav-item"><i  class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
+            <li><a href="reclamos.html" class="admin-nav-item active"><i  class="fas fa-envelope"></i><span>Reclamos</span></a></li>
+        </ul>
+    </div>
+
+    <!-- MAIN CONTENT - Reutilizando la estructura del admin.html -->
+    <div class="admin-main-content">
+        <header class="admin-topbar">
+            <h1 class="admin-titulo-seccion">Reclamos</h1>
+            <div class="admin-acciones">
+                <div class="admin-notif-wrapper">
+                    <button class="admin-notif-btn" id="adminNotifToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="admin-notif-dot"></span>
+                    </button>
+                    <div class="admin-notif-dropdown" id="adminNotifDropdown">
+                        <p class="admin-notif-title">Notificaciones</p>
+                        <ul>
+                            <li>Proveedor aprobado correctamente</li>
+                            <li>Nuevo mensaje interno</li>
+                            <li>Se rechazó un proveedor</li>
+                        </ul>
+                    </div>
+                </div>
+                <button id="adminLogoutButton" class="admin-btn-logout">Cerrar Sesión</button>
+            </div>
+        </header>
+
+                <section class="admin-contenido">
+            <div class="admin-bienvenida">Aqui puedes ver los reclamos que se te hayan enviado.</div>
+
+            <div class="admin-tabla-container">
+                <table class="admin-tabla-reclamos">
+                    <thead>
+                        <tr>
+                            <th>ID Usuario</th>
+                            <th>Tipo de Problema</th>
+                            <th>Descripción</th>
+                            <th>Evidencia</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>id</td>
+                            <td>tipo de problema</td>
+                            <td>descripcion</td>
+                            <td><img src="../img/imagen.jpg" alt="Evidencia 1" class="admin-img-evidencia"></td>
+                            <td><button class="admin-btn-resuelto">Marcar como resuelto</button></td>
+                        </tr>
+                        <tr>
+                            <td>id</td>
+                            <td>tipo de problema</td>
+                            <td>descripcion</td>
+                            <td><img src="../img/imagen.jpg" alt="Evidencia 1" class="admin-img-evidencia"></td>
+                            <td><button class="admin-btn-resuelto">Marcar como resuelto</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+</body>
+</html>

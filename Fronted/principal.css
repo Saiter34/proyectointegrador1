@@ -1,4 +1,9 @@
+/* Importación de fuentes de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap');
+/* No es necesario importar Font Awesome aquí, ya que se carga directamente en el HTML */
 
+/* Estilos generales para el documento */
 * {
   margin: 0;
   padding: 0;
@@ -6,99 +11,98 @@
 }
 
 html, body {
-  height: 100%;
-  font-family: 'Inter', sans-serif;
-  background-color: #ccc;
-  color: #f0f0f0;
-  overflow-x: hidden;
+    height: 100%;
+    font-family: 'Poppins', sans-serif; /* Usamos Poppins como fuente principal para el cuerpo */
+    background-color: #000; /* Fondo base negro */
+    color: #eee; /* Color de texto general */
+    overflow-x: hidden; /* Previene el scroll horizontal */
 }
 
 body {
-  font-family: 'Orbitron', sans-serif;
-  background: url("img/fondometal.jpg") no-repeat center center fixed;
-  background-size: cover;
-  background-attachment: fixed;
-  background-color: #000;
-  color: #eee;
-  position: relative;
-  z-index: 1;
+    display: flex;
+    flex-direction: column;
+    /* Configuración de la imagen de fondo principal con no-repeat y attachment fijo */
+    background: url("img/fmetal.jpg") no-repeat center center fixed; /* Ruta relativa desde la raíz (Fronted/) */
+    background-size: cover;
+    position: relative;
+    z-index: 1; /* Asegura que el contenido del body esté sobre los overlays */
 }
 
 h1, h2, h3, h4 {
-  font-family: 'Orbitron', sans-serif;
+    font-family: 'Orbitron', sans-serif; /* Orbitron para los títulos */
+    color: #ff3333; /* Rojo brillante para los títulos */
+    justify-self: center;
+    font-size: 50px;
 }
 
-/*FONDOS*/
+/* --- CAPAS DE FONDO --- */
+/* Esta capa añade una textura o patrón de fondo que se repite */
 .fondo-overlay-extra {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url("img/fondodetalles.jpg") repeat;
-  opacity: 0.5;
-  z-index: -2;
-  pointer-events: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("img/fondodetalles.jpg") repeat; /* Ruta relativa desde la raíz (Fronted/) */
+    opacity: 0.5; /* Ligeramente transparente para que se vea el fondo principal */
+    z-index: -2; /* Se coloca detrás de la capa de overlay principal */
+    pointer-events: none; /* No interactúa con el cursor */
 }
 
+/* Esta capa es un overlay oscuro semi-transparente sobre la imagen de fondo principal */
 .fondo-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: -1;
-  pointer-events: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4); /* Capa oscura semi-transparente */
+    z-index: -1; /* Se coloca entre la imagen de fondo principal y el contenido */
+    pointer-events: none; /* No interactúa con el cursor */
 }
 
-
-/* ENCABEZADO*/
+/* --- ENCABEZADO ---*/
 header.encabezado {
-  background-color: #4c0000;
-  padding: 10px 30px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 70px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  z-index: 100;
-  backdrop-filter: blur(6px);
-  transition: all 0.3s ease-in-out;
+    background-color: #4c0000; /* Rojo oscuro como base del encabezado */
+    padding: 10px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 100; /* Siempre visible por encima de otros elementos */
+    backdrop-filter: blur(6px); /* Efecto de desenfoque detrás del encabezado */
+    transition: all 0.3s ease-in-out;
 }
 
 .logo img {
-  height: 48px;
+    height: 48px; /* Altura del logo en el encabezado */
 }
 
 nav {
-  display: flex;
-  align-items: center;
-  gap: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Espacio entre elementos de navegación */
 }
 
 .nav-box {
-  background-color: rgba(255, 0, 0, 0.1);
-  padding: 6px 12px;
-  border-radius: 12px;
-  transition: background 0.3s ease;
-  backdrop-filter: blur(4px);
+    background-color: rgba(255, 0, 0, 0.1); /* Fondo semi-transparente rojizo */
+    border: 1px solid #4c0000; /* Borde rojo brillante */
+    padding: 6px 12px;
+    border-radius: 12px;
+    transition: background 0.3s ease;
+    backdrop-filter: blur(4px); /* Desenfoque para el nav-box */
 }
 
 .nav-box:hover {
-  background-color: rgba(255, 0, 0, 0.2);
+    background-color: rgba(255, 0, 0, 0.2); /* Efecto hover para el fondo */
 }
 
-.nav-box input {
-  background: none;
-  border: none;
-  color: white;
-  outline: none;
-}
+/* Eliminado .nav-box input ya que no está en el HTML */
 
 .nav-box a,
 .nav-box button {
@@ -118,7 +122,7 @@ nav {
 
 .nav-box a:hover,
 .nav-box button:hover {
-  background-color: rgba(255, 0, 0, 0.3);
+    background-color: rgba(255, 0, 0, 0.3); /* Efecto hover para enlaces/botones dentro del nav-box */
 }
 
 .dropdown {
@@ -138,7 +142,21 @@ nav {
 }
 
 .dropdown:hover .dropdown-content {
-  display: block;
+
+    display: none; /* Oculto por defecto, se muestra con hover */
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.9); /* Fondo oscuro para el dropdown */
+    border: 1px solid #ff3333;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+    padding: 10px;
+    top: 40px; /* Posicionado debajo del botón */
+    z-index: 20; /* Asegura que esté por encima del contenido */
+    border-radius: 8px;
+    min-width: 150px; /* Ancho mínimo para el contenido del dropdown */
+}
+
+.dropdown:hover .dropdown-content {
+    display: block; /* Muestra el dropdown al pasar el ratón */
 }
 
 .dropdown-content a {
@@ -294,11 +312,234 @@ nav {
   transition: 0.3s ease;
   cursor: pointer;
   text-decoration: none;
+  background-color: #4c0000; /* Efecto hover para los enlaces del dropdown */
+}
+
+/* --- CONTENIDO PRINCIPAL (Wrapper para las secciones principales) --- */
+main {
+    flex: 1;
+    position: relative;
+    z-index: 2; /* Asegura que el contenido de main esté sobre los fondos */
+    padding: 20px; /* Padding general */
+    max-width: 1400px; /* Limita el ancho del contenido principal */
+    margin: 90px auto 20px auto; /* Margen superior para el header fijo, centrado horizontalmente */
+}
+
+/* Estilos generales para los contenedores de sección */
+.contenedor-estilo {
+    background-color: rgba(50, 0, 0, 0.7); /* Fondo semi-transparente para secciones */
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); /* Sombra para resaltar */
+    padding: 20px;
+    margin-bottom: 2rem; /* Espacio entre secciones principales */
+}
+
+/* --- SECCIÓN CARRUSEL (Eventos Destacados) --- */
+.carrusel {
+    position: relative;
+    width: 100vw; /* Ancho completo del viewport */
+    height: 500px; /* Altura fija como en tu CSS */
+    overflow: hidden;
+    margin-bottom: 2rem; /* Margen inferior */
+    border-radius: 15px; /* Bordes redondeados */
+    box-shadow: 0 0 25px rgba(255, 0, 0, 0.5); /* Sombra intensa */
+    background-color: #000; /* Fondo de fallback */
+    max-width: 1400px; /* Alineado con el main */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.carrusel .slide {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 100%; /* Inicia fuera de la vista */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: stretch;
+    background-color: rgba(0, 0, 0, 0.4); /* Overlay para la información */
+    transition: left 1s ease-in-out; /* Transición suave para el movimiento */
+    opacity: 0; /* Oculto por defecto */
+    padding: 40px;
+    box-sizing: border-box;
+    gap: 2rem;
+}
+
+.carrusel .slide.activo {
+    left: 0; /* Slide activo en la vista */
+    opacity: 1; /* Completamente visible */
+    z-index: 2; /* Asegura que el slide activo esté al frente */
+}
+
+.carrusel .slide .info {
+    color: white;
+    max-width: 500px;
+    font-family: 'Orbitron', sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente para la información */
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 3; /* Asegura que la info esté sobre la imagen del slide */
+}
+.carrusel .slide .info h2 {
+    font-size: 2.5rem;
+    color: #4c0000 
+}
+.carrusel .slide .info p {
+    font-size: 1.1rem;
+    line-height: 1.4;
+}
+
+
+.carrusel .btn-vermas {
+    margin-top: 20px;
+    align-self: flex-start;
+    text-decoration: none;
+}
+
+.carrusel .slide img {
+    height: 100%; 
+    width: 100%; 
+    object-fit: cover; /* Recorta la imagen para que cubra todo el espacio */
+    border-radius: 12px;
+    display: block;
+    position: absolute; /* Para que el texto info se superponga */
+    top: 0;
+    left: 0;
+    z-index: 1; /* Detrás de la info */
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); /* Sombra roja brillante para la imagen */
+}
+
+/* --- CONTENIDO PRINCIPAL DE DOS COLUMNAS (Eventos y Destacados) --- */
+.contenido-principal-doscolumnas {
+    display: flex;
+    gap: 2rem; /* Espacio que tenías */
+    padding: 2rem; /* Padding que tenías */
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap; /* Permite que las columnas se apilen */
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.contenido-principal-doscolumnas .eventos {
+    flex: 3; /* Ocupa más espacio */
+    min-width: 300px; /* Ancho mínimo para evitar que se encoja demasiado */
+}
+
+.contenido-principal-doscolumnas .destacados {
+    flex: 1.2; /* Ocupa menos espacio */
+    min-width: 250px; /* Ancho mínimo */
+    background-color: rgba(20, 20, 20, 0.8); /* Fondo más oscuro para destacadas */
+    padding: 1rem;
+    border-radius: 10px;
+    border: 2px solid #5c0d0d; /* Añadido borde para consistencia */
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.3); /* Añadida sombra para consistencia */
+}
+
+/* --- SECCIÓN PRÓXIMOS EVENTOS --- */
+.eventos { /* Ya tiene background-color en .contenido-principal-doscolumnas .eventos */
+    background-color: rgba(50, 0, 0, 0.7); /* Fondo semi-transparente como otros contenedores */
+    padding: 20px;
+    border-radius: 15px; /* Bordes redondeados */
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); /* Sombra */
+    margin-top: 0; /* Resetear margin-top para que lo controle contenedor-estilo o flexbox */
+}
+
+.eventos h3 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #ff3333; /* Rojo para el título */
+    text-align: center;
+    border-bottom: 2px solid #5c0d0d;
+    padding-bottom: 10px;
+}
+
+.eventos-grid {
+    display: grid; /* Usar grid para un layout robusto de eventos */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Columnas adaptativas */
+    gap: 20px; /* Espacio entre tarjetas de eventos */
+}
+
+.evento {
+    background-color: #1a1a1a;
+    border: 2px solid #5c0d0d;
+    padding: 15px; /* Ajustado el padding para el evento */
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column; /* Apila la imagen y la información verticalmente */
+    gap: 10px; /* Espacio entre imagen e información */
+    width: 100%; /* Ocupa el 100% de su columna en el grid */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Sombra para la tarjeta */
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+    align-items: center; /* Centra el contenido horizontalmente dentro de la tarjeta */
+    text-align: center; /* Centra el texto dentro de la tarjeta */
+}
+
+.evento:hover {
+    transform: translateY(-5px); /* Efecto de elevación al pasar el ratón */
+    box-shadow: 0 6px 15px rgba(255, 0, 0, 0.4); /* Sombra más pronunciada en hover */
+}
+
+.evento img {
+    width: 100%; /* Hace que la imagen ocupe el ancho de la tarjeta */
+    max-width: 250px; /* Limita el ancho máximo */
+    height: 150px; /* Altura fija para consistencia */
+    object-fit: cover; /* Ajusta la imagen sin distorsión */
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.2);
+}
+
+.evento-info {
+    color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1; /* Permite que la información ocupe el espacio disponible */
+}
+
+.evento-info h4 {
+    color: #4c0000; /* Dorado para el nombre del evento */
+    margin-bottom: 5px;
+}
+
+.evento-info p {
+    font-size: 0.9em;
+    color: #bbb;
+}
+
+.evento-link {
+    text-decoration: none;
+    color: inherit; /* Hereda el color del texto del evento-info */
+}
+
+
+/* --- BOTONES (General) ---*/
+.btn-vermas, .btn-agregar {
+    background-color: #4c0000;
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    transition: 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block; /* Permite aplicar padding y margin, y centrar */
+    text-align: center;
 }
 
 .btn-vermas:hover, .btn-agregar:hover {
-  background-color: #610000;
-  box-shadow: 0 0 10px red;
+    background-color: #610000;
+    box-shadow: 0 0 10px red;
 }
 
 /* DESTACADO */
@@ -432,6 +673,131 @@ footer {
   display: inline-block;
   padding-bottom: 8px;
 }
+/* --- DESTACADO (Aside de Ubicaciones Destacadas) --- */
+.destacados h3 { /* Aplicado a .destacados h3 */
+    font-size: 1.5rem;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+    color: #ff3333; /* Color consistente */
+    position: relative; /* Para el pseudo-elemento del subrayado */
+}
+
+.destacados h3::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    margin: 0 auto 10px auto;
+    background-color: #4c0000; /* Dorado para el subrayado del título */
+    border-radius: 10px;
+}
+/* --- CIRCULO DE DESTACADO --- */
+.circulos {
+    display: flex;
+    flex-direction: column; /* Dirección que tenías */
+    gap: 15px; /* Espacio que tenías */
+    margin-top: 10px; /* Margen que tenías */
+}
+
+.circulo {
+    position: relative;
+    width: 100px; /* Ancho que tenías */
+    height: 100px; /* Altura que tenías */
+    margin: 0 auto;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #5c0d0d;
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Añadido box-shadow a la transición */
+    cursor: pointer;
+    text-decoration: none; /* Asegura que no haya subrayado */
+    color: inherit; /* Hereda el color del texto */
+}
+
+.circulo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); /* Sombra roja en hover */
+}
+
+/* El <a> dentro de .circulo no es necesario si .circulo ya es un enlace */
+.circulo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.6;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: opacity 0.3s ease;
+}
+
+.circulo:hover img {
+    opacity: 0.8;
+}
+
+.circulo span {
+    position: absolute;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    z-index: 1;
+    padding: 5px;
+    font-size: 0.85rem;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* --- PIE DE PÁGINA (FOOTER) --- */
+.footer-completo {
+    width: 100%;
+    background: radial-gradient(circle at center, #1a1a1a 0%, #0d0d0d 100%);
+    color: #ccc;
+    padding: 60px 0 30px 0; /* Ajustado el padding */
+    font-family: 'Poppins', sans-serif;
+    border-top: 2px solid #520000; /* Borde superior más grueso */
+    box-shadow: 0 -4px 15px rgba(255, 0, 0, 0.3); /* Sombra temática */
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px; /* Margen superior para separarlo del contenido */
+}
+
+.container-footer { /* Este parece ser el contenedor interno del footer */
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.footer-col {
+    flex: 1 1 200px; /* Permite que las columnas se ajusten y crezcan */
+    min-width: 180px; /* Ancho mínimo para las columnas del footer */
+    text-align: left;
+}
+
+.footer-col h4 {
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: #fff; /* Color blanco para los títulos del footer */
+    border-bottom: 2px solid #ff3333; /* Borde rojo para los títulos */
+    display: inline-block;
+    padding-bottom: 8px;
+}
 
 .footer-col ul {
   list-style: none;
@@ -462,7 +828,35 @@ footer {
   margin-right: 10px;
   border-radius: 50%;
   transition: 0.3s ease;
+    color: #ccc; /* Color de texto para los enlaces */
+    text-decoration: none;
+    margin-bottom: 10px;
+    display: block;
+    transition: 0.3s ease;
 }
+
+.footer-col ul li a:hover {
+    padding-left: 6px;
+    color: #4c0000
+}
+
+.social-links a {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1); /* Fondo semi-transparente */
+    color: white;
+    line-height: 40px; /* Centra el icono verticalmente */
+    text-align: center;
+    margin-right: 10px;
+    border-radius: 50%;
+    transition: 0.3s ease;
+}
+.social-links a:hover {
+    background: #ff3333; /* Rojo en hover */
+    transform: scale(1.1);
+}
+
 
 .payment-methods img {
   width: 50px;
@@ -471,6 +865,13 @@ footer {
   object-fit: cover;
   margin-right: 10px;
   transition: transform 0.3s ease;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+    transition: transform 0.3s ease;
+    border: 1px solid #555; /* Borde sutil para imágenes de pago */
 }
 
 .payment-methods img:hover {
@@ -516,4 +917,334 @@ main,
 .carrusel {
   position: relative;
   z-index: 2;
+}  
+.logo-footer { /* Logo al final del footer */
+    height: 50px; /* Ajusta la altura */
+    max-width: 200px;
+    object-fit: contain;
+    margin-top: 20px;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3)); /* Sombra para el logo */
+}
+
+.footer-bottom { /* Derechos de autor */
+    width: 100%;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 15px;
+    font-size: 0.85em; /* Tamaño de fuente razonable */
+    color: #aaa;
+}
+.footer-bottom small {
+    font-size: 1em;
+    color: inherit;
+}
+
+/* Mensajes de Carga/Sin Datos/Error para los grids dinámicos */
+.loading-carousel-message,
+.no-events-found-message,
+.error-message,
+.loading-events-message {
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+    color: #f5f5f5;
+    background-color: rgba(10, 10, 10, 0.9);
+    border-radius: 8px;
+    margin-top: 20px;
+    border: 1px solid #ff3333;
+    box-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
+}
+
+.error-message {
+    color: #dc3545; /* Rojo para mensajes de error */
+    font-weight: bold;
+}
+
+
+/* ----------- CARRUSEL Y SLIDES ----------- */
+.carrusel {
+    width: 100%;
+    height: 500px;
+    position: relative;
+    overflow: hidden;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carrusel .slide {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.4);
+    transition: left 1s ease-in-out;
+    opacity: 0;
+    padding: 40px;
+    box-sizing: border-box;
+    gap: 2rem;
+}
+
+.carrusel .slide.activo {
+    left: 0;
+    opacity: 1;
+}
+
+.carrusel .slide img {
+    width: 45%;
+    height: auto;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+    flex-shrink: 0;
+    z-index: 1;
+    position: relative;
+}
+
+.carrusel .slide .info {
+    max-width: 50%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-family: 'Orbitron', sans-serif;
+    border-radius: 10px;
+    z-index: 2;
+    position: relative;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+}
+
+.carrusel .slide .info h2 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.carrusel .slide .info p {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.carousel-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border: none;
+    padding: 12px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 10;
+    border-radius: 50%;
+}
+.carousel-control.prev { left: 10px; }
+.carousel-control.next { right: 10px; }
+
+/* ----------- CONTENIDO PRINCIPAL ----------- */
+.contenido-principal-doscolumnas {
+    display: flex;
+    gap: 2rem;
+    padding: 2rem;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.eventos {
+    flex: 3;
+}
+
+.eventos h3 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.eventos-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.evento {
+    display: flex;
+    gap: 1rem;
+    background-color: rgba(255,255,255,0.05);
+    padding: 1rem;
+    border: 1px solid #cc1f1a;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+    align-items: center;
+}
+
+.evento:hover {
+    transform: scale(1.03);
+}
+
+.evento img {
+    width: 150px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.evento-info {
+    flex: 1;
+    color: white;
+}
+
+/* ----------- BOTONES ----------- */
+.btn-vermas {
+    background: #cc1f1a;
+    color: white;
+    padding: 0.7rem 1.5rem;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}
+
+.btn-vermas:hover {
+    background: #a61713;
+}
+
+/* ----------- MEDIA QUERIES ----------- */
+@media (max-width: 1024px) {
+    .carrusel {
+        height: 350px;
+    }
+    .carrusel .slide .info h2 {
+        font-size: 2rem;
+    }
+    .contenido-principal-doscolumnas {
+        flex-direction: column;
+        padding: 1rem;
+    }
+    .eventos, .destacados {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .carrusel {
+        height: 250px;
+    }
+    .carrusel .slide {
+        flex-direction: column;
+        text-align: center;
+    }
+    .carrusel .slide img,
+    .carrusel .slide .info {
+        width: 100%;
+        max-width: 100%;
+    }
+    .carrusel .slide img {
+        max-height: 200px;
+    }
+    .eventos h3, .destacados h3 {
+        font-size: 1.4rem;
+    }
+    .evento {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .evento img {
+        width: 100%;
+        height: auto;
+    }
+    .evento-info {
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .carrusel {
+        height: 200px;
+    }
+    .carrusel .slide .info h2 {
+        font-size: 1.2rem;
+    }
+    .carrusel .slide .info p {
+        font-size: 0.8rem;
+    }
+    .evento img {
+        height: 100px;
+    }
+    .btn-vermas {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+    .destacados h3 {
+        font-size: 1.2rem;
+    }
+    .circulo img {
+        width: 70px;
+        height: 70px;
+    }
+}
+.encabezado .barra-pasos {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.encabezado .barra-pasos .paso {
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  font-size: 1rem;
+  padding: 8px 15px;
+  border-radius: 8px;
+ transform: translateX(-20px);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.encabezado .barra-pasos .paso:hover {
+  background-color: rgba(255, 0, 0, 0.2);
+}
+
+.encabezado .barra-pasos .paso.activo {
+  background-color: #700a0a;
+  color: #fff;
+}
+
+.encabezado .barra-pasos .no-subrayado {
+  text-decoration: none;
+}
+.encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70px; /* Altura que tenías */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 100;
+  backdrop-filter: blur(6px); /* Blur que tenías */
+  transition: all 0.3s ease-in-out;
+}
+
+.logo img {
+  height: 48px; /* Altura del logo que tenías */
+  background-color: #4c0000;
+  padding: 10px 30px;
+  position: relative;
+  z-index: 1;
+}
+
+.barra-logo .logo {
+  height: 45px;
 }

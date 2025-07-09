@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Evento - TEYCKETAN</title>
+    <link rel="stylesheet" href="proveedor.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <header class="encabezado">
+        <div class="barra-logo">
+            <img src="../img/logo.png" alt="Logo Teycketan" class="logo" />
+            <h1>Panel del Proveedor</h1>
+        </div>
+        <div class="barra-pasos">
+            <a href="./proveedorPanel.html" class="paso">
+                <div class="circulo">1</div>
+                <span>INICIO</span>
+            </a>
+            <a href="#" id="logoutLink" class="logout-button">Cerrar Sesión</a>
+        </div>
+    </header>
+
+    <main>
+        <nav>
+            <ul>
+                <li><a href="eventoprov.html">Crear Nuevo Evento</a></li>
+                <li><a href="editarprov.html" class="activo">Editar Evento</a></li>
+                <li><a href="estadisticas.html">Estadísticas</a></li>
+            </ul>
+        </nav>
+        <section>
+            <h2>Gestión y Edición de Eventos</h2>
+            <div id="message-container" class="message-container"></div>
+
+            <div class="contenedor-tabla" id="eventosList">
+                <p class="no-data-message">Cargando tus eventos...</p>
+            </div>
+
+            <form id="edit-event-form" class="form-evento" style="display: none;">
+                <h3>Editar Detalles del Evento</h3>
+                <input type="hidden" id="edit_Id_Evento" name="Id_Evento"> <!-- Hidden ID -->
+
+                <label for="edit_Nom_Evento">Nombre del Evento:</label>
+                <input type="text" id="edit_Nom_Evento" name="Nom_Evento" required>
+
+                <label for="edit_Fecha">Fecha del Evento:</label>
+                <input type="date" id="edit_Fecha" name="Fecha" required>
+
+                <label for="edit_Horario_Inicio">Horario de Inicio:</label>
+                <input type="time" id="edit_Horario_Inicio" name="Horario_Inicio" required>
+
+                <label for="edit_Horario_Fin">Horario de Fin:</label>
+                <input type="time" id="edit_Horario_Fin" name="Horario_Fin" required>
+
+                <!-- Selector para Categoría -->
+                <label for="edit_Categoria">Categoría:</label>
+                <select id="edit_Categoria" name="Categoria" required>
+                    <option value="Conciertos">Conciertos</option>
+                    <option value="Teatro">Teatro</option>
+                    <option value="Deportes">Deportes</option>
+                </select>
+
+                <!-- Selector para Ubicación -->
+                <label for="edit_Ubicacion">Ubicación:</label>
+                <select id="edit_Ubicacion" name="Ubicacion" required>
+                    <option value="San Marcos">San Marcos</option>
+                    <option value="Teatro Canut">Teatro Canut</option>
+                    <option value="Teatro Nacional">Teatro Nacional</option>
+                    <option value="Estadio Nacional">Estadio Nacional</option>
+                </select>
+
+                <label for="edit_Descripcion">Descripción:</label>
+                <textarea id="edit_Descripcion" name="Descripcion" required></textarea>
+
+                <label for="edit_PrecioGeneral">Precio General:</label>
+                <input type="number" id="edit_PrecioGeneral" name="PrecioGeneral" step="0.01" required>
+
+                <label for="edit_PrecioVIP">Precio VIP:</label>
+                <input type="number" id="edit_PrecioVIP" name="PrecioVIP" step="0.01">
+
+                <label for="edit_PrecioConadis">Precio CONADIS:</label>
+                <input type="number" id="edit_PrecioConadis" name="PrecioConadis" step="0.01">
+
+                <label for="edit_imagenEvento">Nueva Imagen del Evento (opcional):</label>
+                <input type="file" id="edit_imagenEvento" name="imagenEvento" accept="image/*">
+                <img id="currentImagePreview" src="" alt="Imagen Actual" style="max-width: 150px; margin-top: 10px; display: block;">
+
+                <div class="form-buttons-container">
+                    <button type="submit" class="btn-agregar">Guardar Cambios</button>
+                    <button type="button" id="deleteEventButton" class="btn-eliminar">Eliminar Evento</button>
+                    <button type="button" id="cancelEditButton" class="btn-cancelar">Cancelar</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        const editForm = document.getElementById('edit-event-form');
+        const messageContainer = document.getElementById('message-container');
+        const eventosListDiv = document.getElementById('eventosList');
+        const deleteEventButton = document.getElementById('deleteEventButton');
+        const cancelEditButton = document.getElementById('cancelEditButton');
+        const currentImagePreview = document.getElementById('currentImagePreview');
+
+        const edit_Id_Evento = document.getElementById('edit_Id_Evento');
+        const edit_Nom_Evento = document.getElementById('edit_Nom_Evento');
+        const edit_Fecha = document.getElementById('edit_Fecha');
+        const edit_Horario_Inicio = document.getElementById('edit_Horario_Inicio');
+        const edit_Horario_Fin = document.getElementById('edit_Horario_Fin');
+        const edit_Categoria = document.getElementById('edit_Categoria');
+        const edit_Ubicacion = document.getElementById('edit_Ubicacion');
+        const edit_Descripcion = document.getElementById('edit_Descripcion');
+        const edit_PrecioGeneral = document.getElementById('edit_PrecioGeneral');
+        const edit_PrecioVIP = document.getElementById('edit_PrecioVIP');
+        const edit_PrecioConadis = document.getElementById('edit_PrecioConadis');
+        const edit_imagenEvento = document.getElementById('edit_imagenEvento');
+
+        let currentEventId = null;
+        let token = null;
+        const API_URL = 'http://localhost:3000';
+
+        /**
+         * @brief Muestra un mensaje temporal en la interfaz de usuario.
+         * @param {string} msg - El texto del mensaje a mostrar.
+         * @param {string} type - El tipo de mensaje ('success' o 'error') para aplicar estilos.
+         */
+        function showMessage(msg, type) {
+            messageContainer.textContent = msg;
+            messageContainer.className = `message-container message-${type}`;
+            setTimeout(() => {
+                messageContainer.textContent = '';
+                messageContainer.className = 'message-container';
+            }, 5000);
+        }
+
+        /**
+         * @brief Muestra el formulario de edición y oculta la lista de eventos.
+         */
+        function showEditForm() {
+            eventosListDiv.style.display = 'none';
+            editForm.style.display = 'block';
+        }
+
+        /**
+         * @brief Muestra la lista de eventos y oculta el formulario de edición.
+         * También recarga la lista de eventos.
+         */
+        function showEventList() {
+            editForm.style.display = 'none';
+            eventosListDiv.style.display = 'block';
+            fetchMyEventsForList();
+        }
+
+        /**
+         * @brief Carga los detalles de un evento específico en el formulario de edición.
+         * @param {number} eventId - El ID del evento a cargar.
+         */
+        async function loadEventDetails(eventId) {
+            if (!eventId) {
+                editForm.reset();
+                currentEventId = null;
+                return;
+            }
+            currentEventId = eventId;
+            try {
+                const response = await fetch(`${API_URL}/api/proveedor/eventos/${eventId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    edit_Id_Evento.value = data.Id_Evento;
+                    edit_Nom_Evento.value = data.Nom_Evento;
+                    edit_Fecha.value = data.Fecha ? new Date(data.Fecha).toISOString().split('T')[0] : '';
+                    edit_Horario_Inicio.value = data.Horario_Inicio || '';
+                    edit_Horario_Fin.value = data.Horario_Fin || '';
+                    edit_Categoria.value = data.Categoria || '';
+                    edit_Ubicacion.value = data.Ubicacion || '';
+                    edit_Descripcion.value = data.Descripcion;
+                    edit_PrecioGeneral.value = data.PrecioGeneral !== null ? parseFloat(data.PrecioGeneral).toFixed(2) : '';
+                    edit_PrecioVIP.value = data.PrecioVIP !== null ? parseFloat(data.PrecioVIP).toFixed(2) : '';
+                    edit_PrecioConadis.value = data.PrecioConadis !== null ? parseFloat(data.PrecioConadis).toFixed(2) : '';
+
+                    // Previsualización de la imagen, ruta ajustada
+                    currentImagePreview.src = data.URL_Imagen ? `${API_URL}${data.URL_Imagen}` : 'https://placehold.co/150x100/cccccc/000000?text=No+Img';
+                    currentImagePreview.style.display = 'block';
+
+                    showEditForm();
+                } else {
+                    showMessage(`Error al cargar detalles del evento: ${data.error || data.message || 'Error desconocido'}`, 'error');
+                    editForm.reset();
+                    currentEventId = null;
+                    showEventList();
+                }
+            } catch (error) {
+                console.error('Error al obtener detalles del evento:', error);
+                showMessage('Error de conexión al cargar detalles del evento.', 'error');
+                showEventList();
+            }
+        }
+
+        /**
+         * @brief Envía la solicitud para eliminar un evento.
+         * @param {number} eventId - El ID del evento a eliminar.
+         */
+        async function handleDeleteEvent(eventId) {
+            // Reemplazo de window.confirm por un mensaje interactivo
+            if (!window.confirm(`¿Estás seguro de que quieres ELIMINAR el evento ID: ${eventId}? Esta acción es irreversible.`)) {
+                return;
+            }
+
+            try {
+                // Ruta DELETE ajustada a /api/proveedor/eventos/:id
+                const response = await fetch(`${API_URL}/api/proveedor/eventos/${eventId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage(data.message, 'success');
+                    editForm.reset();
+                    currentEventId = null;
+                    showEventList();
+                } else {
+                    showMessage(`Error al eliminar evento: ${data.message || 'Desconocido'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error al eliminar evento:', error);
+                showMessage('Error de red al eliminar el evento.', 'error');
+            }
+        }
+
+        /**
+         * @brief Renderiza la lista de eventos en una tabla HTML.
+         * @param {Array<Object>} events - Un array de objetos de evento.
+         */
+        function renderEventsList(events) {
+            eventosListDiv.innerHTML = '';
+            if (events.length === 0) {
+                eventosListDiv.innerHTML = '<p class="no-data-message">No tienes eventos creados aún.</p>';
+                return;
+            }
+
+            let tableHtml = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID Evento</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Fecha</th>
+                            <th>Horario Inicio</th>
+                            <th>Horario Fin</th>
+                            <th>Ubicación</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            events.forEach(event => {
+                const formattedDate = new Date(event.Fecha).toLocaleDateString();
+                const formattedStartTime = event.Horario_Inicio ? event.Horario_Inicio.substring(0, 5) : 'N/A';
+                const formattedEndTime = event.Horario_Fin ? event.Horario_Fin.substring(0, 5) : 'N/A';
+                tableHtml += `
+                    <tr>
+                        <td>${event.Id_Evento}</td>
+                        <td>${event.Nom_Evento}</td>
+                        <td>${event.Categoria || 'N/A'}</td>
+                        <td>${formattedDate}</td>
+                        <td>${formattedStartTime}</td>
+                        <td>${formattedEndTime}</td>
+                        <td>${event.Ubicacion || 'N/A'}</td>
+                        <td><span class="event-status status-${event.Estado.toLowerCase()}">${event.Estado || 'N/A'}</span></td>
+                        <td class="actions">
+                            <button class="btn-editar" data-id="${event.Id_Evento}">Editar</button>
+                            <button class="btn-eliminar" data-id="${event.Id_Evento}">Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            tableHtml += `
+                    </tbody>
+                </table>
+            `;
+            eventosListDiv.innerHTML = tableHtml;
+
+            document.querySelectorAll('.btn-editar').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const eventId = e.target.dataset.id;
+                    loadEventDetails(eventId);
+                });
+            });
+
+            document.querySelectorAll('.btn-eliminar').forEach(button => {
+                button.addEventListener('click', (e) => handleDeleteEvent(e.target.dataset.id));
+            });
+        }
+
+        /**
+         * @brief Fetches y muestra la lista de eventos del organizador autenticado.
+         */
+        async function fetchMyEventsForList() {
+            eventosListDiv.innerHTML = '<p class="no-data-message">Cargando tus eventos...</p>';
+            try {
+                // Ruta GET ajustada a /api/proveedor/eventos
+                const response = await fetch(`${API_URL}/api/proveedor/eventos`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    renderEventsList(data.events);
+                } else {
+                    showMessage(`Error al cargar eventos: ${data.message || 'Desconocido'}`, 'error');
+                    eventosListDiv.innerHTML = `<p class="no-data-message">No se pudieron cargar tus eventos.</p>`;
+                }
+            } catch (error) {
+                console.error('Error al cargar eventos:', error);
+                showMessage('Error de red al cargar eventos.', 'error');
+                eventosListDiv.innerHTML = `<p class="no-data-message">Error de red.</p>`;
+            }
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            token = localStorage.getItem('jwtToken');
+
+            if (!token || localStorage.getItem('userRole') !== 'organizador') {
+                showMessage('Acceso denegado. Debes ser un proveedor para ver esta página.', 'error');
+                window.location.href = '../login.html';
+                return;
+            }
+
+            const logoutLink = document.getElementById('logoutLink');
+            logoutLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('jwtToken');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userRole');
+                localStorage.removeItem('isOrganizer');
+                showMessage('Sesión cerrada exitosamente.', 'success');
+                setTimeout(() => {
+                    window.location.href = '../login.html';
+                }, 1000);
+            });
+
+            editForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!currentEventId) {
+                    showMessage('Por favor, selecciona un evento para editar.', 'error');
+                    return;
+                }
+
+                const formData = new FormData(editForm); // Recopila todos los datos del formulario, incluyendo el archivo
+
+                // Validaciones de precios (reafirmando parseFloat)
+                const precioGeneral = parseFloat(formData.get('PrecioGeneral'));
+                if (isNaN(precioGeneral) || precioGeneral <= 0) {
+                    showMessage('El precio general es inválido.', 'error');
+                    return;
+                }
+
+                const precioVIP = formData.get('PrecioVIP') !== '' ? parseFloat(formData.get('PrecioVIP')) : null;
+                if (precioVIP !== null && (isNaN(precioVIP) || precioVIP < 0)) {
+                    showMessage('El precio VIP es inválido.', 'error');
+                    return;
+                }
+
+                const precioConadis = formData.get('PrecioConadis') !== '' ? parseFloat(formData.get('PrecioConadis')) : null;
+                if (precioConadis !== null && (isNaN(precioConadis) || precioConadis < 0)) {
+                    showMessage('El precio CONADIS es inválido.', 'error');
+                    return;
+                }
+
+
+                try {
+                    // La ruta para actualizar es PUT /api/proveedor/eventos/:id
+                    const response = await fetch(`${API_URL}/api/proveedor/eventos/${currentEventId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                            // No Content-Type aquí, FormData lo maneja automáticamente
+                        },
+                        body: formData // Enviar FormData
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showMessage(data.message || 'Evento actualizado exitosamente.', 'success');
+                        editForm.reset();
+                        currentEventId = null;
+                        document.getElementById('edit_imagenEvento').value = ''; // Limpiar input file
+                        currentImagePreview.src = ''; // Limpiar previsualización
+                        currentImagePreview.style.display = 'none';
+                        showEventList(); // Recargar la lista de eventos
+                    } else {
+                        showMessage(`Error al guardar cambios: ${data.error || data.message || 'Error desconocido'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error al guardar cambios del evento:', error);
+                    showMessage('Error de conexión al guardar cambios.', 'error');
+                }
+            });
+
+            deleteEventButton.addEventListener('click', () => {
+                if (currentEventId) {
+                    handleDeleteEvent(currentEventId);
+                } else {
+                    showMessage('No hay un evento seleccionado para eliminar.', 'error');
+                }
+            });
+
+            cancelEditButton.addEventListener('click', () => {
+                editForm.reset();
+                currentEventId = null;
+                document.getElementById('edit_imagenEvento').value = '';
+                currentImagePreview.src = '';
+                currentImagePreview.style.display = 'none';
+                showEventList();
+            });
+
+            fetchMyEventsForList(); // Cargar la lista de eventos al iniciar la página
+        });
+    </script>
+</body>
+</html>

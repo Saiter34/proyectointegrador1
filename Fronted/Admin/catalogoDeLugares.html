@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Lugares - TEYCKETAN</title>
+    <link rel="stylesheet" href="admin.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="admin-sidebar">
+        <div class="admin-barra-logo">
+            <img src="../img/logo.png" alt="Logo Teycketan" class="admin-logo-img" />
+        </div>
+        <ul class="admin-nav-list">
+            <li><a href="admin.html" class="admin-nav-item"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
+            <li><a href="solicitud.html" class="admin-nav-item"><i class="fas fa-user-clock"></i><span>Solicitud de proveedores</span></a></li>
+            <li><a href="aprobados.html" class="admin-nav-item"><i class="fas fa-user-check"></i><span>Proveedores aprobados</span></a></li>
+            <li><a href="eventos.html" class="admin-nav-item"><i class="fas fa-tasks"></i><span>Solicitud de eventos</span></a></li>
+            <li><a href="eventoApro.html" class="admin-nav-item"><i class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
+            <li><a href="categorias.html" class="admin-nav-item"><i class="fas fa-tags"></i><span>Eventos por categorias</span></a></li>
+            <li><a href="eventoDestacado.html" class="admin-nav-item"><i class="fas fa-star"></i><span>Eventos Destacados</span></a></li>
+            <li><a href="solicitudDestacar.html" class="admin-nav-item"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
+            <li><a href="catalogoDeLugares.html" class="admin-nav-item active"><i class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
+            <li><a href="reclamos.html" class="admin-nav-item"><i  class="fas fa-envelope"></i><span>Reclamos</span></a></li>
+
+        </ul>
+    </div>
+
+    <div class="admin-main-content">
+        <header class="admin-topbar">
+            <h1 class="admin-titulo-seccion">Catálogo de Lugares</h1>
+            <div class="admin-acciones">
+                <div class="admin-notif-wrapper">
+                    <button class="admin-notif-btn" id="adminNotifToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="admin-notif-dot"></span>
+                    </button>
+                    <div class="admin-notif-dropdown" id="adminNotifDropdown">
+                        <p class="admin-notif-title">Notificaciones</p>
+                        <ul>
+                            <li>Proveedor aprobado correctamente</li>
+                            <li>Nuevo mensaje interno</li>
+                            <li>Se rechazó un proveedor</li>
+                        </ul>
+                    </div>
+                </div>
+                <button id="adminLogoutButton" class="admin-btn-logout">Cerrar Sesión</button>
+            </div>
+        </header>
+
+        <section class="admin-contenido">
+            <div class="admin-bienvenida">Aquí puedes gestionar los lugares con los que trabajas y para qué categoría de evento están disponibles.</div>
+            <div class="catl-container">
+
+                <div class="catl-grid" id="lugares-grid">
+                    <p class="loading-message">Cargando lugares...</p>
+                </div>
+
+                <button class="catl-btn-agregar" id="toggleFormButton">
+                    <i class="fas fa-plus"></i> Agregar lugar
+                </button>
+
+                <div id="formLugar" class="catl-formulario oculto">
+                    <h3>Nuevo Lugar</h3>
+                    <form id="addLugarForm" enctype="multipart/form-data"> <!-- IMPORTANTE: Añadir enctype="multipart/form-data" -->
+                        <input type="text" name="nombre" placeholder="Nombre del lugar" required>
+                        <input type="number" name="capacidad" placeholder="Capacidad General (Opcional si usas Capacidad Total)" min="0"> 
+                        
+                        <input type="number" name="capacidad_total" placeholder="Capacidad Total" required min="1">
+                        <input type="number" name="cantidad_general" placeholder="Cantidad General" required min="0">
+                        <input type="number" name="cantidad_vip" placeholder="Cantidad VIP" required min="0">
+                        <input type="number" name="cantidad_conadis" placeholder="Cantidad CONADIS" required min="0">
+                        
+                        <select name="categoria" required>
+                            <option value="" disabled selected>Selecciona categoría</option>
+                            <option value="Deportiva">Deportiva</option>
+                            <option value="Concierto">Concierto</option>
+                            <option value="Teatro">Teatro</option>
+                            <option value="Conferencia">Conferencia</option>
+                            <option value="Festival">Festival</option>
+                            <option value="Exposición">Exposición</option>
+                            <option value="Banquete">Banquete</option>
+                            <option value="Feria">Feria</option>
+                        </select>
+                        <input type="text" name="ubicacion" placeholder="Ubicación" required>
+                        
+                        <!-- CAMBIADO: Inputs de tipo file para las imágenes -->
+                        <label for="imagen_referencial">Imagen Referencial (Vista general):</label>
+                        <input type="file" id="imagen_referencial" name="imagen_referencial" accept="image/*" required>
+                        
+                        <label for="imagen_asientos">Imagen Asientos (Vista de distribución):</label>
+                        <input type="file" id="imagen_asientos" name="imagen_asientos" accept="image/*" required>
+
+                        <button type="submit" class="catl-btn-guardar">
+                            <i class="fas fa-save"></i> Guardar Lugar
+                        </button>
+                        <button type="button" class="catl-btn-cancelar" id="cancelAddLugar">Cancelar</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="adminModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="admin-close-button">&times;</span>
+            <p id="adminModalMessage" class="admin-message-text"></p>
+            <div id="adminModalActions">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta para tu backend
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const lugaresGrid = document.getElementById('lugares-grid');
+            const toggleFormButton = document.getElementById('toggleFormButton');
+            const formLugar = document.getElementById('formLugar');
+            const addLugarForm = document.getElementById('addLugarForm');
+            const cancelAddLugar = document.getElementById('cancelAddLugar');
+
+            // Modal elements
+            const adminModal = document.getElementById('adminModal');
+            const adminModalMessage = document.getElementById('adminModalMessage');
+            const adminModalActions = document.getElementById('adminModalActions');
+            const adminCloseButton = document.querySelector('.admin-modal-content .admin-close-button');
+
+            // Function to show custom modal
+            function showModal(message, type = 'info', actions = []) {
+                adminModalMessage.textContent = message;
+                adminModalMessage.className = `admin-message-text admin-message-${type}`;
+                adminModalActions.innerHTML = ''; // Clear previous actions
+
+                if (actions.length > 0) {
+                    actions.forEach(action => {
+                        const button = document.createElement('button');
+                        button.textContent = action.text;
+                        button.className = `admin-modal-btn admin-modal-${action.type}`;
+                        button.onclick = () => {
+                            adminModal.style.display = 'none';
+                            if (action.handler) {
+                                action.handler();
+                            }
+                        };
+                        adminModalActions.appendChild(button);
+                    });
+                } else {
+                    // Default OK button if no actions are provided
+                    const okButton = document.createElement('button');
+                    okButton.textContent = 'OK';
+                    okButton.className = 'admin-modal-btn';
+                    okButton.onclick = () => adminModal.style.display = 'none';
+                    adminModalActions.appendChild(okButton);
+                }
+                adminModal.style.display = 'flex'; // Use flex to center
+            }
+
+            adminCloseButton.onclick = () => {
+                adminModal.style.display = 'none';
+            };
+            window.onclick = (event) => {
+                if (event.target === adminModal) {
+                    adminModal.style.display = 'none';
+                }
+            };
+
+            // --- Lógica de Sesión del Administrador ---
+            const adminLogoutButton = document.getElementById('adminLogoutButton');
+            const token = localStorage.getItem('jwtToken');
+            const userRole = localStorage.getItem('userRole');
+
+            if (!token || userRole !== 'admin') {
+                showModal('Acceso denegado. Solo los administradores pueden ver esta página.', 'error', [{
+                    text: 'Ir a Iniciar Sesión',
+                    type: 'confirm',
+                    handler: () => window.location.replace('../login.html')
+                }]);
+                return; // Detener la ejecución si no es admin
+            }
+
+            adminLogoutButton.addEventListener('click', () => {
+                showModal('¿Estás seguro de que quieres cerrar sesión?', 'info', [
+                    {
+                        text: 'Sí, Cerrar Sesión',
+                        type: 'confirm',
+                        handler: () => {
+                            localStorage.removeItem('jwtToken');
+                            localStorage.removeItem('userName');
+                            localStorage.removeItem('userEmail');
+                            localStorage.removeItem('userRole');
+                            localStorage.removeItem('userId');
+                            window.location.replace('../login.html'); // Redirigir a login
+                        }
+                    },
+                    {
+                        text: 'Cancelar',
+                        type: 'cancel',
+                        handler: () => {}
+                    }
+                ]);
+            });
+
+            // --- Lógica de Notificaciones ---
+            const adminNotifToggle = document.getElementById('adminNotifToggle');
+            const adminNotifDropdown = document.getElementById('adminNotifDropdown');
+            const adminNotifDot = document.querySelector('.admin-notif-dot');
+
+            adminNotifToggle.addEventListener('click', (event) => {
+                event.stopPropagation();
+                adminNotifDropdown.style.display = adminNotifDropdown.style.display === 'block' ? 'none' : 'block';
+                if (adminNotifDot) adminNotifDot.style.display = 'none';
+            });
+
+            document.addEventListener('click', (event) => {
+                if (adminNotifDropdown && !adminNotifDropdown.contains(event.target) && adminNotifToggle && !adminNotifToggle.contains(event.target)) {
+                    adminNotifDropdown.style.display = 'none';
+                }
+            });
+
+            // --- Funciones para cargar y renderizar lugares ---
+            async function fetchLugares() {
+                lugaresGrid.innerHTML = '<p class="loading-message">Cargando lugares...</p>';
+                try {
+                    const response = await fetch(`${API_URL}/api/lugares`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}` // Incluye el token para autenticación
+                        }
+                    });
+                    const lugares = await response.json();
+
+                    if (response.ok) {
+                        if (lugares.length === 0) {
+                            lugaresGrid.innerHTML = '<p class="no-data-message">No hay lugares registrados en el catálogo.</p>';
+                        } else {
+                            renderLugares(lugares);
+                        }
+                    } else {
+                        showModal(`Error al cargar lugares: ${lugares.message || 'Error desconocido'}`, 'error');
+                        lugaresGrid.innerHTML = `<p class="error-message">Error al cargar lugares: ${lugares.message || 'Error desconocido'}</p>`;
+                        console.error('Error fetching lugares:', lugares);
+                    }
+                } catch (error) {
+                    showModal('Error de conexión con el servidor. No se pudieron cargar los lugares.', 'error');
+                    lugaresGrid.innerHTML = '<p class="error-message">Error de conexión con el servidor. No se pudieron cargar los lugares.</p>';
+                    console.error('Network error fetching lugares:', error);
+                }
+            }
+
+            function renderLugares(lugares) {
+                let lugaresHtml = '';
+                lugares.forEach(lugar => {
+                    // Usar la imagen referencial para la tarjeta principal
+                    // La URL ahora apunta a la ruta estática que sirve Express
+                    const imageUrl = lugar.URL_Imagen_Referencial ? `${API_URL}${lugar.URL_Imagen_Referencial}` : '../img/default_place.jpg'; 
+                    lugaresHtml += `
+                        <div class="catl-card" data-id="${lugar.Id_Lugar}">
+                            <img src="${imageUrl}" alt="${lugar.Nom_Lugar}" class="catl-img">
+                            <div class="catl-info">
+                                <h3>${lugar.Nom_Lugar}</h3>
+                                <p><strong>Categoría:</strong> ${lugar.Categoria_Lugar}</p>
+                                <p><strong>Ubicación:</strong> ${lugar.Ubicacion_Lugar}</p>
+                                <hr class="catl-divider">
+                                <p><strong>Capacidad Total:</strong> ${lugar.Capacidad_Total || 'N/A'}</p>
+                                <p><strong>General:</strong> ${lugar.Cantidad_General || 'N/A'}</p>
+                                <p><strong>VIP:</strong> ${lugar.Cantidad_VIP || 'N/A'}</p>
+                                <p><strong>CONADIS:</strong> ${lugar.Cantidad_Conadis || 'N/A'}</p>
+                                <div class="catl-botones">
+                                    <button class="catl-btn-destacar" data-id="${lugar.Id_Lugar}"><i class="fas fa-star"></i> Destacar</button>
+                                    <button class="catl-btn-eliminar" data-id="${lugar.Id_Lugar}"><i class="fas fa-trash-alt"></i> Eliminar</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                lugaresGrid.innerHTML = lugaresHtml;
+                attachEventListeners(); // Adjunta listeners después de renderizar
+            }
+
+            // --- Lógica para agregar un nuevo lugar ---
+            toggleFormButton.addEventListener('click', () => {
+                formLugar.classList.toggle('oculto');
+                if (!formLugar.classList.contains('oculto')) {
+                    addLugarForm.reset(); // Limpia el formulario al mostrarlo
+                }
+            });
+
+            cancelAddLugar.addEventListener('click', () => {
+                formLugar.classList.add('oculto');
+                addLugarForm.reset();
+            });
+
+            addLugarForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                // Crear FormData para enviar archivos
+                const formData = new FormData(addLugarForm);
+
+                // Validaciones de archivos
+                const imagenReferencialFile = formData.get('imagen_referencial');
+                const imagenAsientosFile = formData.get('imagen_asientos');
+
+                if (!imagenReferencialFile || imagenReferencialFile.size === 0) {
+                    showModal('Debes seleccionar una imagen referencial.', 'error');
+                    return;
+                }
+                if (!imagenAsientosFile || imagenAsientosFile.size === 0) {
+                    showModal('Debes seleccionar una imagen de asientos.', 'error');
+                    return;
+                }
+
+                // Validaciones de números (convertir a int antes de enviar)
+                const capacidadTotal = parseInt(formData.get('capacidad_total'));
+                const cantidadGeneral = parseInt(formData.get('cantidad_general'));
+                const cantidadVip = parseInt(formData.get('cantidad_vip'));
+                const cantidadConadis = parseInt(formData.get('cantidad_conadis'));
+                const capacidad = formData.get('capacidad') ? parseInt(formData.get('capacidad')) : null;
+
+                if (isNaN(capacidadTotal) || capacidadTotal < 1 ||
+                    isNaN(cantidadGeneral) || cantidadGeneral < 0 ||
+                    isNaN(cantidadVip) || cantidadVip < 0 ||
+                    isNaN(cantidadConadis) || cantidadConadis < 0) {
+                    showModal('Por favor, ingresa valores numéricos válidos para las capacidades.', 'error');
+                    return;
+                }
+
+                // Pequeña validación: capacidad total debe ser la suma o al menos la suma de las partes
+                if (capacidadTotal < (cantidadGeneral + cantidadVip + cantidadConadis)) {
+                    showModal('La capacidad total debe ser al menos la suma de las capacidades por categoría (General, VIP, CONADIS).', 'warning');
+                    return;
+                }
+
+                // Añadir los datos numéricos y otros campos al FormData
+                formData.set('capacidad_total', capacidadTotal);
+                formData.set('cantidad_general', cantidadGeneral);
+                formData.set('cantidad_vip', cantidadVip);
+                formData.set('cantidad_conadis', cantidadConadis);
+                if (capacidad !== null) {
+                    formData.set('capacidad', capacidad);
+                } else {
+                    formData.delete('capacidad'); // Eliminar si es nulo para evitar enviar 'null' como string
+                }
+                // Los campos 'nombre', 'categoria', 'ubicacion' ya están en formData por defecto
+
+                showModal('Agregando lugar...', 'info');
+
+                try {
+                    const response = await fetch(`${API_URL}/api/lugares`, {
+                        method: 'POST',
+                        headers: {
+                            // 'Content-Type': 'multipart/form-data' NO es necesario con FormData, el navegador lo establece automáticamente
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: formData // FormData se envía directamente
+                    });
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        showModal('Lugar agregado correctamente.', 'success');
+                        formLugar.classList.add('oculto');
+                        addLugarForm.reset(); // Limpiar el formulario
+                        fetchLugares(); // Recargar la lista de lugares
+                    } else {
+                        showModal(`Error al agregar lugar: ${result.message || 'Error desconocido'}`, 'error');
+                        console.error('Error adding lugar:', result);
+                    }
+                } catch (error) {
+                    showModal('Error de conexión con el servidor al agregar lugar.', 'error');
+                    console.error('Network error adding lugar:', error);
+                }
+            });
+
+            // --- Lógica para eliminar un lugar ---
+            function attachEventListeners() {
+                document.querySelectorAll('.catl-btn-eliminar').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const lugarId = e.currentTarget.dataset.id;
+                        showModal(`¿Estás seguro de que quieres eliminar este lugar (ID: ${lugarId})? Esta acción es irreversible y también eliminará las imágenes asociadas.`, 'warning', [
+                            {
+                                text: 'Sí, Eliminar',
+                                type: 'confirm',
+                                handler: () => deleteLugar(lugarId)
+                            },
+                            {
+                                text: 'Cancelar',
+                                type: 'cancel',
+                                handler: () => {}
+                            }
+                        ]);
+                    });
+                });
+
+                // Lógica para el botón 'Destacar' (ejemplo, necesitaría implementación en el backend)
+                document.querySelectorAll('.catl-btn-destacar').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const lugarId = e.currentTarget.dataset.id;
+                        showModal(`Funcionalidad "Destacar" para el lugar ID: ${lugarId} aún no implementada en el backend.`, 'info');
+                        // Aquí iría la llamada a la API para destacar el lugar
+                    });
+                });
+            }
+
+            async function deleteLugar(id) {
+                try {
+                    const response = await fetch(`${API_URL}/api/lugares/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        showModal(result.message, 'success');
+                        fetchLugares(); // Recargar la lista de lugares
+                    } else {
+                        showModal(`Error al eliminar lugar: ${result.message || 'Error desconocido'}`, 'error');
+                        console.error('Error deleting lugar:', result);
+                    }
+                } catch (error) {
+                    showModal('Error de conexión con el servidor al eliminar lugar.', 'error');
+                    console.error('Network error deleting lugar:', error);
+                }
+            }
+
+            // Iniciar la carga de lugares al cargar la página
+            fetchLugares();
+        });
+    </script>
+</body>
+</html>

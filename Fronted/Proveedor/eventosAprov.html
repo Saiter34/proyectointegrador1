@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventos Aprobados - TEYCKETAN</title>
+    <link rel="stylesheet" href="proveedor.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="prov-sidebar">
+        <div class="prov-barra-logo">
+            <img src="../img/logo.png" alt="Logo Teycketan" class="prov-logo-img" />
+        </div>
+        <ul class="prov-nav-list">
+            <li><a href="proveedorPanel.html" class="prov-nav-item"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
+            <li><a href="crearevento.html" class="prov-nav-item"><i class="fas fa-plus-circle"></i><span>Crear evento</span></a></li>
+            <li><a href="verEvento.html" class="prov-nav-item"><i class="fas fa-calendar-alt"></i><span>Ver eventos</span></a></li>
+            <li><a href="contactarEmpresa.html" class="prov-nav-item"><i class="fas fa-envelope"></i><span>Contactar empresa</span></a></li>
+            <li><a href="eventosAprov.html" class="prov-nav-item active"><i class="fas fa-check-circle"></i><span>Eventos Aprobados</span></a></li>
+            <li><a href="catalogoDeLugares.html" class="prov-nav-item"><i class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
+        </ul>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="prov-main-content">
+        <header class="prov-topbar">
+            <h1 class="prov-titulo-seccion">Mis Eventos Aprobados</h1>
+            <div class="prov-acciones">
+                <div class="prov-notif-wrapper">
+                    <button class="prov-notif-btn" id="provNotifToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="prov-notif-dot"></span>
+                    </button>
+                    <div class="prov-notif-dropdown" id="provNotifDropdown">
+                        <p class="prov-notif-title">Notificaciones</p>
+                        <ul>
+                            <li>Tu evento “Damiano David” fue aprobado</li>
+                            <li>Nuevo mensaje de TEYCKETAN</li>
+                            <li>Revisa el estado de tu evento</li>
+                        </ul>
+                    </div>
+                </div>
+                <a href="crearevento.html" class="prov-btn-crear-evento">+ Nuevo evento</a>
+                <button id="provLogoutButton" class="prov-btn-logout">Cerrar Sesión</button>
+            </div>
+        </header>
+
+        <section class="prov-contenido">
+            <div class="prov-bienvenida">Aquí puedes ver todos los eventos que han sido aprobados para publicación.</div>
+
+            <!-- Contenedor para mensajes (para modales) -->
+            <div id="provMessageContainer" class="prov-message-container"></div>
+            <div class="prov-tabla-contenedor">
+
+                <table class="prov-table">
+                    <thead>
+                        <tr>
+                            <th>Imagen</th>
+                            <th>Nombre del Evento</th>
+                            <th>Fecha</th>
+                            <th>Horario</th>
+                            <th>Ubicación</th>
+                            <th>Estado Destacar</th> <!-- Cambiado a "Estado Destacar" para claridad -->
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eventsListBody">
+                        <!-- Los eventos se cargarán aquí dinámicamente -->
+                        <tr><td colspan="7" class="prov-loading-message">Cargando tus eventos aprobados...</td></tr>
+                    </tbody>
+                </table>
+                <p id="noEventsMessage" class="prov-no-data-message" style="display: none;">No tienes eventos aprobados aún.</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modales -->
+    <div id="provConfirmationModal" class="prov-modal">
+        <div class="prov-modal-content">
+            <span class="prov-close-button">&times;</span>
+            <p id="provModalMessage">¿Estás seguro de realizar esta acción?</p>
+            <button id="provModalConfirmBtn" class="prov-modal-btn prov-modal-confirm">Confirmar</button>
+            <button id="provModalCancelBtn" class="prov-modal-btn prov-modal-cancel">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="provMessageModal" class="prov-modal">
+        <div class="prov-modal-content">
+            <span class="prov-close-button">&times;</span>
+            <p id="provMessageModalText"></p>
+            <button id="provMessageModalCloseBtn" class="prov-modal-btn prov-modal-confirm">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta
+
+            // --- Lógica de Autenticación al cargar la página ---
+            const token = localStorage.getItem('jwtToken');
+            const userRole = localStorage.getItem('userRole');
+            const userId = localStorage.getItem('userId');
+
+            console.log('Eventos Aprobados Page Loaded.');
+            console.log('JWT Token:', token ? 'Exists' : 'Missing');
+            console.log('User Role from localStorage:', userRole);
+            console.log('User ID from localStorage:', userId);
+
+            // Seguridad: Redirige si no hay token o el rol no es 'organizador'
+            if (!token || userRole !== 'organizador' || !userId) {
+                showProvMessageModal('Acceso denegado. Debes ser un proveedor autenticado para ver esta página.', 'error');
+                setTimeout(() => {
+                    window.location.replace('../login.html');
+                }, 2000);
+                return; // Detener la ejecución del script aquí
+            }
+
+            // Elementos DOM principales
+            const provLogoutButton = document.getElementById('provLogoutButton');
+            const provNotifToggle = document.getElementById('provNotifToggle');
+            const provNotifDropdown = document.getElementById('provNotifDropdown');
+            const provMessageContainer = document.getElementById('provMessageContainer');
+            const eventsListBody = document.getElementById('eventsListBody'); // tbody de la tabla
+            const noEventsMessage = document.getElementById('noEventsMessage'); // Mensaje de no eventos
+
+            // Referencias a los IDs de modales
+            const provConfirmationModal = document.getElementById('provConfirmationModal');
+            const provModalMessage = document.getElementById('provModalMessage');
+            const provModalConfirmBtn = document.getElementById('provModalConfirmBtn');
+            const provModalCancelBtn = document.getElementById('provModalCancelBtn');
+            const provMessageModal = document.getElementById('provMessageModal');
+            const provMessageModalText = document.getElementById('provMessageModalText');
+            const provMessageModalCloseBtn = document.getElementById('provMessageModalCloseBtn');
+
+            // --- Funciones para Modales ---
+
+            /**
+             * @brief Muestra un modal de confirmación al usuario (específico para Proveedor).
+             * @param {string} message - El mensaje a mostrar en el modal.
+             * @returns {Promise<boolean>} Una promesa que se resuelve a `true` si el usuario confirma, `false` si cancela.
+             */
+            function showProvConfirmationModal(message) {
+                return new Promise((resolve) => {
+                    provModalMessage.textContent = message;
+                    provConfirmationModal.style.display = 'flex'; // Usar flex para centrar
+
+                    const confirmHandler = () => {
+                        provConfirmationModal.style.display = 'none';
+                        provModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        provModalCancelBtn.removeEventListener('click', cancelHandler);
+                        provConfirmationModal.querySelector('.prov-close-button').removeEventListener('click', cancelHandler);
+                        resolve(true);
+                    };
+
+                    const cancelHandler = () => {
+                        provConfirmationModal.style.display = 'none';
+                        provModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        provModalCancelBtn.removeEventListener('click', cancelHandler);
+                        provConfirmationModal.querySelector('.prov-close-button').removeEventListener('click', cancelHandler);
+                        resolve(false);
+                    };
+
+                    provModalConfirmBtn.addEventListener('click', confirmHandler);
+                    provModalCancelBtn.addEventListener('click', cancelHandler);
+                    provConfirmationModal.querySelector('.prov-close-button').addEventListener('click', cancelHandler);
+                });
+            }
+
+            /**
+             * @brief Muestra un modal de mensaje informativo al usuario (específico para Proveedor).
+             * @param {string} message - El mensaje a mostrar en el modal.
+             * @param {string} type - Tipo de mensaje ('success' o 'error') para estilos. Opcional.
+             */
+            function showProvMessageModal(message, type = '') {
+                provMessageModalText.textContent = message;
+                provMessageModalText.className = `prov-message-text ${type ? 'prov-message-' + type : ''}`; // Añadir clase para estilo
+                provMessageModal.style.display = 'flex'; // Usar flex para centrar
+
+                provMessageModalCloseBtn.onclick = () => {
+                    provMessageModal.style.display = 'none';
+                };
+                provMessageModal.querySelector('.prov-close-button').onclick = () => {
+                    provMessageModal.style.display = 'none';
+                };
+            }
+
+            // --- Event Listener para Cerrar Sesión ---
+            provLogoutButton.addEventListener('click', async () => {
+                const confirmLogout = await showProvConfirmationModal('¿Estás seguro de que quieres cerrar sesión?');
+                if (confirmLogout) {
+                    localStorage.removeItem('jwtToken');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('isOrganizer');
+                    localStorage.removeItem('userId');
+                    showProvMessageModal('Sesión cerrada correctamente.', 'success');
+                    setTimeout(() => {
+                        window.location.replace('../login.html');
+                    }, 500);
+                }
+            });
+
+            // --- Lógica para Notificaciones (Dropdown) ---
+            provNotifToggle.addEventListener('click', (event) => {
+                event.stopPropagation();
+                provNotifDropdown.style.display = provNotifDropdown.style.display === 'block' ? 'none' : 'block';
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!provNotifDropdown.contains(event.target) && !provNotifToggle.contains(event.target)) {
+                    provNotifDropdown.style.display = 'none';
+                }
+            });
+
+            // Añadir clase 'active' al enlace de la página actual en el sidebar
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.prov-nav-item').forEach(link => {
+                if (link.href.includes('eventosAprov.html')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+
+            // --- Funcionalidad para cargar y mostrar eventos aprobados del proveedor ---
+
+            /**
+             * @brief Carga todos los eventos aprobados creados por el proveedor autenticado.
+             */
+            async function fetchApprovedProviderEvents() {
+                eventsListBody.innerHTML = '<tr><td colspan="7" class="prov-loading-message">Cargando tus eventos aprobados...</td></tr>';
+                noEventsMessage.style.display = 'none';
+
+                try {
+                    // **NOTA: Necesitas un endpoint en tu backend para esto.**
+                    // Por ejemplo: GET /api/proveedor/eventos/aprobados
+                    const response = await fetch(`${API_URL}/api/proveedor/eventos-aprobados`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok && data.events) {
+                        if (data.events.length === 0) {
+                            eventsListBody.innerHTML = '';
+                            noEventsMessage.style.display = 'block';
+                        } else {
+                            renderEventsTable(data.events);
+                        }
+                    } else {
+                        showProvMessageModal(`Error al cargar tus eventos aprobados: ${data.message || 'Desconocido'}`, 'error');
+                        eventsListBody.innerHTML = `<tr><td colspan="7" class="prov-no-data-message prov-error-text">No se pudieron cargar tus eventos aprobados.</td></tr>`;
+                    }
+                } catch (error) {
+                    console.error('Error al cargar eventos aprobados del proveedor:', error);
+                    showProvMessageModal('Error de red al cargar tus eventos aprobados.', 'error');
+                    eventsListBody.innerHTML = `<tr><td colspan="7" class="prov-no-data-message prov-error-text">Error de red.</td></tr>`;
+                }
+            }
+
+            /**
+             * @brief Renderiza la tabla de eventos aprobados del proveedor.
+             * @param {Array<Object>} events - Array de objetos de evento.
+             */
+            function renderEventsTable(events) {
+                eventsListBody.innerHTML = ''; // Limpiar tbody
+                noEventsMessage.style.display = 'none';
+
+                if (events.length === 0) {
+                    noEventsMessage.style.display = 'block';
+                    return;
+                }
+
+                let tableRowsHtml = '';
+                events.forEach(event => {
+                    // --- CORRECCIÓN AQUÍ: Usar event.URL_Imagen_Evento ---
+                    console.log(`Valor de event.URL_Imagen_Evento (proveedor eventosAprov):`, event.URL_Imagen_Evento); 
+                    const imageUrl = event.URL_Imagen_Evento ? `${API_URL}${event.URL_Imagen_Evento}` : 'https://placehold.co/60x60/cccccc/000000?text=No+Img';
+                    console.log(`URL final de imagen para proveedor eventosAprov: ${imageUrl}`);
+                    // --- FIN CORRECCIÓN ---
+
+                    const isFeaturedPending = event.SolicitudDestacar === 'pendiente'; // Asumiendo que esta propiedad viene del backend
+
+                    tableRowsHtml += `
+                        <tr data-event-id="${event.Id_Evento}" class="event-main-row">
+                            <td data-label="Imagen"><img src="${imageUrl}" alt="Imagen del evento" class="prov-event-image-thumbnail"></td>
+                            <td data-label="Nombre">${event.Nom_Evento}</td>
+                            <td data-label="Fecha">${new Date(event.Fecha).toLocaleDateString('es-ES')}</td>
+                            <td data-label="Horario">${event.Horario_Inicio || 'N/A'} - ${event.Horario_Fin || 'N/A'}</td>
+                            <td data-label="Ubicación">${event.Ubicacion}</td>
+                            <td data-label="Estado Destacar"> <!-- Cambiado a "Estado Destacar" para claridad -->
+                                ${isFeaturedPending
+                                    ? '<span class="event-status event-status-pendiente">Pendiente</span>'
+                                    : `<button class="prov-btn-solicitar" data-id="${event.Id_Evento}"><i class="fas fa-star"></i> Solicitar destacar</button>`
+                                }
+                            </td>
+                            <td class="prov-actions-cell">
+                                <button class="prov-btn-details" data-id="${event.Id_Evento}" data-name="${event.Nom_Evento}"><i class="fas fa-info-circle"></i> Detalles</button>
+                                <button class="prov-btn-edit" data-id="${event.Id_Evento}" data-name="${event.Nom_Evento}"><i class="fas fa-edit"></i> Editar</button>
+                                <!-- El botón de eliminar probablemente no debería estar en Eventos Aprobados si solo se pueden eliminar Pendientes/Rechazados -->
+                                <!-- <button class="prov-btn-delete" data-id="${event.Id_Evento}" data-name="${event.Nom_Evento}"><i class="fas fa-trash-alt"></i> Eliminar</button> -->
+                            </td>
+                        </tr>
+                        <tr class="prov-details-row" id="details-row-${event.Id_Evento}" style="display: none;">
+                            <td colspan="7">
+                                <div class="prov-details-content">
+                                    <h3>Estadísticas de Venta para "${event.Nom_Evento}"</h3>
+                                    <p><strong>Precio General (Evento):</strong> S/. ${parseFloat(event.PrecioGeneral || 0).toFixed(2)}</p>
+                                    <p><strong>Precio VIP (Evento):</strong> ${event.PrecioVIP ? `S/. ${parseFloat(event.PrecioVIP).toFixed(2)}` : 'N/A'}</p>
+                                    <p><strong>Precio CONADIS (Evento):</strong> ${event.PrecioConadis ? `S/. ${parseFloat(event.PrecioConadis).toFixed(2)}` : 'N/A'}</p>
+                                    <p><strong>Asientos General (Inicial):</strong> ${event.Asientos_General_Disponibles || 'N/A'}</p>
+                                    <p><strong>Asientos VIP (Inicial):</strong> ${event.Asientos_VIP_Disponibles || 'N/A'}</p>
+                                    <p><strong>Asientos CONADIS (Inicial):</strong> ${event.Asientos_CONADIS_Disponibles || 'N/A'}</p>
+
+                                    <h4>Tickets Vendidos:</h4>
+                                    <p><strong>General Vendidos:</strong> <span id="sold-general-${event.Id_Evento}">Cargando...</span></p>
+                                    <p><strong>VIP Vendidos:</strong> <span id="sold-vip-${event.Id_Evento}">Cargando...</span></p>
+                                    <p><strong>CONADIS Vendidos:</strong> <span id="sold-conadis-${event.Id_Evento}">Cargando...</span></p>
+                                    <p><strong>Total Vendidos:</strong> <span id="sold-total-${event.Id_Evento}">Cargando...</span></p>
+                                    <p><strong>Ganancias Estimadas:</strong> <span id="revenue-${event.Id_Evento}">Cargando...</span></p>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+                eventsListBody.innerHTML = tableRowsHtml;
+
+                // Añadir event listeners a los botones de acción
+                eventsListBody.querySelectorAll('.prov-btn-details').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const eventId = e.target.dataset.id || e.target.closest('button').dataset.id;
+                        toggleEventDetails(eventId);
+                    });
+                });
+                eventsListBody.querySelectorAll('.prov-btn-edit').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const eventId = e.target.dataset.id || e.target.closest('button').dataset.id;
+                        window.location.href = `editarEvento.html?eventId=${eventId}`; // Asegúrate de que esta ruta sea correcta
+                    });
+                });
+                // Eliminar el manejador del botón de eliminar si no debe estar aquí
+                // eventsListBody.querySelectorAll('.prov-btn-delete').forEach(button => { /* ... */ });
+
+                eventsListBody.querySelectorAll('.prov-btn-solicitar').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        const eventId = e.target.dataset.id || e.target.closest('button').dataset.id;
+                        const confirm = await showProvConfirmationModal('¿Deseas enviar una solicitud para destacar este evento?');
+                        if (!confirm) return;
+
+                        try {
+                            const response = await fetch(`${API_URL}/api/proveedor/eventos/${eventId}/solicitar-destacar`, {
+                                method: 'POST',
+                                headers: {
+                                    'Authorization': `Bearer ${token}`, // Usamos el token aquí
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+
+                            const data = await response.json();
+                            if (response.ok) {
+                                showProvMessageModal('Solicitud enviada correctamente.', 'success');
+                                fetchApprovedProviderEvents(); // Recargar tabla para actualizar estado
+                            } else {
+                                showProvMessageModal(data.message || 'Error al solicitar destacar.', 'error');
+                            }
+                        } catch (err) {
+                            console.error('Error al enviar solicitud para destacar:', err);
+                            showProvMessageModal('Error de red al enviar solicitud.', 'error');
+                        }
+                    });
+                });
+            }
+
+            /**
+             * @brief Alterna la visibilidad de los detalles del evento y carga las estadísticas.
+             * @param {number} eventId - El ID del evento cuyos detalles se van a mostrar/ocultar.
+             */
+            async function toggleEventDetails(eventId) {
+                const detailsRow = document.getElementById(`details-row-${eventId}`);
+                if (detailsRow.style.display === 'none') {
+                    // Ocultar cualquier otra fila de detalles que pueda estar abierta
+                    document.querySelectorAll('.prov-details-row').forEach(row => {
+                        if (row.id !== `details-row-${eventId}` && row.style.display !== 'none') {
+                            row.style.display = 'none';
+                            row.classList.remove('show-details');
+                        }
+                    });
+
+                    detailsRow.style.display = 'table-row'; // Mostrar la fila de detalles
+                    detailsRow.classList.add('show-details'); // Añadir clase para la animación
+                    await fetchEventStatistics(eventId); // Cargar estadísticas cuando se muestra
+                } else {
+                    detailsRow.classList.remove('show-details'); // Remover clase de animación
+                    detailsRow.style.display = 'none'; // Ocultar la fila de detalles
+                }
+            }
+
+            /**
+             * @brief Carga y muestra las estadísticas de venta para un evento específico.
+             * @param {number} eventId - El ID del evento para el que se cargarán las estadísticas.
+             */
+            async function fetchEventStatistics(eventId) {
+                // Actualizar los textos a "Cargando..." mientras se obtienen los datos
+                document.getElementById(`sold-general-${eventId}`).textContent = 'Cargando...';
+                document.getElementById(`sold-vip-${eventId}`).textContent = 'Cargando...';
+                document.getElementById(`sold-conadis-${eventId}`).textContent = 'Cargando...';
+                document.getElementById(`sold-total-${eventId}`).textContent = 'Cargando...';
+                document.getElementById(`revenue-${eventId}`).textContent = 'Cargando...';
+
+                try {
+                    // Asegúrate de que esta ruta exista y devuelva las estadísticas correctas para el proveedor
+                    const response = await fetch(`${API_URL}/api/proveedor/eventos/${eventId}/stats`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok && data.statistics) {
+                        const stats = data.statistics;
+                        document.getElementById(`sold-general-${eventId}`).textContent = stats.general_vendidos || 0;
+                        document.getElementById(`sold-vip-${eventId}`).textContent = stats.vip_vendidos || 0;
+                        document.getElementById(`sold-conadis-${eventId}`).textContent = stats.conadis_vendidos || 0;
+                        document.getElementById(`sold-total-${eventId}`).textContent = stats.total_vendidos || 0;
+                        document.getElementById(`revenue-${eventId}`).textContent = `S/. ${parseFloat(stats.ganancias_estimadas || 0).toFixed(2)}`;
+                    } else {
+                        throw new Error(data.message || 'Error al obtener estadísticas del evento.');
+                    }
+                } catch (error) {
+                    console.error(`Error al cargar estadísticas para el evento ${eventId}:`, error);
+                    document.getElementById(`sold-general-${eventId}`).textContent = 'Error';
+                    document.getElementById(`sold-vip-${eventId}`).textContent = 'Error';
+                    document.getElementById(`sold-conadis-${eventId}`).textContent = 'Error';
+                    document.getElementById(`sold-total-${eventId}`).textContent = 'Error';
+                    document.getElementById(`revenue-${eventId}`).textContent = 'Error';
+                    showProvMessageModal(`No se pudieron cargar las estadísticas para el evento (ID: ${eventId}).`, 'error');
+                }
+            }
+
+            /**
+             * @brief Maneja la eliminación de un evento.
+             * @param {number} eventId - El ID del evento a eliminar.
+             * @param {string} eventName - El nombre del evento para el mensaje de confirmación.
+             */
+            async function handleDeleteEvent(eventId, eventName) {
+                const confirmDelete = await showProvConfirmationModal(`¿Estás seguro de que quieres ELIMINAR el evento "${eventName}" (ID: ${eventId})? Esta acción no se puede deshacer.`);
+
+                if (!confirmDelete) {
+                    return;
+                }
+
+                showProvMessageModal('Eliminando evento...', 'info');
+
+                try {
+                    const response = await fetch(`${API_URL}/api/proveedor/eventos/${eventId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showProvMessageModal(data.message, 'success');
+                        fetchApprovedProviderEvents(); // Recargar datos después de la eliminación
+                    } else {
+                        showProvMessageModal(`Error al eliminar el evento: ${data.message || data.error || 'Error desconocido'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error(`Error al eliminar el evento:`, error);
+                    showProvMessageModal(`Error de conexión con el servidor al eliminar evento.`, 'error');
+                }
+            }
+
+            // Llamar a la función para cargar eventos al cargar la página
+            fetchApprovedProviderEvents();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Método de Pago - TEYCKETAN</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="pago3.css" />
+</head>
+<body>
+  <!-- Capas de fondo -->
+  <div class="fondo-overlay-extra"></div>
+  <div class="fondo-overlay"></div>
+
+<body>
+  <header class="encabezado">
+    <div class="barra-logo">
+      <img src="img/logo.png" alt="Logo Teycketan" class="logo" />
+    </div>
+    <div class="barra-pasos">
+      <div class="paso">
+        <div class="circulo">1</div>
+        <span>TICKETS</span>
+      </div>
+      <div class="paso">
+        <div class="circulo">2</div>
+        <span>DATOS DE COMPRA</span>
+      </div>
+      <div class="paso activo">
+        <div class="circulo">3</div>
+        <span>CONFIRMACIÓN</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="contenedor">
+    <div class="mensaje-confirmacion">
+      <h1>PAGO REALIZADO</h1>
+      <p>GRACIAS POR SU COMPRA</p>
+      <p>Se ha enviado un correo de confirmación a tu email.</p> <button onclick="descargarTicket()">Descargar Ticket</button>
+
+      <div id="ticket" style="display: none; padding: 20px; border: 2px solid black; width: 400px; margin: 20px auto; background-color: white; color: black; font-family: sans-serif;">
+        <img src="img/logo.png" alt="Logo" style="width: 100px; margin-bottom: 10px;">
+        <h2>Ticket de Entrada</h2>
+        <p><strong>Evento:</strong> <span id="ticketEvento"></span></p>
+        <p><strong>Fecha:</strong> <span id="ticketFecha">14 - 18 mayo 2025</span></p> <p><strong>Hora:</strong> <span id="ticketHora">8:00 PM</span></p> <p><strong>Ubicación:</strong> <span id="ticketUbicacion">Jockey Club del Perú</span></p> <p><strong>Zona:</strong> <span id="ticketZona"></span></p>
+        <p><strong>Cantidad:</strong> <span id="ticketCantidad"></span></p>
+        <p><strong>Total Pagado:</strong> <span id="ticketTotal"></span></p>
+        <p style="margin-top: 20px; font-size: 0.8em;">¡Nos vemos en el evento!</p>
+      </div>
+
+      <a href="principal.HTML" class="btn-siguiente">Volver a inicio</a>
+    </div>
+  </main>
+
+  <footer>
+    <img src="img/logo.png" alt="Logo Footer" class="logo-footer"/>
+  </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const purchaseDetails = JSON.parse(localStorage.getItem('purchaseDetails'));
+
+    if (!purchaseDetails || !purchaseDetails.tickets || purchaseDetails.tickets.length === 0) {
+        alert('No se encontraron detalles de la compra. Redirigiendo al inicio.');
+        window.location.href = 'principal.HTML';
+        return;
+    }
+
+    // Populate the ticket details for PDF download
+    const ticketEvento = document.getElementById('ticketEvento');
+    const ticketFecha = document.getElementById('ticketFecha');
+    const ticketHora = document.getElementById('ticketHora');
+    const ticketUbicacion = document.getElementById('ticketUbicacion');
+    const ticketZona = document.getElementById('ticketZona');
+    const ticketCantidad = document.getElementById('ticketCantidad');
+    const ticketTotal = document.getElementById('ticketTotal');
+
+    const firstTicket = purchaseDetails.tickets[0];
+
+    ticketEvento.textContent = purchaseDetails.eventName || '#';
+    ticketFecha.textContent = '14 - 18 mayo 2025';
+    ticketHora.textContent = '8:00 PM'; 
+    ticketUbicacion.textContent = 'Jockey Club del Perú'; 
+    ticketZona.textContent = firstTicket.name || '#';
+    ticketCantidad.textContent = firstTicket.quantity || '#';
+    ticketTotal.textContent = `S/ ${purchaseDetails.total.toFixed(2)}`;
+
+});
+
+function descargarTicket(){
+    const elemento = document.getElementById("ticket");
+    elemento.style.display = 'block';
+
+    const opciones = {
+        margin: 1,
+        filename: 'ticket_Teycketan.pdf',
+        image: {type:'jpeg', quality: 0.98},
+        html2canvas:{scale:2},
+        jsPDF:{unit: 'in', format: 'letter', orientation:'portrait'}
+    };
+
+    html2pdf().set(opciones).from(elemento).save().then(()=>{
+        elemento.style.display='none'; 
+    });
+}
+</script>
+</body>
+</html>

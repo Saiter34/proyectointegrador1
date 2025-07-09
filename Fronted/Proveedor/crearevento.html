@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Evento - TEYCKETAN</title>
+    <link rel="stylesheet" href="proveedor.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="prov-sidebar">
+        <div class="prov-barra-logo">
+            <img src="../img/logo.png" alt="Logo Teycketan" class="prov-logo-img" />
+        </div>
+        <ul class="prov-nav-list">
+            <li><a href="proveedorPanel.html" class="prov-nav-item"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
+            <li><a href="crearevento.html" class="prov-nav-item active"><i class="fas fa-plus-circle"></i><span>Crear evento</span></a></li>
+            <li><a href="verEvento.html" class="prov-nav-item"><i class="fas fa-calendar-alt"></i><span>Ver eventos</span></a></li>
+            <li><a href="contactarEmpresa.html" class="prov-nav-item"><i class="fas fa-envelope"></i><span>Contactar empresa</span></a></li>
+            <li><a href="eventosAprov.html" class="prov-nav-item"><i class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
+            <li><a href="catalogoDeLugares.html" class="prov-nav-item"><i class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
+        </ul>
+    </div>
+
+    <div class="prov-main-content">
+        <header class="prov-topbar">
+            <h1 class="prov-titulo-seccion">Crear Nuevo Evento</h1>
+            <div class="prov-acciones">
+                <div class="prov-notif-wrapper">
+                    <button class="prov-notif-btn" id="provNotifToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="prov-notif-dot"></span>
+                    </button>
+                    <div class="prov-notif-dropdown" id="provNotifDropdown">
+                        <p class="prov-notif-title">Notificaciones</p>
+                        <ul>
+                            <li>Tu evento “Damiano David” fue aprobado</li>
+                            <li>Nuevo mensaje de TEYCKETAN</li>
+                            <li>Revisa el estado de tu evento</li>
+                        </ul>
+                    </div>
+                </div>
+                <button id="provLogoutButton" class="prov-btn-logout">Cerrar Sesión</button>
+            </div>
+        </header>
+
+        <section class="prov-contenido">
+            <div class="prov-bienvenida">Llena los siguientes datos para registrar un nuevo evento en TEYCKETAN.</div>
+
+            <div id="provMessageContainer" class="prov-message-container"></div>
+            
+            <form id="create-event-form" class="prov-form" enctype="multipart/form-data">
+                <label for="Nom_Evento">Nombre del Evento:</label>
+                <input type="text" id="Nom_Evento" name="Nom_Evento" placeholder="Ej. Concierto Teycketan" required>
+
+                <label for="Fecha">Fecha del Evento:</label>
+                <input type="date" id="Fecha" name="Fecha" required>
+
+                <label for="Horario_Inicio">Horario de Inicio:</label>
+                <input type="time" id="Horario_Inicio" name="Horario_Inicio" required>
+
+                <label for="Horario_Fin">Horario de Fin:</label>
+                <input type="time" id="Horario_Fin" name="Horario_Fin" required>
+
+                <label for="Categoria">Categoría:</label>
+                <select id="Categoria" name="Categoria" required>
+                    <option value="">Selecciona una categoría</option>
+                    <option value="Deportiva">Deportiva</option>
+                    <option value="Concierto">Concierto</option>
+                    <option value="Teatro">Teatro</option>  
+                    <!-- Asegúrate de que estas categorías coincidan con las de tu backend (eventosprov.js) -->
+                </select>
+
+                <label for="Id_Lugar">Lugar del Evento:</label>
+                <select id="Id_Lugar" name="Id_Lugar" required>
+                    <option value="">Cargando lugares...</option>
+                </select>
+                <div id="lugar-detalles" class="prov-lugar-detalles" style="display: none;">
+                    <h4>Detalles del Lugar Seleccionado:</h4>
+                    <p><strong>Capacidad Total:</strong> <span id="lugarCapacidadTotal"></span></p>
+                    <p><strong>General (Máx.):</strong> <span id="lugarCantidadGeneral"></span></p>
+                    <p><strong>VIP (Máx.):</strong> <span id="lugarCantidadVIP"></span></p>
+                    <p><strong>CONADIS (Máx.):</strong> <span id="lugarCantidadConadis"></span></p>
+                    <img id="lugarImagenAsientos" src="" alt="Distribución de Asientos" style="max-width: 100%; height: auto; margin-top: 10px; border-radius: 5px;">
+                    <p class="lugar-error-message" style="color: #ff6b6b; font-size: 0.9em;"></p>
+                </div>
+
+                <label for="Descripcion">Descripción:</label>
+                <textarea id="Descripcion" name="Descripcion" placeholder="Describe brevemente el evento..." required></textarea>
+
+                <label for="AsientosGeneral">Asientos GENERAL a vender:</label>
+                <input type="number" id="AsientosGeneral" name="AsientosGeneral" placeholder="Ej. 1000" min="1" step="1" required>
+
+                <label for="AsientosVIP">Asientos VIP a vender (Opcional):</label>
+                <input type="number" id="AsientosVIP" name="AsientosVIP" placeholder="Ej. 100" min="0" step="1">
+
+                <!-- ¡¡¡ ESTE ES EL CAMPO QUE FALTABA !!! -->
+                <label for="AsientosConadis">Asientos CONADIS a vender (Opcional):</label>
+                <input type="number" id="AsientosConadis" name="AsientosConadis" placeholder="Ej. 50" min="0" step="1">
+                <!-- FIN DEL CAMPO FALTANTE -->
+
+                <label for="CostoGeneral">Precio General:</label>
+                <input type="number" id="CostoGeneral" name="CostoGeneral" placeholder="Ej. 120.00" step="0.01" min="1.00" required>
+
+                <label for="CostoVIP">Precio VIP (Opcional):</label>
+                <input type="number" id="CostoVIP" name="CostoVIP" placeholder="Ej. 250.00" step="0.01" min="1.00">
+
+                <label for="CostoConadis">Precio CONADIS (80% del General):</label>
+                <input type="number" id="CostoConadis" name="CostoConadis" placeholder="Se calcula automáticamente" step="0.01" readonly>
+
+                <label for="imagenEvento">Imagen del Evento:</label>
+                <input type="file" id="imagenEvento" name="imagenEvento" accept="image/*" required>
+
+                <button type="submit" class="prov-btn-submit">Enviar Solicitud de Evento</button>
+            </form>
+        </section>
+    </div>
+
+    <div id="provConfirmationModal" class="prov-modal">
+        <div class="prov-modal-content">
+            <span class="prov-close-button">&times;</span>
+            <p id="provModalMessage">¿Estás seguro de realizar esta acción?</p>
+            <button id="provModalConfirmBtn" class="prov-modal-btn prov-modal-confirm">Confirmar</button>
+            <button id="provModalCancelBtn" class="prov-modal-btn prov-modal-cancel">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="provMessageModal" class="prov-modal">
+        <div class="prov-modal-content">
+            <span class="prov-close-button">&times;</span>
+            <p id="provMessageModalText"></p>
+            <button id="provMessageModalCloseBtn" class="prov-modal-btn prov-modal-confirm">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta
+
+            // Elementos DOM principales
+            const provLogoutButton = document.getElementById('provLogoutButton');
+            const provNotifToggle = document.getElementById('provNotifToggle');
+            const provNotifDropdown = document.getElementById('provNotifDropdown');
+            const createEventForm = document.getElementById('create-event-form');
+            
+            // Campos específicos del formulario
+            const categoriaSelect = document.getElementById('Categoria');
+            const lugarSelect = document.getElementById('Id_Lugar'); // Ahora es Id_Lugar
+            const lugarDetallesDiv = document.getElementById('lugar-detalles'); // Nuevo div para detalles del lugar
+
+            const asientosGeneralInput = document.getElementById('AsientosGeneral');
+            const asientosVIPInput = document.getElementById('AsientosVIP');
+            const asientosConadisInput = document.getElementById('AsientosConadis'); // ¡Nuevo!
+
+            const costoGeneralInput = document.getElementById('CostoGeneral');
+            const costoVIPInput = document.getElementById('CostoVIP');
+            const costoConadisInput = document.getElementById('CostoConadis');
+            const imagenEventoInput = document.getElementById('imagenEvento');
+
+            // Referencias a los IDs de modales
+            const provConfirmationModal = document.getElementById('provConfirmationModal');
+            const provModalMessage = document.getElementById('provModalMessage');
+            const provModalConfirmBtn = document.getElementById('provModalConfirmBtn');
+            const provModalCancelBtn = document.getElementById('provModalCancelBtn');
+            const provMessageModal = document.getElementById('provMessageModal');
+            const provMessageModalText = document.getElementById('provMessageModalText');
+            const provMessageModalCloseBtn = document.getElementById('provMessageModalCloseBtn');
+
+            // Cache para almacenar los lugares cargados
+            let cachedLugares = []; 
+
+            // --- Funciones para Modales (igual que en tu código) ---
+            function showProvConfirmationModal(message) {
+                return new Promise((resolve) => {
+                    provModalMessage.textContent = message;
+                    provConfirmationModal.style.display = 'flex'; 
+                    
+                    const confirmHandler = () => {
+                        provConfirmationModal.style.display = 'none';
+                        provModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        provModalCancelBtn.removeEventListener('click', cancelHandler);
+                        provConfirmationModal.querySelector('.prov-close-button').removeEventListener('click', cancelHandler);
+                        resolve(true);
+                    };
+
+                    const cancelHandler = () => {
+                        provConfirmationModal.style.display = 'none';
+                        provModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        provModalCancelBtn.removeEventListener('click', cancelHandler);
+                        provConfirmationModal.querySelector('.prov-close-button').removeEventListener('click', cancelHandler);
+                        resolve(false);
+                    };
+
+                    provModalConfirmBtn.addEventListener('click', confirmHandler);
+                    provModalCancelBtn.addEventListener('click', cancelHandler);
+                    provConfirmationModal.querySelector('.prov-close-button').addEventListener('click', cancelHandler);
+                });
+            }
+
+            function showProvMessageModal(message, type = '') {
+                provMessageModalText.textContent = message;
+                provMessageModalText.className = `prov-message-text ${type ? 'prov-message-' + type : ''}`;
+                provMessageModal.style.display = 'flex'; 
+                
+                provMessageModalCloseBtn.onclick = () => {
+                    provMessageModal.style.display = 'none';
+                };
+                provMessageModal.querySelector('.prov-close-button').onclick = () => {
+                    provMessageModal.style.display = 'none';
+                };
+            }
+
+            // --- Lógica de Autenticación al cargar la página ---
+            const token = localStorage.getItem('jwtToken');
+            const userRole = localStorage.getItem('userRole');
+            const userId = localStorage.getItem('userId');
+
+            // Seguridad: Redirige si no hay token o el rol no es 'organizador' (ajusta el rol si es diferente)
+            if (!token || userRole !== 'organizador' || !userId) { // Asume que 'organizador' es el rol del proveedor
+                showProvMessageModal('Acceso denegado. Debes ser un proveedor autenticado para ver esta página.', 'error'); 
+                setTimeout(() => {
+                    window.location.replace('../login.html'); 
+                }, 2000); 
+                return; 
+            }
+
+            // --- Event Listener para Cerrar Sesión ---
+            provLogoutButton.addEventListener('click', async () => {
+                const confirmLogout = await showProvConfirmationModal('¿Estás seguro de que quieres cerrar sesión?');
+                if (confirmLogout) {
+                    localStorage.removeItem('jwtToken');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('isOrganizer'); // Si usas esta variable
+                    localStorage.removeItem('userId'); 
+                    showProvMessageModal('Sesión cerrada correctamente.', 'success');
+                    setTimeout(() => {
+                        window.location.replace('../login.html'); 
+                    }, 500); 
+                }
+            });
+
+            // --- Lógica para Notificaciones (Dropdown) ---
+            provNotifToggle.addEventListener('click', (event) => {
+                event.stopPropagation(); 
+                provNotifDropdown.style.display = provNotifDropdown.style.display === 'block' ? 'none' : 'block';
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!provNotifDropdown.contains(event.target) && !provNotifToggle.contains(event.target)) {
+                    provNotifDropdown.style.display = 'none';
+                }
+            });
+
+            // Añadir clase 'active' al enlace de la página actual en el sidebar
+            document.querySelectorAll('.prov-nav-item').forEach(link => {
+                if (link.href.includes('crearevento.html')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+
+            // --- Lógica para el cálculo automático de Precio CONADIS y validación de precios ---
+            function calculateConadisPrice() {
+                const generalCost = parseFloat(costoGeneralInput.value);
+                let conadisCost = 0;
+
+                if (!isNaN(generalCost) && generalCost >= 1.00) { 
+                    conadisCost = (generalCost * 0.8);
+                    if (conadisCost < 1.00) { 
+                        conadisCost = 1.00; // Mínimo 1.00
+                    }
+                    costoConadisInput.value = conadisCost.toFixed(2);
+                } else {
+                    costoConadisInput.value = ''; 
+                }
+            }
+            
+            costoGeneralInput.addEventListener('input', calculateConadisPrice);
+            calculateConadisPrice(); // Calcular al cargar la página si hay un valor inicial
+
+            // --- Lógica para cargar y filtrar lugares ---
+            async function fetchLugares() {
+                lugarSelect.innerHTML = '<option value="">Cargando lugares...</option>';
+                try {
+                    const response = await fetch(`${API_URL}/api/lugares`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}` // Incluye el token para autenticación
+                        }
+                    });
+                    const lugares = await response.json();
+
+                    if (response.ok) {
+                        cachedLugares = lugares; // Cachear los lugares
+                        updateLugarOptions(); // Llenar el select inicialmente
+                    } else {
+                        lugarSelect.innerHTML = '<option value="">Error al cargar lugares</option>';
+                        showProvMessageModal(`Error al cargar lugares: ${lugares.message || 'Error desconocido'}`, 'error');
+                        console.error('Error fetching lugares:', lugares);
+                    }
+                } catch (error) {
+                    lugarSelect.innerHTML = '<option value="">Error de conexión</option>';
+                    showProvMessageModal('Error de conexión con el servidor al cargar lugares.', 'error');
+                    console.error('Network error fetching lugares:', error);
+                }
+            }
+
+            function updateLugarOptions() {
+                const selectedCategory = categoriaSelect.value;
+                lugarSelect.innerHTML = '<option value="">-- Selecciona un lugar --</option>';
+                lugarDetallesDiv.style.display = 'none'; // Ocultar detalles al cambiar categoría
+                lugarDetallesDiv.querySelector('.lugar-error-message').textContent = ''; // Limpiar mensaje de error
+                
+                if (selectedCategory) {
+                    const filteredLugares = cachedLugares.filter(lugar => lugar.Categoria_Lugar === selectedCategory);
+                    if (filteredLugares.length > 0) {
+                        filteredLugares.forEach(lugar => {
+                            const option = document.createElement('option');
+                            option.value = lugar.Id_Lugar;
+                            option.textContent = `${lugar.Nom_Lugar} (${lugar.Ubicacion_Lugar})`;
+                            lugarSelect.appendChild(option);
+                        });
+                    } else {
+                        lugarSelect.innerHTML = '<option value="">No hay lugares para esta categoría</option>';
+                    }
+                } else {
+                    lugarSelect.innerHTML = '<option value="">Selecciona una categoría primero</option>';
+                }
+            }
+
+            function displayLugarDetails() {
+                const selectedLugarId = lugarSelect.value;
+                lugarDetallesDiv.style.display = 'none';
+                lugarDetallesDiv.querySelector('.lugar-error-message').textContent = ''; // Limpiar mensaje de error
+
+                if (selectedLugarId) {
+                    const lugar = cachedLugares.find(l => l.Id_Lugar == selectedLugarId);
+                    if (lugar) {
+                        document.getElementById('lugarCapacidadTotal').textContent = lugar.Capacidad_Total || 'N/A';
+                        document.getElementById('lugarCantidadGeneral').textContent = lugar.Cantidad_General || 'N/A';
+                        document.getElementById('lugarCantidadVIP').textContent = lugar.Cantidad_VIP || 'N/A';
+                        document.getElementById('lugarCantidadConadis').textContent = lugar.Cantidad_Conadis || 'N/A';
+                        
+                        // Usar la imagen de asientos para mostrar la distribución
+                        const imagenAsientosSrc = lugar.URL_Imagen_Asientos ? `${API_URL}${lugar.URL_Imagen_Asientos}` : '../img/default_seats.jpg'; // Ruta por defecto si no hay imagen
+                        document.getElementById('lugarImagenAsientos').src = imagenAsientosSrc;
+
+                        lugarDetallesDiv.style.display = 'block'; // Mostrar el div de detalles
+                    } else {
+                        console.error('Lugar no encontrado en caché:', selectedLugarId);
+                    }
+                }
+                // Validar los inputs de asientos cada vez que cambian los detalles del lugar
+                validateAsientosInputs();
+            }
+
+            // --- Validación de asientos disponibles vs. capacidad del recinto ---
+            function validateAsientosInputs() {
+                const selectedLugarId = lugarSelect.value;
+                const errorMessageElement = lugarDetallesDiv.querySelector('.lugar-error-message');
+                errorMessageElement.textContent = ''; // Limpiar errores previos
+
+                if (!selectedLugarId) {
+                    asientosGeneralInput.setCustomValidity('');
+                    asientosVIPInput.setCustomValidity('');
+                    asientosConadisInput.setCustomValidity(''); // Nuevo
+                    return;
+                }
+
+                const lugar = cachedLugares.find(l => l.Id_Lugar == selectedLugarId);
+                if (!lugar) {
+                    asientosGeneralInput.setCustomValidity('No se pudieron obtener los detalles del lugar.');
+                    asientosVIPInput.setCustomValidity('');
+                    asientosConadisInput.setCustomValidity(''); // Nuevo
+                    return;
+                }
+
+                const asientosGeneral = parseInt(asientosGeneralInput.value);
+                const asientosVIP = parseInt(asientosVIPInput.value);
+                const asientosConadis = parseInt(asientosConadisInput.value); // Nuevo
+
+                // Validar Asientos General
+                if (isNaN(asientosGeneral) || asientosGeneral < 1) {
+                    asientosGeneralInput.setCustomValidity('Debe especificar al menos 1 asiento GENERAL.');
+                } else if (asientosGeneral > lugar.Cantidad_General) {
+                    asientosGeneralInput.setCustomValidity(`No puedes vender más de ${lugar.Cantidad_General} asientos GENERAL para este lugar.`);
+                } else {
+                    asientosGeneralInput.setCustomValidity('');
+                }
+
+                // Validar Asientos VIP (solo si se ha ingresado un valor)
+                if (asientosVIPInput.value !== '') {
+                    if (isNaN(asientosVIP) || asientosVIP < 0) {
+                        asientosVIPInput.setCustomValidity('Los asientos VIP deben ser un número válido (0 o más).');
+                    } else if (asientosVIP > lugar.Cantidad_VIP) {
+                        asientosVIPInput.setCustomValidity(`No puedes vender más de ${lugar.Cantidad_VIP} asientos VIP para este lugar.`);
+                    } else {
+                        asientosVIPInput.setCustomValidity('');
+                    }
+                } else {
+                    asientosVIPInput.setCustomValidity(''); // No es requerido, así que si está vacío es válido
+                }
+
+                // Validar Asientos CONADIS (solo si se ha ingresado un valor)
+                if (asientosConadisInput.value !== '') { // Nuevo
+                    if (isNaN(asientosConadis) || asientosConadis < 0) {
+                        asientosConadisInput.setCustomValidity('Los asientos CONADIS deben ser un número válido (0 o más).');
+                    } else if (asientosConadis > lugar.Cantidad_Conadis) {
+                        asientosConadisInput.setCustomValidity(`No puedes vender más de ${lugar.Cantidad_Conadis} asientos CONADIS para este lugar.`);
+                    } else {
+                        asientosConadisInput.setCustomValidity('');
+                    }
+                } else {
+                    asientosConadisInput.setCustomValidity(''); // No es requerido, si está vacío es válido
+                }
+
+                // Mostrar el error en el div de detalles si existe
+                if (asientosGeneralInput.validationMessage) {
+                    errorMessageElement.textContent = asientosGeneralInput.validationMessage;
+                    lugarDetallesDiv.style.display = 'block';
+                } else if (asientosVIPInput.validationMessage) {
+                    errorMessageElement.textContent = asientosVIPInput.validationMessage;
+                    lugarDetallesDiv.style.display = 'block';
+                } else if (asientosConadisInput.validationMessage) { // Nuevo
+                    errorMessageElement.textContent = asientosConadisInput.validationMessage;
+                    lugarDetallesDiv.style.display = 'block';
+                } else {
+                    errorMessageElement.textContent = '';
+                }
+
+                asientosGeneralInput.reportValidity();
+                asientosVIPInput.reportValidity();
+                asientosConadisInput.reportValidity(); // Nuevo
+            }
+
+            // Event listeners para los selectores de categoría y lugar
+            categoriaSelect.addEventListener('change', updateLugarOptions);
+            lugarSelect.addEventListener('change', displayLugarDetails);
+
+            // Event listeners para los inputs de asientos para validar en tiempo real
+            asientosGeneralInput.addEventListener('input', validateAsientosInputs);
+            asientosVIPInput.addEventListener('input', validateAsientosInputs);
+            asientosConadisInput.addEventListener('input', validateAsientosInputs); // Nuevo
+
+            // Cargar lugares al iniciar la página
+            fetchLugares();
+
+            // --- Manejo del envío del formulario ---
+            createEventForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                // Disparar las validaciones finales antes de enviar
+                validateAsientosInputs();
+                calculateConadisPrice(); // Asegurarse que el CONADIS esté calculado
+
+                // Verificar si hay algún campo inválido antes de proceder
+                if (!createEventForm.checkValidity()) {
+                    showProvMessageModal('Por favor, completa y corrige todos los campos requeridos.', 'error');
+                    return;
+                }
+
+                // Validaciones adicionales de precios
+                const costoGeneral = parseFloat(costoGeneralInput.value);
+                const costoVIP = parseFloat(costoVIPInput.value);
+                const costoConadis = parseFloat(costoConadisInput.value);
+
+                if (isNaN(costoGeneral) || costoGeneral < 1.00) {
+                    showProvMessageModal('El Precio General debe ser 1.00 o mayor.', 'error');
+                    return;
+                }
+                if (costoVIPInput.value !== '' && (isNaN(costoVIP) || costoVIP < 1.00)) {
+                    showProvMessageModal('El Precio VIP debe ser 1.00 o mayor, o déjalo vacío si no aplica.', 'error');
+                    return;
+                }
+                if (isNaN(costoConadis) || costoConadis < 1.00) {
+                    // Esto debería ser cubierto por calculateConadisPrice, pero por seguridad
+                    showProvMessageModal('El Precio CONADIS calculado es inválido o menor a 1.00.', 'error');
+                    return;
+                }
+                
+                // Asegurarse de que el input de archivo tenga un archivo seleccionado
+                if (!imagenEventoInput.files || imagenEventoInput.files.length === 0) {
+                    showProvMessageModal('Debe seleccionar una imagen para el evento.', 'error');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('Nom_Evento', document.getElementById('Nom_Evento').value);
+                formData.append('Fecha', document.getElementById('Fecha').value);
+                formData.append('Horario_Inicio', document.getElementById('Horario_Inicio').value);
+                formData.append('Horario_Fin', document.getElementById('Horario_Fin').value);
+                formData.append('Categoria', categoriaSelect.value);
+                formData.append('Id_Lugar', lugarSelect.value); // ¡Enviamos el Id_Lugar!
+                formData.append('Descripcion', document.getElementById('Descripcion').value);
+                
+                formData.append('AsientosGeneral', asientosGeneralInput.value);
+                formData.append('AsientosVIP', asientosVIPInput.value === '' ? '0' : asientosVIPInput.value); // Enviar '0' si está vacío
+                formData.append('AsientosConadis', asientosConadisInput.value === '' ? '0' : asientosConadisInput.value); // ¡Nuevo! Enviar '0' si está vacío
+                
+                formData.append('CostoGeneral', costoGeneral.toFixed(2));
+                formData.append('CostoVIP', costoVIPInput.value === '' ? '' : costoVIP.toFixed(2)); // Enviar vacío si no hay VIP
+                formData.append('CostoConadis', costoConadis.toFixed(2));
+                
+                formData.append('imagenEvento', imagenEventoInput.files[0]);
+
+                showProvMessageModal('Enviando solicitud de evento...', 'info'); 
+
+                try {
+                    const response = await fetch(`${API_URL}/api/proveedor/crear`, { 
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}` // Asegúrate de enviar el token del proveedor
+                        },
+                        body: formData // FormData se envía directamente, sin 'Content-Type'
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showProvMessageModal(data.message || 'Solicitud de evento enviada con éxito y pendiente de aprobación.', 'success');
+                        createEventForm.reset(); // Limpiar el formulario
+                        costoConadisInput.value = ''; // Limpiar campo calculado
+                        lugarDetallesDiv.style.display = 'none'; // Ocultar detalles del lugar
+                        fetchLugares(); // Recargar la lista de lugares para limpiar el select
+                    } else {
+                        showProvMessageModal(`Error: ${data.error || data.message || 'Error al enviar la solicitud de evento.'}`, 'error');
+                        console.error('Error al crear evento:', data);
+                    }
+                } catch (error) {
+                    console.error('Error de red o del servidor al enviar la solicitud de evento:', error);
+                    showProvMessageModal(`Error de conexión o del servidor al enviar solicitud: ${error.message}`, 'error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

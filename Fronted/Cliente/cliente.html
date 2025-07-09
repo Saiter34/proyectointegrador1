@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teycketan</title>
-    <link rel="stylesheet" href="principal.css">
+    <title>Teycketan - Mi Perfil</title>
+    <link rel="stylesheet" href="cliente.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -12,25 +12,48 @@
 <body>
     <div class="fondo-overlay-extra"></div>
     <div class="fondo-overlay"></div>
+
     <main>
         <header class="encabezado">
             <div class="logo">
-                <img src="img/logo.png" alt="Logo de Teycketan">
+                <img src="../img/logo.png" alt="Logo de Teycketan">
             </div>
             <nav>
+                <div class="nav-box" id="organizerLinkContainer">
+                    <a href="../Proveedor/bienvenidoprov.html" id="organizerLink">¿Quieres ser organizador?</a>
+                </div>
+
                 <div class="nav-box dropdown">
                     <button>Categorías</button>
                     <div class="dropdown-content">
-                        <a href="categoriasprincipal.html?categoria=Conciertos">Conciertos</a>
-                        <a href="categoriasprincipal.html?categoria=Teatro">Teatro</a>
-                        <a href="categoriasprincipal.html?categoria=Deportes">Deportes</a>
+                        <!-- Nombres de categorías ajustados según tu posible backend -->
+                        <a href="categorias.html?categoria=Conciertos">Conciertos</a>
+                        <a href="categorias.html?categoria=Teatro">Teatro</a>
+                        <a href="categorias.html?categoria=Deportiva">Deportes</a> <!-- Cambiado a 'Deportiva' -->
+                        <!-- Agrega más categorías aquí si existen en tu backend -->
                     </div>
                 </div>
-                <div class="nav-box dropdown" id="miCuentaContainer"> 
+
+                <div class="nav-box dropdown" id="miCuentaContainer">
                     <button id="miCuentaButton">Mi Cuenta</button>
                     <div class="dropdown-content" id="miCuentaDropdownContent">
-                        <a href="login.html" id="loginLink">Iniciar Sesión</a>
-                        <a href="registro.html" id="registerLink">Registrarse</a>
+                        <a href="perfil.html" id="viewProfileLink">Ver Perfil</a>
+                        <a href="#" id="logoutLink">Cerrar Sesión</a>
+                    </div>
+                </div>
+
+                <div class="client-notif-wrapper">
+                    <button class="client-notif-btn" id="clientNotifToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="client-notif-dot"></span>
+                    </button>
+                    <div class="client-notif-dropdown" id="clientNotifDropdown">
+                        <p class="client-notif-title">Notificaciones</p>
+                        <ul>
+                            <li>Tu compra de "Concierto XYZ" fue exitosa!</li>
+                            <li>Recordatorio: "Evento ABC" es mañana.</li>
+                            <li>Nuevo evento "Festival de Verano" disponible.</li>
+                        </ul>
                     </div>
                 </div>
             </nav>
@@ -38,37 +61,35 @@
 
         <section class="carrusel" id="carrusel-eventos-destacados">
             <p class="loading-carousel-message">Cargando eventos destacados...</p>
+            <!-- Los slides y botones de control se añadirán aquí dinámicamente -->
         </section>
 
         <div class="contenido-principal-doscolumnas">
             <section class="eventos contenedor-estilo">
                 <h3>Próximos eventos</h3>
-                <div class="eventos-grid" id="proximos-eventos-grid" style="display: flex; flex-direction: column; gap: 1rem;">
+                <div class="eventos-grid" id="proximos-eventos-grid">
                     <p class="loading-events-message">Cargando próximos eventos...</p>
                 </div>
             </section>
 
             <aside class="destacados contenedor-estilo">
-                <h3 style="font-size: 1.2rem;">Ubicaciones destacadas</h3>
+                <h3>Ubicaciones destacadas</h3>
                 <div class="circulos">
-                    <a href="Clientes/sanmarcos.html" class="circulo">
-                        <img src="img/sanmarcos.png" alt="Estadio San Marcos">
+                    <a href="sanmarcos.html" class="circulo">
+                        <img src="../img/sanmarcos.png" alt="Estadio San Marcos">
                         <span>San Marcos</span>
                     </a>
                     <a href="teatrocanut.html" class="circulo">
-                        <img src="img/teatrocanout.jpg" alt="Canut">
-                        <span>Parque de la exposicion</span>
-                    <a href="Clientes/teatrocanut.html" class="circulo">
-                        <img src="img/teatrocanout.jpg" alt="Teatro Canut">
+                        <img src="../img/teatrocanout.jpg" alt="Teatro Canut">
                         <span>Teatro Canut</span>
                     </a>
-                    <a href="Clientes/teatronacional.html" class="circulo">
-                        <img src="img/teatronacional.jpg" alt="Teatro Nacional">
+                    <a href="teatronacional.html" class="circulo">
+                        <img src="../img/teatronacional.jpg" alt="Teatro Nacional">
                         <span>Teatro Nacional</span>
                     </a>
                 </div>
             </aside>
-</div>
+        </div>
     </main>
 
     <footer class="footer-completo">
@@ -102,8 +123,8 @@
                 <div class="footer-col">
                     <h4>Métodos de pago</h4>
                     <div class="payment-methods">
-                        <img src="img/logo-yape.jpg" alt="Logo Yape">
-                        <img src="img/logo-plin.jpg" alt="Logo Plin">
+                        <img src="../img/logo-yape.jpg" alt="Logo Yape">
+                        <img src="../img/logo-plin.jpg" alt="Logo Plin">
                     </div>
                 </div>
             </div>
@@ -111,79 +132,133 @@
                 <small>&copy; 2024 <b>SLee Dw</b> - Todos los Derechos Reservados.</small>
             </div>
         </div>
-        <img src="img/logo.png" alt="Logo Teycketan" class="logo-footer"/>
+        <img src="../img/logo.png" alt="Logo Teycketan" class="logo-footer"/>
     </footer>
+
+    <div id="clientModal" class="client-modal">
+        <div class="client-modal-content">
+            <span class="client-close-button">&times;</span>
+            <p id="clientModalMessage" class="client-message-text"></p>
+            <div id="clientModalActions">
+            </div>
+        </div>
+    </div>
 
     <script>
         const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta para tu backend
 
         document.addEventListener('DOMContentLoaded', () => {
-            const miCuentaContainer = document.getElementById('miCuentaContainer');
             const miCuentaButton = document.getElementById('miCuentaButton');
-            const miCuentaDropdownContent = document.getElementById('miCuentaDropdownContent');
-
-            const carruselEventosDestacados = document.getElementById('carrusel-eventos-destacados');
+            const organizerLinkContainer = document.getElementById('organizerLinkContainer');
             const proximosEventosGrid = document.getElementById('proximos-eventos-grid');
+            const carruselEventosDestacados = document.getElementById('carrusel-eventos-destacados');
+            const logoutLink = document.getElementById('logoutLink');
+            const viewProfileLink = document.getElementById('viewProfileLink');
+
+            const clientNotifToggle = document.getElementById('clientNotifToggle');
+            const clientNotifDropdown = document.getElementById('clientNotifDropdown');
+            const clientNotifDot = document.querySelector('.client-notif-dot');
 
             let carouselInterval; // Variable para almacenar el intervalo del carrusel
 
-            // --- Lógica de Manejo de Sesión y Redirección ---
+            // Modal elements
+            const clientModal = document.getElementById('clientModal');
+            const clientModalMessage = document.getElementById('clientModalMessage');
+            const clientModalActions = document.getElementById('clientModalActions');
+            const clientCloseButton = document.querySelector('.client-modal-content .client-close-button');
+
+            // Function to show custom modal
+            function showModal(message, type = 'info', actions = []) {
+                clientModalMessage.textContent = message;
+                clientModalMessage.className = `client-message-text client-message-${type}`;
+                clientModalActions.innerHTML = ''; // Clear previous actions
+
+                if (actions.length > 0) {
+                    actions.forEach(action => {
+                        const button = document.createElement('button');
+                        button.textContent = action.text;
+                        button.className = `client-modal-btn client-modal-${action.type}`;
+                        button.onclick = () => {
+                            clientModal.style.display = 'none';
+                            if (action.handler) {
+                                action.handler();
+                            }
+                        };
+                        clientModalActions.appendChild(button);
+                    });
+                } else {
+                    // Default OK button if no actions are provided
+                    const okButton = document.createElement('button');
+                    okButton.textContent = 'OK';
+                    okButton.className = 'client-modal-btn';
+                    okButton.onclick = () => clientModal.style.display = 'none';
+                    clientModalActions.appendChild(okButton);
+                }
+                clientModal.style.display = 'flex'; // Use flex to center
+            }
+
+            clientCloseButton.onclick = () => {
+                clientModal.style.display = 'none';
+            };
+            window.onclick = (event) => {
+                if (event.target === clientModal) {
+                    clientModal.style.display = 'none';
+                }
+            };
+
+            // --- Lógica de Redirección y Control de Sesión ---
             const token = localStorage.getItem('jwtToken');
             const userName = localStorage.getItem('userName');
             const userRole = localStorage.getItem('userRole');
 
-            if (token && userName && userRole) {
-                // Usuario logueado: Actualizar "Mi cuenta" y redirigir
-                miCuentaButton.textContent = `Hola, ${userName}`;
-                miCuentaDropdownContent.innerHTML = `
-                    <a href="Clientes/cliente.html" id="viewProfileLink">Ver Perfil</a>
-                    <a href="#" id="logoutLink">Cerrar Sesión</a>
-                `;
-
-                // Añadir listener para cerrar sesión
-                document.getElementById('logoutLink').addEventListener('click', (e) => {
-                    e.preventDefault();
-                    localStorage.removeItem('jwtToken');
-                    localStorage.removeItem('userName');
-                    localStorage.removeItem('userEmail');
-                    localStorage.removeItem('userRole');
-                    localStorage.removeItem('userId'); 
-                    window.location.reload(); // Recargar la página para reflejar el estado de no logueado
-                });
-
-                // Si está en principal.html y ya está logueado, redirigir a cliente.html
-                // Asegúrate de que esta redirección solo ocurra si el usuario está en la página principal
-                // y no en otras subpáginas de Cliente que también usan este script.
-                if (window.location.pathname.endsWith('principal.html') || window.location.pathname.endsWith('/')) {
-                    // Ruta corregida a la carpeta Clientes/
-                    window.location.replace('Clientes/cliente.html'); 
-                }
-                // No retornar aquí, ya que queremos que los eventos públicos se carguen si la redirección no ocurre inmediatamente
-            } else {
-                // Usuario no logueado: Asegurarse de que los enlaces de login/registro estén visibles
-                miCuentaButton.textContent = 'Mi Cuenta';
-                miCuentaDropdownContent.innerHTML = `
-                    <a href="login.html" id="loginLink">Iniciar Sesión</a>
-                    <a href="registro.html" id="registerLink">Registrarse</a>
-                `;
+            // Si no hay token, o falta información esencial, redirigir a la página principal (pública).
+            if (!token || !userName || !userRole) {
+                console.warn('No hay sesión activa en cliente.html. Redirigiendo a la página principal.');
+                showModal('Para acceder a tu perfil, necesitas iniciar sesión primero.', 'error', [{
+                    text: 'Ir a Iniciar Sesión',
+                    type: 'confirm',
+                    // Ruta corregida a login.html (desde Clientes/ a Fronted/)
+                    handler: () => window.location.replace('../login.html') 
+                }]);
+                // No detener la ejecución aquí para permitir que se carguen los eventos públicos.
             }
 
-            // --- Lógica para Cargar y Renderizar Eventos Destacados (Carrusel) ---
+            // Si hay token y userName, el usuario está logueado.
+            if (userName) { // Solo si userName existe
+                miCuentaButton.textContent = `Hola, ${userName}`;
+            } else {
+                miCuentaButton.textContent = `Mi Cuenta`; // Default text if not logged in
+            }
+
+            // Mostrar u ocultar "¿Quieres ser organizador?" según el rol
+            // 'pendiente_organizador' indica que ya envió la solicitud
+            if (userRole === 'organizador' || userRole === 'admin' || userRole === 'pendiente_organizador') { 
+                if (organizerLinkContainer) {
+                    organizerLinkContainer.style.display = 'none';
+                }
+            } else {
+                if (organizerLinkContainer) {
+                    organizerLinkContainer.style.display = 'block';
+                }
+            }
+
+            // --- Lógica para cargar eventos destacados (para el carrusel) ---
             async function fetchFeaturedEvents() {
                 carruselEventosDestacados.innerHTML = '<p class="loading-carousel-message">Cargando eventos destacados...</p>';
                 try {
+                    // Endpoint para obtener eventos destacados (público)
                     const response = await fetch(`${API_URL}/api/eventos/destacados`);
-                    const data = await response.json(); 
+                    const data = await response.json(); // Leer la respuesta como JSON
 
                     if (response.ok) {
-                        const events = data.events; // Extraer el array de eventos de la propiedad 'events'
+                        const events = data.events; // Asumiendo que el backend envía { events: [...] }
                         if (events && events.length === 0) {
                             carruselEventosDestacados.innerHTML = '<p class="no-events-found-message">No hay eventos destacados por el momento.</p>';
                         } else if (events) {
                             renderFeaturedEvents(events);
                             initCarousel(); // Inicializar carrusel después de renderizar
                         } else {
-                             carruselEventosDestacados.innerHTML = `<p class="error-message">Formato de datos inesperado para eventos destacados.</p>`;
+                            carruselEventosDestacados.innerHTML = `<p class="error-message">Formato de datos inesperado para eventos destacados.</p>`;
                              console.error('Unexpected data format for featured events:', data);
                         }
                     } else {
@@ -206,9 +281,10 @@
                 events.forEach((event, index) => {
                     const formattedDate = new Date(event.Fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
                     // Depuración: Log el valor crudo de event.URL_Imagen_Evento (ahora se espera este nombre)
-                    console.log(`Valor de event.URL_Imagen_Evento (carrusel principal):`, event.URL_Imagen_Evento); 
+                    console.log(`Valor de event.URL_Imagen_Evento (carrusel):`, event.URL_Imagen_Evento); 
+                    // --- CORRECCIÓN AQUÍ: Usar event.URL_Imagen_Evento ---
                     const imageUrl = event.URL_Imagen_Evento ? `${API_URL}${event.URL_Imagen_Evento}` : 'https://placehold.co/800x450/cccccc/000000?text=No+Img';
-                    console.log(`URL final de imagen para carrusel principal: ${imageUrl}`); 
+                    console.log(`URL final de imagen para carrusel: ${imageUrl}`); 
 
                     slidesHtml += `
                         <div class="slide ${index === 0 ? 'activo' : ''}">
@@ -217,8 +293,7 @@
                                 <p><strong>${event.Categoria || 'Categoría'}</strong> / Presencial</p>
                                 <p>${event.Descripcion || 'Especificación del evento'}</p>
                                 <p>${formattedDate}</p>
-                                <!-- Ruta corregida a detalles.html dentro de la carpeta Clientes/ -->
-                                <a href="Clientes/detalles.html?eventId=${event.Id_Evento}" class="btn-vermas">Ver más</a>
+                                <a href="detalles.html?eventId=${event.Id_Evento}" class="btn-vermas">Ver más</a>
                             </div>
                             <img src="${imageUrl}" alt="${event.Nom_Evento}">
                         </div>
@@ -226,8 +301,8 @@
                 });
                 carruselEventosDestacados.innerHTML = slidesHtml; 
                 
-                // Añadir los botones de control después de los slides
-                if (events.length > 1) { // Solo si hay más de un evento para el carrusel
+                // Añadir los botones de control después de los slides, si hay más de uno
+                if (events.length > 1) { 
                     const prevButton = document.createElement('button');
                     prevButton.classList.add('carousel-control', 'prev');
                     prevButton.id = 'prevSlide';
@@ -265,21 +340,21 @@
                     // Mostrar botones si hay más de un slide
                     const prevBtn = carruselEventosDestacados.querySelector('#prevSlide');
                     const nextBtn = carruselEventosDestacados.querySelector('#nextSlide');
-                    if (prevBtn) prevBtn.style.display = 'block';
-                    if (nextBtn) nextBtn.style.display = 'block';
+                    if (prevBtn) prevBtn.style.display = 'block'; 
+                    if (nextBtn) nextBtn.style.display = 'block'; 
                 }
-
 
                 // Asegurarse de que solo el primer slide esté activo inicialmente
                 slides.forEach((slide, i) => {
-                    slide.style.transition = 'transform 0.5s ease-in-out, opacity 0.5s ease-in-out'; // Añadir transición
+                    slide.style.transition = 'transform 0.5s ease-in-out, opacity 0.5s ease-in-out'; 
                     if (i === 0) {
                         slide.classList.add('activo');
                         slide.style.transform = 'translateX(0)';
                         slide.style.opacity = '1';
                     } else {
                         slide.classList.remove('activo');
-                        slide.style.transform = 'translateX(100%)';
+                        // Posicionar los slides no activos fuera de la vista para la transición
+                        slide.style.transform = 'translateX(100%)'; 
                         slide.style.opacity = '0';
                     }
                 });
@@ -367,13 +442,13 @@
                 events.forEach(event => {
                     const formattedDate = new Date(event.Fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
                     // Depuración: Log el valor crudo de event.URL_Imagen_Evento (ahora se espera este nombre)
-                    console.log(`Valor de event.URL_Imagen_Evento (eventos principal):`, event.URL_Imagen_Evento); 
+                    console.log(`Valor de event.URL_Imagen_Evento (eventos):`, event.URL_Imagen_Evento); 
+                    // --- CORRECCIÓN AQUÍ: Usar event.URL_Imagen_Evento ---
                     const imageUrl = event.URL_Imagen_Evento ? `${API_URL}${event.URL_Imagen_Evento}` : 'https://placehold.co/150x100/cccccc/000000?text=No+Img';
-                    console.log(`URL final de imagen para evento principal: ${imageUrl}`); 
+                    console.log(`URL final de imagen para evento: ${imageUrl}`); 
 
                     eventsHtml += `
-                        <!-- Ruta corregida a detalles.html dentro de la carpeta Clientes/ -->
-                        <a href="Clientes/detalles.html?eventId=${event.Id_Evento}" class="evento-link">
+                        <a href="detalles.html?eventId=${event.Id_Evento}" class="evento-link">
                             <div class="evento">
                                 <img src="${imageUrl}" alt="${event.Nom_Evento}">
                                 <div class="evento-info">
@@ -391,29 +466,51 @@
             // Iniciar la carga de eventos destacados y aprobados al cargar la página
             fetchFeaturedEvents();
             fetchApprovedEvents();
+
+            // --- Event Listeners para la navegación de usuario logueado ---
+            viewProfileLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                showModal('La visualización del perfil está en desarrollo.', 'info');
+            });
+
+            logoutLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                showModal('¿Estás seguro de que quieres cerrar sesión?', 'info', [
+                    {
+                        text: 'Sí, Cerrar Sesión',
+                        type: 'confirm',
+                        // Ruta corregida a principal.html (desde Clientes/ a Fronted/)
+                        handler: () => {
+                            localStorage.removeItem('jwtToken');
+                            localStorage.removeItem('userName');
+                            localStorage.removeItem('userEmail');
+                            localStorage.removeItem('userRole');
+                            localStorage.removeItem('userId');
+                            window.location.replace('../principal.html'); 
+                        }
+                    },
+                    {
+                        text: 'Cancelar',
+                        type: 'cancel',
+                        handler: () => {} // Solo cerrar el modal
+                    }
+                ]);
+            });
+
+            // --- Lógica para el dropdown de notificaciones ---
+            clientNotifToggle.addEventListener('click', (event) => {
+                event.stopPropagation();
+                clientNotifDropdown.style.display = clientNotifDropdown.style.display === 'block' ? 'none' : 'block';
+                // Opcional: Ocultar el punto de notificación cuando se abre el dropdown
+                clientNotifDot.style.display = 'none';
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!clientNotifDropdown.contains(event.target) && !clientNotifToggle.contains(event.target)) {
+                    clientNotifDropdown.style.display = 'none';
+                }
+            });
         });
     </script>
 </body>
-<script>
-  let index = 0;
-  const slides = document.querySelectorAll('.slide');
-
-  function mostrarSiguienteSlide() {
-    slides.forEach((slide, i) => {
-      slide.classList.remove('activo');
-      slide.style.left = '100%';
-    });
-
-    index = (index + 1) % slides.length;
-    slides[index].classList.add('activo');
-    slides[index].style.left = '0';
-  }
-
-  // Inicia el primer slide visible
-  slides[0].classList.add('activo');
-  slides[0].style.left = '0';
-
-  setInterval(mostrarSiguienteSlide, 10000);
-</script>
-
 </html>

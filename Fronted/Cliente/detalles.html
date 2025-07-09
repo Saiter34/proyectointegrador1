@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Teycketan - Detalles del Evento</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="detalles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <!-- Capas de fondo para un diseño más rico y un efecto visual atractivo -->
+    <div class="fondo-overlay-extra"></div>
+    <div class="fondo-overlay"></div>
+
+    <header class="encabezado">
+        <div class="barra-logo">
+            <img src="../img/logo.png" alt="Logo Teycketan" class="logo" />
+        </div>
+        <div class="barra-pasos">
+            <a href="cliente.html" class="paso activo no-subrayado">
+                <span>INICIO</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="precios">
+            <div class="precios-box">
+                <div class="lado-imagen">
+                    <img id="eventImage" src="https://placehold.co/600x400/cccccc/000000?text=Cargando+Imagen" alt="Imagen del Evento" />
+                </div>
+                <div class="lado-precios">
+                    <img id="venueMap" src="https://placehold.co/300x200/cccccc/000000?text=Cargando+Mapa" alt="Mapa del Recinto" class="mapa-mini" />
+                    <h2 id="eventName" class="event-title">Cargando Nombre del Evento...</h2>
+                    <p id="eventCategoryLocation" class="event-subtitle">Cargando Categoría y Ubicación...</p>
+                    <p id="eventDate" class="event-date">Cargando Fecha...</p>
+
+                    <div class="tabla-precios" id="pricingTable">
+                        <div class="fila tabla-encabezado">
+                            <div>Zona</div>
+                            <div>Regular</div>
+                            <div>Conadis</div>
+                            <div>Preventa</div>
+                        </div>
+                        <p class="loading-message">Cargando precios...</p>
+                    </div>
+                    <a id="buyTicketsBtn" href="pago1.html" class="btn-comprar">COMPRAR ENTRADAS</a>
+                    <p class="nota-conadis">* Descuento CONADIS válido con carné vigente. Cupos limitados.</p>
+                </div>
+            </div>
+        </section>
+        <section class="degradado-bottom"></section>
+
+        <section class="historia">
+            <div class="historia-box">
+                <div class="historia-overlay">
+                    <div class="historia-contenido">
+                        <h2 class="section-title">Descripción del Evento</h2>
+                        <p id="eventDescription">
+                            Cargando descripción del evento o historia del artista...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="degradado-top reglas-gradiente"></section>
+        <section class="reglas">
+            <div class="reglas-box">
+                <h2>Reglas del Evento</h2>
+                <ul id="eventRules">
+                    <li>Cargando reglas del evento...</li>
+                </ul>
+            </div>
+        </section>
+        <section class="degradado-bottom"></section>
+    </main>
+
+    <footer class="footer-completo">
+        <div class="container-footer">
+            <div class="footer-row">
+                <div class="footer-col">
+                    <h4>Síguenos</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Compañía</h4>
+                    <ul>
+                        <li><a href="#">Nosotros</a></li>
+                        <li><a href="#">Servicios</a></li>
+                        <li><a href="#">Política de Privacidad</a></li>
+                        <li><a href="#">Califícanos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Ayuda</h4>
+                    <ul>
+                        <li><a href="#">Teléfono: (999-999-999)</a></li>
+                        <li><a href="#">Correo: Teycketan@gmail.com</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Métodos de pago</h4>
+                    <div class="payment-methods">
+                        <img src="../img/logo-yape.jpg" alt="Logo Yape">
+                        <img src="../img/logo-plin.jpg" alt="Logo Plin">
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <small>&copy; 2024 <b>SLee Dw</b> - Todos los Derechos Reservados.</small>
+            </div>
+        </div>
+        <img src="../img/logo.png" alt="Logo Teycketan" class="logo-footer"/>
+    </footer>
+ 
+    <div id="clientModal" class="client-modal">
+        <div class="client-modal-content">
+            <span class="client-close-button">&times;</span>
+            <p id="clientModalMessage" class="client-message-text"></p>
+            <div id="clientModalActions">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta para tu backend
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const eventId = urlParams.get('eventId'); 
+
+            const eventImage = document.getElementById('eventImage');
+            const venueMap = document.getElementById('venueMap');
+            const eventName = document.getElementById('eventName');
+            const eventCategoryLocation = document.getElementById('eventCategoryLocation');
+            const eventDate = document.getElementById('eventDate');
+            const pricingTable = document.getElementById('pricingTable');
+            const buyTicketsBtn = document.getElementById('buyTicketsBtn'); 
+            const eventDescription = document.getElementById('eventDescription');
+            const eventRules = document.getElementById('eventRules');
+
+            const clientModal = document.getElementById('clientModal');
+            const clientModalMessage = document.getElementById('clientModalMessage');
+            const clientModalActions = document.getElementById('clientModalActions');
+            const clientCloseButton = document.querySelector('.client-modal-content .client-close-button');
+
+            function showModal(message, type = 'info', actions = []) {
+                clientModalMessage.textContent = message;
+                clientModalMessage.className = `client-message-text client-message-${type}`;
+                clientModalActions.innerHTML = ''; 
+
+                if (actions.length > 0) {
+                    actions.forEach(action => {
+                        const button = document.createElement('button');
+                        button.textContent = action.text;
+                        button.className = `client-modal-btn client-modal-${action.type}`;
+                        button.onclick = () => {
+                            clientModal.style.display = 'none';
+                            if (action.handler) {
+                                action.handler();
+                            }
+                        };
+                        clientModalActions.appendChild(button);
+                    });
+                } else {
+                    const okButton = document.createElement('button');
+                    okButton.textContent = 'OK';
+                    okButton.className = 'client-modal-btn';
+                    okButton.onclick = () => clientModal.style.display = 'none';
+                    clientModalActions.appendChild(okButton);
+                }
+                clientModal.style.display = 'flex'; 
+            }
+
+            clientCloseButton.onclick = () => {
+                clientModal.style.display = 'none';
+            };
+            window.onclick = (event) => {
+                if (event.target === clientModal) {
+                    clientModal.style.display = 'none';
+                }
+            };
+
+            /**
+             * @brief Fetches event details from the API based on eventId and renders them.
+             */
+            async function fetchEventDetails() {
+                if (!eventId) {
+                    showModal('Error: ID de evento no proporcionado en la URL.', 'error');
+                    console.error('Error: eventId missing in URL');
+                    window.location.replace('principal.html');
+                    return;
+                }
+
+                try {
+                    // ¡¡¡ CAMBIO CLAVE AQUÍ !!!
+                    // Ahora llama a /api/eventospublicos/:eventId para coincidir con el montaje en index.js
+                    const response = await fetch(`${API_URL}/api/eventos/${eventId}`); 
+                    const eventData = await response.json();
+
+                    if (response.ok) {
+                        console.log('--- Datos COMPLETOS del evento recibidos del backend (detalles.html): ---');
+                        console.log(eventData); 
+                        console.log('----------------------------------------------------');
+                        renderEventDetails(eventData);
+                    } else {
+                        showModal(`Error al cargar detalles del evento: ${eventData.message || 'Error desconocido'}`, 'error');
+                        console.error('Error fetching event details:', eventData);
+                        document.querySelector('.precios-box').innerHTML = '<p class="error-message">No se pudieron cargar los detalles del evento.</p>';
+                        document.querySelector('.historia-box').innerHTML = '';
+                        document.querySelector('.reglas-box').innerHTML = '';
+                    }
+                } catch (error) {
+                    showModal('Error de conexión con el servidor. No se pudieron cargar los detalles del evento.', 'error');
+                    console.error('Network error fetching event details:', error);
+                    document.querySelector('.precios-box').innerHTML = '<p class="error-message">Error de conexión con el servidor.</p>';
+                    document.querySelector('.historia-box').innerHTML = '';
+                    document.querySelector('.reglas-box').innerHTML = '';
+                }
+            }
+
+            /**
+             * @brief Renders the fetched event details onto the page.
+             * @param {Object} event - The event data object from the API.
+             */
+            function renderEventDetails(event) {
+                const eventImageUrl = event.URL_Imagen_Evento ? `${API_URL}${event.URL_Imagen_Evento}` : 'https://placehold.co/600x400/cccccc/000000?text=Imagen+No+Disponible';
+                console.log(`Final Event Image URL: ${eventImageUrl}`);
+                eventImage.src = eventImageUrl;
+                
+                let venueMapUrl;
+                if (event.URL_Imagen_Asientos) {
+                    venueMapUrl = `${API_URL}${event.URL_Imagen_Asientos}`;
+                } else {
+                    venueMapUrl = 'https://placehold.co/300x200/cccccc/000000?text=Mapa+No+Disponible';
+                    console.warn("URL_Imagen_Asientos not found in event data. Using a placeholder for the venue map. Please ensure this field is populated in your database for the associated Lugar.");
+                }
+                console.log(`Final Seat Map URL: ${venueMapUrl}`);
+                venueMap.src = venueMapUrl;
+
+                eventName.textContent = event.Nom_Evento || 'Unknown Event';
+                eventCategoryLocation.textContent = `${event.Categoria || 'Unknown Category'} / ${event.Ubicacion || 'Unknown Location'}`; 
+                eventDate.textContent = event.Fecha ? new Date(event.Fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Unknown Date';
+
+                let pricingHtml = `
+                    <div class="fila tabla-encabezado">
+                        <div>Zona</div>
+                        <div>Regular</div>
+                        <div>Conadis</div>
+                        <div>Preventa</div>
+                    </div>
+                `;
+                
+                // Ahora renderizamos usando el array CategoriasDeEntradas que viene del backend
+                // Asegúrate de que event.CategoriasDeEntradas esté presente y sea un array
+                if (event.CategoriasDeEntradas && Array.isArray(event.CategoriasDeEntradas) && event.CategoriasDeEntradas.length > 0) {
+                    event.CategoriasDeEntradas.forEach(category => {
+                        pricingHtml += `
+                            <div class="fila">
+                                <div>${category.Nom_Categoria || 'N/A'}</div>
+                                <div>S/. ${parseFloat(category.precioRegular || 0).toFixed(2)}</div>
+                                <div>S/. ${parseFloat(category.precioConadis || 0).toFixed(2)}</div>
+                                <div>S/. ${parseFloat(category.precioPreventa || 0).toFixed(2)}</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    pricingHtml += `<p class="no-data-message">Precios no disponibles.</p>`;
+                }
+                pricingTable.innerHTML = pricingHtml;
+
+                eventDescription.textContent = event.Descripcion || 'No description available for this event.';
+
+                let rulesHtml = '';
+                if (event.Reglas && Array.isArray(event.Reglas) && event.Reglas.length > 0) {
+                    event.Reglas.forEach(rule => {
+                        rulesHtml += `<li>${rule}</li>`;
+                    });
+                } else {
+                    rulesHtml = `<li>No specific rules for this event.</li>`;
+                }
+                eventRules.innerHTML = rulesHtml;
+
+                // Update the buy tickets button link to include the eventId
+                buyTicketsBtn.href = `pago1.html?eventId=${event.Id_Evento}`; 
+            }
+
+            fetchEventDetails();
+        });
+    </script>
+</body>
+</html>

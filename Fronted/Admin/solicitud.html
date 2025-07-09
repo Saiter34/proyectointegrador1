@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitudes de Organizador - TEYCKETAN</title>
+    <!-- Usar el nuevo archivo CSS del panel de administración -->
+    <link rel="stylesheet" href="admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="admin-sidebar">
+        <div class="admin-barra-logo">
+            <!-- RUTA CORREGIDA: Acceso absoluto desde la raíz del servidor estático o subiendo un nivel -->
+            <img src="../img/logo.png" alt="Logo Teycketan" class="admin-logo-img" />
+        </div>
+        <ul class="admin-nav-list">
+            <li><a href="admin.html" class="admin-nav-item"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
+            <li><a href="solicitud.html" class="admin-nav-item active"><i class="fas fa-user-clock"></i><span>Solicitud de proveedores</span></a></li>
+            <li><a href="aprobados.html" class="admin-nav-item"><i class="fas fa-user-check"></i><span>Proveedores aprobados</span></a></li>
+            <li><a href="eventos.html" class="admin-nav-item"><i class="fas fa-tasks"></i><span>Solicitud de eventos</span></a></li>
+            <li><a href="eventoApro.html" class="admin-nav-item"><i class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
+            <li><a href="categorias.html" class="admin-nav-item"><i class="fas fa-tags"></i><span>Eventos por categorias</span></a></li>
+            <li><a href="eventoDestacado.html" class="admin-nav-item"><i class="fas fa-star"></i><span>Eventos Destacados</span></a></li>
+            <li><a href="solicitudDestacar.html" class="admin-nav-item"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
+            <li><a href="catalogoDeLugares.html" class="admin-nav-item"><i  class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
+            <li><a href="reclamos.html" class="admin-nav-item"><i  class="fas fa-envelope"></i><span>Reclamos</span></a></li>
+        </ul>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="admin-main-content">
+        <header class="admin-topbar">
+            <h1 class="admin-titulo-seccion">Solicitudes de Organizador</h1>
+            <div class="admin-acciones">
+                <div class="admin-notif-wrapper">
+                    <button class="admin-notif-btn" id="adminNotifToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="admin-notif-dot"></span>
+                    </button>
+                    <div class="admin-notif-dropdown" id="adminNotifDropdown">
+                        <p class="admin-notif-title">Notificaciones</p>
+                        <ul>
+                            <li>Evento “Damiano David” fue aprobado</li>
+                            <li>Nuevo mensaje del soporte</li>
+                            <li>Revisa los detalles del evento</li>
+                        </ul>
+                    </div>
+                </div>
+                <button id="adminLogoutButton" class="admin-btn-logout">Cerrar Sesión</button>
+            </div>
+        </header>
+
+        <section class="admin-contenido">
+            <div class="admin-bienvenida">Aquí puedes aprobar o rechazar las solicitudes de nuevos proveedores.</div>
+
+            <!-- Contenedor para mensajes -->
+            <div id="adminMessageContainer" class="admin-message-container"></div>
+
+            <div class="admin-tabla-contenedor">
+                <table class="admin-table-solicitudes">
+                    <thead>
+                        <tr>
+                            <th>ID Usuario</th>
+                            <th>Nombre Completo</th>
+                            <th>Email</th>
+                            <th>Empresa Solicitada</th>
+                            <th>Teléfono</th>
+                            <th>Descripción</th>
+                            <th>Fecha Solicitud</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaSolicitudesBody">
+                        <!-- Las solicitudes se cargarán aquí dinámicamente -->
+                        <tr><td colspan="8" class="admin-loading-message">Cargando solicitudes...</td></tr>
+                    </tbody>
+                </table>
+                <p id="noRequestsMessage" class="admin-no-requests-message" style="display: none;">No hay solicitudes pendientes de organizador en este momento.</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modales -->
+    <div id="adminConfirmationModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="admin-close-button">&times;</span>
+            <p id="adminModalMessage">¿Estás seguro de realizar esta acción?</p>
+            <button id="adminModalConfirmBtn" class="admin-modal-btn admin-modal-confirm">Confirmar</button>
+            <button id="adminModalCancelBtn" class="admin-modal-btn admin-modal-cancel">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="adminMessageModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="admin-close-button">&times;</span>
+            <p id="adminMessageModalText"></p>
+            <button id="adminMessageModalCloseBtn" class="admin-modal-btn admin-modal-confirm">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta
+
+            // --- Lógica de Autenticación al cargar la página ---
+            const token = localStorage.getItem('jwtToken');
+            const userRole = localStorage.getItem('userRole');
+
+            console.log('Solicitud Page Loaded.');
+            console.log('JWT Token:', token ? 'Exists' : 'Missing');
+            console.log('User Role from localStorage:', userRole);
+
+            // Seguridad: Redirige si no hay token o el rol no es 'admin'
+            if (!token || userRole !== 'admin') {
+                showAdminMessageModal('Acceso denegado. Debes ser un administrador para ver esta página.', 'error');
+                setTimeout(() => {
+                    window.location.replace('../login.html');
+                }, 2000);
+                return; // Detener la ejecución del script aquí
+            }
+
+            // Elementos DOM principales
+            const adminLogoutButton = document.getElementById('adminLogoutButton');
+            const adminNotifToggle = document.getElementById('adminNotifToggle');
+            const adminNotifDropdown = document.getElementById('adminNotifDropdown');
+            const listaSolicitudesBody = document.getElementById('listaSolicitudesBody');
+            const adminMessageContainer = document.getElementById('adminMessageContainer');
+            const noRequestsMessage = document.getElementById('noRequestsMessage');
+
+            // Referencias a los nuevos IDs de modales
+            const adminConfirmationModal = document.getElementById('adminConfirmationModal');
+            const adminModalMessage = document.getElementById('adminModalMessage');
+            const adminModalConfirmBtn = document.getElementById('adminModalConfirmBtn');
+            const adminModalCancelBtn = document.getElementById('adminModalCancelBtn');
+            const adminMessageModal = document.getElementById('adminMessageModal');
+            const adminMessageModalText = document.getElementById('adminMessageModalText');
+            const adminMessageModalCloseBtn = document.getElementById('adminMessageModalCloseBtn');
+
+            // --- Funciones para Modales ---
+
+            /**
+             * @brief Muestra un modal de confirmación al usuario (específico para Admin).
+             * @param {string} message - El mensaje a mostrar en el modal.
+             * @returns {Promise<boolean>} Una promesa que se resuelve a `true` si el usuario confirma, `false` si cancela.
+             */
+            function showAdminConfirmationModal(message) {
+                return new Promise((resolve) => {
+                    adminModalMessage.textContent = message;
+                    adminConfirmationModal.style.display = 'flex'; // Usar flex para centrar
+
+                    const confirmHandler = () => {
+                        adminConfirmationModal.style.display = 'none';
+                        adminModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        adminModalCancelBtn.removeEventListener('click', cancelHandler);
+                        adminConfirmationModal.querySelector('.admin-close-button').removeEventListener('click', cancelHandler);
+                        resolve(true);
+                    };
+
+                    const cancelHandler = () => {
+                        adminConfirmationModal.style.display = 'none';
+                        adminModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        adminModalCancelBtn.removeEventListener('click', cancelHandler);
+                        adminConfirmationModal.querySelector('.admin-close-button').removeEventListener('click', cancelHandler);
+                        resolve(false);
+                    };
+
+                    adminModalConfirmBtn.addEventListener('click', confirmHandler);
+                    adminModalCancelBtn.addEventListener('click', cancelHandler);
+                    adminConfirmationModal.querySelector('.admin-close-button').addEventListener('click', cancelHandler);
+                });
+            }
+
+            /**
+             * @brief Muestra un modal de mensaje informativo al usuario (específico para Admin).
+             * @param {string} message - El mensaje a mostrar en el modal.
+             * @param {string} type - Tipo de mensaje ('success' o 'error') para estilos. Opcional.
+             */
+            function showAdminMessageModal(message, type = '') {
+                adminMessageModalText.textContent = message;
+                adminMessageModalText.className = `admin-message-text ${type ? 'admin-message-' + type : ''}`; // Añadir clase para estilo
+                adminMessageModal.style.display = 'flex'; // Usar flex para centrar
+
+                adminMessageModalCloseBtn.onclick = () => {
+                    adminMessageModal.style.display = 'none';
+                };
+                adminMessageModal.querySelector('.admin-close-button').onclick = () => {
+                    adminMessageModal.style.display = 'none';
+                };
+            }
+
+            // --- Event Listener para Cerrar Sesión ---
+            adminLogoutButton.addEventListener('click', async () => {
+                const confirmLogout = await showAdminConfirmationModal('¿Estás seguro de que quieres cerrar sesión?');
+                if (confirmLogout) {
+                    localStorage.removeItem('jwtToken');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('isOrganizer');
+                    localStorage.removeItem('userId');
+                    showAdminMessageModal('Sesión cerrada correctamente.', 'success');
+                    setTimeout(() => {
+                        window.location.replace('../login.html');
+                    }, 500);
+                }
+            });
+
+            // --- Lógica para Notificaciones (Dropdown) ---
+            adminNotifToggle.addEventListener('click', (event) => {
+                event.stopPropagation();
+                adminNotifDropdown.style.display = adminNotifDropdown.style.display === 'block' ? 'none' : 'block';
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!adminNotifDropdown.contains(event.target) && !adminNotifToggle.contains(event.target)) {
+                    adminNotifDropdown.style.display = 'none';
+                }
+            });
+
+            // Añadir clase 'active' al enlace de la página actual en el sidebar
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.admin-nav-item').forEach(link => {
+                if (link.href.includes('solicitud.html')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+
+            // --- Funcionalidad de Solicitudes de Organizador ---
+
+            /**
+             * @brief Fetches pending organizer requests from the backend.
+             */
+            async function fetchPendingRequests() {
+                listaSolicitudesBody.innerHTML = '<tr><td colspan="8" class="admin-loading-message">Cargando solicitudes...</td></tr>';
+                noRequestsMessage.style.display = 'none'; // Ocultar mensaje de "no hay solicitudes"
+
+                try {
+                    const response = await fetch(`${API_URL}/api/admin/solicitudes/organizer-requests/pending`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}` // Asegúrate de enviar el token
+                        }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        renderRequests(data.requests);
+                    } else {
+                        showAdminMessageModal(`Error al cargar solicitudes: ${data.message || 'Desconocido'}`, 'error');
+                        listaSolicitudesBody.innerHTML = `<tr><td colspan="8" class="admin-no-requests-message admin-error-text">No se pudieron cargar las solicitudes.</td></tr>`;
+                    }
+                } catch (error) {
+                    console.error('Error al cargar solicitudes:', error);
+                    showAdminMessageModal('Error de red al cargar solicitudes.', 'error');
+                    listaSolicitudesBody.innerHTML = `<tr><td colspan="8" class="admin-no-requests-message admin-error-text">Error de red.</td></tr>`;
+                }
+            }
+
+            /**
+             * @brief Handles approving or rejecting an organizer request.
+             * @param {string} userId - The ID of the user whose request is being acted upon.
+             * @param {string} userName - The name of the user for confirmation messages.
+             * @param {string} actionType - 'approve' or 'reject'.
+             */
+            async function handleAction(userId, userName, actionType) {
+                const actionText = actionType === 'approve' ? 'APROBAR' : 'RECHAZAR';
+                const confirmAction = await showAdminConfirmationModal(`¿Estás seguro de ${actionText} la solicitud de ${userName} (ID: ${userId})?`);
+
+                if (!confirmAction) {
+                    return; // User cancelled
+                }
+
+                try {
+                    const response = await fetch(`${API_URL}/api/admin/solicitudes/organizer-requests/${actionType}/${userId}`, {
+                        method: 'POST', // O PUT, según tu backend
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}` // Asegúrate de enviar el token
+                        }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showAdminMessageModal(data.message, 'success');
+                        fetchPendingRequests(); // Recargar solicitudes después de la acción
+                    } else {
+                        showAdminMessageModal(`Error al ${actionType} la solicitud: ${data.message || 'Desconocido'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error(`Error al ${actionType} solicitud:`, error);
+                    showAdminMessageModal(`Error de red al ${actionType} la solicitud.`, 'error');
+                }
+            }
+
+            /**
+             * @brief Renders the list of pending organizer requests into a table.
+             * @param {Array<Object>} requests - An array of pending request objects.
+             */
+            function renderRequests(requests) {
+                listaSolicitudesBody.innerHTML = ''; // Limpiar contenido previo
+                if (requests.length === 0) {
+                    noRequestsMessage.style.display = 'block'; // Mostrar mensaje de "no hay solicitudes"
+                    return;
+                }
+                noRequestsMessage.style.display = 'none'; // Ocultar si hay solicitudes
+
+                let tableRowsHtml = '';
+                requests.forEach(req => {
+                    const formattedDate = new Date(req.Fecha_Solicitud).toLocaleDateString('es-ES');
+                    tableRowsHtml += `
+                        <tr>
+                            <td data-label="ID Usuario">${req.user_id}</td>
+                            <td data-label="Nombre Completo">${req.Nom_Usuario || ''} ${req.Ape_Usuario || ''}</td>
+                            <td data-label="Email">${req.Correo_Usuario}</td>
+                            <td data-label="Empresa Solicitada">${req.Nom_Empresa || 'N/A'}</td>
+                            <td data-label="Teléfono">${req.Tlf_Usuario || 'N/A'}</td>
+                            <td data-label="Descripción">${req.Descripcion ? req.Descripcion.substring(0, 100) + '...' : 'N/A'}</td>
+                            <td data-label="Fecha Solicitud">${formattedDate}</td>
+                            <td class="admin-actions-cell">
+                                <button class="admin-btn-approve" data-id="${req.user_id}" data-name="${req.Nom_Usuario || ''} ${req.Ape_Usuario || ''}">Aprobar</button>
+                                <button class="admin-btn-reject" data-id="${req.user_id}" data-name="${req.Nom_Usuario || ''} ${req.Ape_Usuario || ''}">Rechazar</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                listaSolicitudesBody.innerHTML = tableRowsHtml;
+
+                // Attach event listeners to the action buttons
+                listaSolicitudesBody.querySelectorAll('.admin-btn-approve').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const userId = e.target.dataset.id;
+                        const userName = e.target.dataset.name;
+                        handleAction(userId, userName, 'approve');
+                    });
+                });
+                listaSolicitudesBody.querySelectorAll('.admin-btn-reject').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const userId = e.target.dataset.id;
+                        const userName = e.target.dataset.name;
+                        handleAction(userId, userName, 'reject');
+                    });
+                });
+            }
+
+            // Initial fetch of pending requests
+            fetchPendingRequests();
+        });
+    </script>
+</body>
+</html>

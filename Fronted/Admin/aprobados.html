@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proveedores Aprobados - TEYCKETAN</title>
+    <!-- Usar el nuevo archivo CSS del panel de administración -->
+    <link rel="stylesheet" href="admin.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- SIDEBAR - Reutilizando la estructura del admin.html -->
+    <div class="admin-sidebar">
+        <div class="admin-barra-logo">
+            <!-- RUTA CORREGIDA: Acceso absoluto desde la raíz del servidor estático -->
+            <img src="../img/logo.png" alt="Logo Teycketan" class="admin-logo-img" />
+        </div>
+        <ul class="admin-nav-list">
+            <li><a href="admin.html" class="admin-nav-item"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
+            <li><a href="solicitud.html" class="admin-nav-item"><i class="fas fa-user-clock"></i><span>Solicitud de proveedores</span></a></li>
+            <li><a href="aprobados.html" class="admin-nav-item active"><i class="fas fa-user-check"></i><span>Proveedores aprobados</span></a></li>
+            <li><a href="eventos.html" class="admin-nav-item"><i class="fas fa-tasks"></i><span>Solicitud de eventos</span></a></li>
+            <li><a href="eventoApro.html" class="admin-nav-item"><i class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
+            <li><a href="categorias.html" class="admin-nav-item"><i class="fas fa-tags"></i><span>Eventos por categorias</span></a></li>
+            <li><a href="eventoDestacado.html" class="admin-nav-item"><i class="fas fa-star"></i><span>Eventos Destacados</span></a></li>
+            <li><a href="solicitudDestacar.html" class="admin-nav-item"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
+            <li><a href="catalogoDeLugares.html" class="admin-nav-item"><i  class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
+            <li><a href="reclamos.html" class="admin-nav-item"><i  class="fas fa-envelope"></i><span>Reclamos</span></a></li>
+
+        </ul>
+    </div>
+
+    <!-- MAIN CONTENT - Reutilizando la estructura del admin.html -->
+    <div class="admin-main-content">
+        <header class="admin-topbar">
+            <h1 class="admin-titulo-seccion">Proveedores Aprobados</h1>
+            <div class="admin-acciones">
+                <div class="admin-notif-wrapper">
+                    <button class="admin-notif-btn" id="adminNotifToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="admin-notif-dot"></span>
+                    </button>
+                    <div class="admin-notif-dropdown" id="adminNotifDropdown">
+                        <p class="admin-notif-title">Notificaciones</p>
+                        <ul>
+                            <li>Proveedor aprobado correctamente</li>
+                            <li>Nuevo mensaje interno</li>
+                            <li>Se rechazó un proveedor</li>
+                        </ul>
+                    </div>
+                </div>
+                <button id="adminLogoutButton" class="admin-btn-logout">Cerrar Sesión</button>
+            </div>
+        </header>
+
+        <section class="admin-contenido">
+            <div class="admin-bienvenida">Aquí puedes ver todos los proveedores que han sido aprobados.</div>
+
+            <!-- Contenedor para mensajes -->
+            <div id="adminMessageContainer" class="admin-message-container"></div>
+            
+            <div class="admin-tabla-contenedor">
+                <table class="admin-table"> <!-- Usamos admin-table para la consistencia -->
+                    <thead>
+                        <tr>
+                            <th>ID Usuario</th>
+                            <th>Empresa</th>
+                            <th>Responsable</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaProveedoresAprobadosBody">
+                        <!-- Los proveedores se cargarán aquí dinámicamente -->
+                        <tr><td colspan="7" class="admin-loading-message">Cargando proveedores...</td></tr>
+                    </tbody>
+                </table>
+                <p id="noApprovedOrganizersMessage" class="admin-no-requests-message" style="display: none;">No hay proveedores aprobados en este momento.</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modales (copiados de admin.html para auto-contención) -->
+    <div id="adminConfirmationModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="admin-close-button">&times;</span>
+            <p id="adminModalMessage">¿Estás seguro de realizar esta acción?</p>
+            <button id="adminModalConfirmBtn" class="admin-modal-btn admin-modal-confirm">Confirmar</button>
+            <button id="adminModalCancelBtn" class="admin-modal-btn admin-modal-cancel">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="adminMessageModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="admin-close-button">&times;</span>
+            <p id="adminMessageModalText"></p>
+            <button id="adminMessageModalCloseBtn" class="admin-modal-btn admin-modal-confirm">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta
+
+            // Elementos DOM principales
+            const adminLogoutButton = document.getElementById('adminLogoutButton');
+            const adminNotifToggle = document.getElementById('adminNotifToggle');
+            const adminNotifDropdown = document.getElementById('adminNotifDropdown');
+            const listaProveedoresAprobadosBody = document.getElementById('listaProveedoresAprobadosBody');
+            const adminMessageContainer = document.getElementById('adminMessageContainer');
+            const noApprovedOrganizersMessage = document.getElementById('noApprovedOrganizersMessage');
+
+            // Referencias a los IDs de modales
+            const adminConfirmationModal = document.getElementById('adminConfirmationModal');
+            const adminModalMessage = document.getElementById('adminModalMessage');
+            const adminModalConfirmBtn = document.getElementById('adminModalConfirmBtn');
+            const adminModalCancelBtn = document.getElementById('adminModalCancelBtn');
+            const adminMessageModal = document.getElementById('adminMessageModal');
+            const adminMessageModalText = document.getElementById('adminMessageModalText');
+            const adminMessageModalCloseBtn = document.getElementById('adminMessageModalCloseBtn');
+
+            // --- Funciones para Modales (copiadas de admin.html para auto-contención) ---
+
+            /**
+             * @brief Muestra un modal de confirmación al usuario (específico para Admin).
+             * @param {string} message - El mensaje a mostrar en el modal.
+             * @returns {Promise<boolean>} Una promesa que se resuelve a `true` si el usuario confirma, `false` si cancela.
+             */
+            function showAdminConfirmationModal(message) {
+                return new Promise((resolve) => {
+                    adminModalMessage.textContent = message;
+                    adminConfirmationModal.style.display = 'flex'; // Usar flex para centrar
+                    
+                    const confirmHandler = () => {
+                        adminConfirmationModal.style.display = 'none';
+                        adminModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        adminModalCancelBtn.removeEventListener('click', cancelHandler);
+                        adminConfirmationModal.querySelector('.admin-close-button').removeEventListener('click', cancelHandler);
+                        resolve(true);
+                    };
+
+                    const cancelHandler = () => {
+                        adminConfirmationModal.style.display = 'none';
+                        adminModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        adminModalCancelBtn.removeEventListener('click', cancelHandler);
+                        adminConfirmationModal.querySelector('.admin-close-button').removeEventListener('click', cancelHandler);
+                        resolve(false);
+                    };
+
+                    adminModalConfirmBtn.addEventListener('click', confirmHandler);
+                    adminModalCancelBtn.addEventListener('click', cancelHandler);
+                    adminConfirmationModal.querySelector('.admin-close-button').addEventListener('click', cancelHandler);
+                });
+            }
+
+            /**
+             * @brief Muestra un modal de mensaje informativo al usuario (específico para Admin).
+             * @param {string} message - El mensaje a mostrar en el modal.
+             * @param {string} type - Tipo de mensaje ('success' o 'error') para estilos. Opcional, si no se usa para estilos.
+             */
+            function showAdminMessageModal(message, type = '') {
+                adminMessageModalText.textContent = message;
+                adminMessageModalText.className = `admin-message-text ${type ? 'admin-message-' + type : ''}`; // Añadir clase para estilo
+                adminMessageModal.style.display = 'flex'; // Usar flex para centrar
+                
+                adminMessageModalCloseBtn.onclick = () => {
+                    adminMessageModal.style.display = 'none';
+                };
+                adminMessageModal.querySelector('.admin-close-button').onclick = () => {
+                    adminMessageModal.style.display = 'none';
+                };
+            }
+
+            // --- Lógica de Autenticación al cargar la página ---
+            const token = localStorage.getItem('jwtToken');
+            const userRole = localStorage.getItem('userRole');
+
+            console.log('Approved Organizers Page Loaded.'); 
+            console.log('JWT Token:', token ? 'Exists' : 'Missing'); 
+            console.log('User Role from localStorage:', userRole); 
+
+            // Seguridad: Redirige si no hay token o el rol no es 'admin'
+            if (!token || userRole !== 'admin') {
+                showAdminMessageModal('Acceso denegado. Debes ser un administrador para ver esta página.', 'error'); 
+                setTimeout(() => {
+                    window.location.replace('../login.html'); 
+                }, 2000); 
+                return; 
+            }
+
+            // --- Event Listener para Cerrar Sesión ---
+            adminLogoutButton.addEventListener('click', async () => {
+                const confirmLogout = await showAdminConfirmationModal('¿Estás seguro de que quieres cerrar sesión?');
+                if (confirmLogout) {
+                    localStorage.removeItem('jwtToken');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('isOrganizer');
+                    localStorage.removeItem('userId'); 
+                    showAdminMessageModal('Sesión cerrada correctamente.', 'success');
+                    setTimeout(() => {
+                        window.location.replace('../login.html'); 
+                    }, 500); 
+                }
+            });
+
+            // --- Lógica para Notificaciones (Dropdown) ---
+            adminNotifToggle.addEventListener('click', (event) => {
+                event.stopPropagation(); 
+                adminNotifDropdown.style.display = adminNotifDropdown.style.display === 'block' ? 'none' : 'block';
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!adminNotifDropdown.contains(event.target) && !adminNotifToggle.contains(event.target)) {
+                    adminNotifDropdown.style.display = 'none';
+                }
+            });
+
+            // Añadir clase 'active' al enlace de la página actual en el sidebar
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.admin-nav-item').forEach(link => {
+                // Ajuste para que 'aprobados.html' se marque como activo correctamente
+                if (link.href.includes('aprobados.html')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active'); // Remover de otros enlaces por si acaso
+                }
+            });
+
+            // --- Funcionalidad de Proveedores Aprobados ---
+
+            /**
+             * @brief Fetches approved organizers from the backend.
+             */
+            async function fetchApprovedOrganizers() {
+                listaProveedoresAprobadosBody.innerHTML = '<tr><td colspan="7" class="admin-loading-message">Cargando proveedores...</td></tr>';
+                noApprovedOrganizersMessage.style.display = 'none'; // Ocultar mensaje de "no hay proveedores"
+
+                try {
+                    const response = await fetch(`${API_URL}/api/admin/solicitudes/organizers/approved`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        renderApprovedOrganizers(data.approvedOrganizers);
+                    } else {
+                        showAdminMessageModal(`Error al cargar proveedores aprobados: ${data.message || 'Desconocido'}`, 'error');
+                        listaProveedoresAprobadosBody.innerHTML = `<tr><td colspan="7" class="admin-no-requests-message admin-error-text">No se pudieron cargar los proveedores aprobados.</td></tr>`;
+                    }
+                } catch (error) {
+                    console.error('Error al cargar proveedores:', error);
+                    showAdminMessageModal('Error de red al cargar proveedores.', 'error');
+                    listaProveedoresAprobadosBody.innerHTML = `<tr><td colspan="7" class="admin-no-requests-message admin-error-text">Error de red.</td></tr>`;
+                }
+            }
+
+            /**
+             * @brief Handles removing an approved organizer.
+             * @param {string} userId - The ID of the user (organizer) to be removed.
+             * @param {string} userName - The name of the user (organizer) for confirmation message.
+             */
+            async function handleRemoveOrganizer(userId, userName) {
+                const confirmRemoval = await showAdminConfirmationModal(`¿Estás seguro de que quieres ELIMINAR al organizador ${userName} (ID: ${userId})? Su rol se revertirá a cliente.`);
+                
+                if (!confirmRemoval) {
+                    return; // User cancelled
+                }
+
+                try {
+                    const response = await fetch(`${API_URL}/api/admin/solicitudes/organizers/remove/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showAdminMessageModal(data.message, 'success');
+                        fetchApprovedOrganizers(); // Reload the list after removal
+                    } else {
+                        showAdminMessageModal('Error al eliminar: ' + (data.message || 'Desconocido'), 'error');
+                    }
+                } catch (error) {
+                    console.error('Error al eliminar:', error);
+                    showAdminMessageModal('Error de red al eliminar el organizador.', 'error');
+                }
+            }
+
+            /**
+             * @brief Renders the list of approved organizers into the table.
+             * @param {Array<Object>} organizers - An array of approved organizer objects.
+             */
+            function renderApprovedOrganizers(organizers) {
+                listaProveedoresAprobadosBody.innerHTML = ''; // Clear previous content
+                if (organizers.length === 0) {
+                    noApprovedOrganizersMessage.style.display = 'block'; // Show "no approved organizers" message
+                    return;
+                }
+                noApprovedOrganizersMessage.style.display = 'none'; // Hide if there are organizers
+
+                let tableRowsHtml = '';
+                organizers.forEach(org => {
+                    tableRowsHtml += `
+                        <tr>
+                            <td data-label="ID Usuario">${org.user_id}</td>
+                            <td data-label="Empresa">${org.Nom_Empresa || 'N/A'}</td>
+                            <td data-label="Responsable">${org.Nom_Usuario || ''} ${org.Ape_Usuario || ''}</td>
+                            <td data-label="Email">${org.Correo_Usuario}</td>
+                            <td data-label="Teléfono">${org.Tlf_Usuario || 'N/A'}</td>
+                            <td data-label="Estado">${org.Estado_Solicitud}</td>
+                            <td class="admin-actions-cell">
+                                <button class="admin-btn-delete" data-id="${org.user_id}" data-name="${org.Nom_Usuario || ''} ${org.Ape_Usuario || ''}">Eliminar</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                listaProveedoresAprobadosBody.innerHTML = tableRowsHtml;
+
+                // Attach event listeners to the delete buttons
+                listaProveedoresAprobadosBody.querySelectorAll('.admin-btn-delete').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const userId = e.target.dataset.id;
+                        const userName = e.target.dataset.name;
+                        handleRemoveOrganizer(userId, userName);
+                    });
+                });
+            }
+
+            // Initial fetch of approved organizers
+            fetchApprovedOrganizers(); 
+        });
+    </script>
+</body>
+</html>
