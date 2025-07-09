@@ -16,9 +16,11 @@
     <!-- Header -->
     
     <header class="encabezado">
-      <div class="logo">
-          <img src="../img/logo.png" alt="Logo de Teycketan">
-      </div>
+<div class="logo">
+  <a href="cliente.html">
+    <img src="../img/logo.png" alt="Logo de Teycketan">
+  </a>
+</div>
       <nav>
           <div class="nav-box" id="organizerLinkContainer">
               <a href="../Proveedor/bienvenidoprov.html" id="organizerLink">¿Quieres ser organizador?</a>
@@ -55,27 +57,65 @@
     <h3 id="userNameDisplay">Cargando...</h3>
     <span id="userRoleDisplay" class="perfil-rol">Cargando...</span>
 
-    <nav class="perfil-menu">
-      <a href="perfil.html" class="active">Datos Personales</a>
+  <nav class="perfil-menu">
+      <a href="perfil.html">Datos Personales</a>
       <a href="perfilPuntos.html">Puntos Teycketan</a>
       <a href="perfilHistorial.html">Historial de Compras</a>
-      <a href="perfil.noti.html">Notificaiones</a>
+      <a href="perfil.noti.html" class="active">Notificaiones</a>
     </nav>
   </aside>
 
   <!-- Panel derecho principal -->
-  <section class="perfil-panel">
+<section class="perfil-panel">
+  <div class="perfil-box">
+    <h2>Notificaciones</h2>
 
-    <div id="datos" class="perfil-box perfil-datos-flex">
-      <h2>Mi Perfil</h2>
-      <div class="perfil-datos">
-        <p><strong>Nombre:</strong> <span id="userNameDisplayDup">Cargando...</span></p>
-        <p><strong>Email:</strong> <span id="userEmailDisplay">Cargando...</span></p>
-        <p><strong>Rol:</strong> <span id="userRoleDisplayDup">Cargando...</span></p>
-        <button class="btn-editar">Editar Perfil</button>
+    <!-- Notificación individual -->
+    <div class="notificacion-box">
+      <div class="notificacion-info">
+        <p class="notificacion-mensaje">
+          <strong>Titulos en negrita</strong> demas normal.
+        </p>
+        <span class="notificacion-fecha">fecha</span>
+      </div>
+      <div class="notificacion-acciones">
+        <button class="btn-ver-detalles" onclick="toggleDetalles(this)">
+          <i class="fas fa-eye"></i> Ver detalles
+        </button>
+        <button class="btn-marcar-leido" onclick="marcarLeido(this)">
+          <i class="fas fa-check"></i> Marcar como leído
+        </button>
+      </div>
+      <div class="notificacion-detalles oculto">
+        <p>Detalles de notificacion</p>
       </div>
     </div>
-  </section>
+
+    <!-- Otra notificación -->
+    <div class="notificacion-box">
+      <div class="notificacion-info">
+        <p class="notificacion-mensaje">
+          <strong>Titulos en negrita</strong> demas normal.
+        </p>
+        <span class="notificacion-fecha">fecha</span>
+      </div>
+      <div class="notificacion-acciones">
+        <button class="btn-ver-detalles" onclick="toggleDetalles(this)">
+          <i class="fas fa-eye"></i> Ver detalles
+        </button>
+        <button class="btn-marcar-leido" onclick="marcarLeido(this)">
+          <i class="fas fa-check"></i> Marcar como leído
+        </button>
+      </div>
+      <div class="notificacion-detalles oculto">
+        <p>Detalles de notificacion</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
 </div>
 
 
@@ -93,6 +133,26 @@
             </div>
         </div>
     </div>
+<script>
+  function toggleDetalles(btn) {
+    const box = btn.closest('.notificacion-box');
+    const detalles = box.querySelector('.notificacion-detalles');
+    detalles.classList.toggle('oculto');
+    detalles.style.display = detalles.classList.contains('oculto') ? 'none' : 'block';
+
+    // Cambiar texto del botón
+    btn.innerHTML = detalles.classList.contains('oculto')
+      ? '<i class="fas fa-eye"></i> Ver detalles'
+      : '<i class="fas fa-eye-slash"></i> Ocultar detalles';
+  }
+
+  function marcarLeido(btn) {
+    const box = btn.closest('.notificacion-box');
+    box.classList.add('leido');
+    btn.disabled = true;
+    btn.textContent = 'Leído';
+  }
+</script>
 
     <script>
         const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta para tu backend
