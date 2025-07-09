@@ -1,31 +1,96 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Panel de Administración - TEYCKETAN</title>
-  <link rel="stylesheet" href="solicitud.css">
+  <meta charset="UTF-8">
+  <title>Panel de Administración - TEYCKETAN</title>
+  <link rel="stylesheet" href="panel.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-  <header>
-    <h1>Panel de Administración</h1>
-    <nav>
-      <ul>
-        <li><a href="solicitud.html">Solicitudes</a></li>
-        <li><a href="aprobados.html">Proveedores</a></li>
-        <li><a href="eventos.html">Eventos</a></li>
-      </ul>
-    </nav>
-  </header>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="barra-logo">
+      <img src="img/logo.png" alt="Logo Teycketan" class="logo-img" />
+    </div>
+    <ul class="nav-list">
+      <li><a href="admin.html"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
+      <li><a href="solicitud.html"><i class="fas fa-user-clock"></i><span>Solicitud de proveedores</span></a></li>
+      <li><a href="aprobados.html"><i class="fas fa-user-check"></i><span>Proveedores aprobados</span></a></li>
+      <li><a href="eventos.html"><i class="fas fa-tasks"></i><span>Solicitud de eventos</span></a></li>
+      <li><a href="eventosAprobados.html"><i class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
+    </ul>
+  </div>
 
-  <main>
-        <section id="solicitudes-proveedores">
-      <h2>Solicitudes de Proveedores</h2>
-      <div class="contenedor-tabla" id="listaSolicitudes">
-                <p>Cargando solicitudes...</p>
-      </div>
-    </section>
-  </main>
+  
+  <div class="main-content">
+    <header class="topbar">
+      <h1 class="titulo-seccion">Panel del Administrador</h1>
+      <div class="acciones">
+        <div class="notif-wrapper">
+  <button class="notif-btn" id="notifToggle">
+    <i class="fas fa-bell"></i>
+    <span class="notif-dot"></span>
+  </button>
+  <div class="notif-dropdown" id="notifDropdown">
+    <p class="notif-title">Notificaciones</p>
+    <ul>
+      <li>Evento “Damiano David” fue aprobado</li>
+      <li>Nuevo mensaje del soporte</li>
+      <li>Revisa los detalles del evento</li>
+    </ul>
+  </div>
+</div>
+        <button id="logoutButton" class="nuevo-evento" style="background-color:#dc3545;">Cerrar Sesión</button>
+      </div>
+    </header>
 
+     <section class="contenido">
+  <div class="bienvenida">Aquí puedes aprobar o rechazar las solicitudes de nuevos proveedores.</div>
+
+  <div class="tabla-contenedor">
+    <table class="tabla-solicitudes">
+      <thead>
+        <tr>
+          <th>Empresa</th>
+          <th>Responsable</th>
+          <th>Email</th>
+          <th>Teléfono</th>
+          <th>Descripción</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Eventos Épicos S.A.</td>
+          <td>Ana González</td>
+          <td>ana@epicos.com</td>
+          <td>987654321</td>
+          <td>Organización de eventos musicales en Lima.</td>
+          <td>
+            <button class="btn-aprobar">Aprobar</button>
+            <button class="btn-rechazar">Rechazar</button>
+          </td>
+        </tr>
+        <tr>
+          <td>Shows Perú</td>
+          <td>Marco Ruiz</td>
+          <td>marco@liveshows.pe</td>
+          <td>965432187</td>
+          <td>Especializados en festivales al aire libre.</td>
+          <td>
+            <button class="btn-aprobar">Aprobar</button>
+            <button class="btn-rechazar">Rechazar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+  </div>
+
+ <!-- CONTENT 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const token = localStorage.getItem('jwtToken');
@@ -44,7 +109,7 @@
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
-                    });
+                  });
                     const data = await response.json();
 
                     if (response.ok) {
@@ -140,6 +205,6 @@
 
             fetchPendingRequests(); 
         });
-    </script>
+    </script>--> 
 </body>
 </html>

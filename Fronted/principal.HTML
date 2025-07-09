@@ -10,7 +10,9 @@
 
 </head>
 <body>
-    <div class="overlay"></div>
+<div class="fondo-overlay-extra"></div>
+<div class="fondo-overlay"></div>
+
     <main>
         <header class="encabezado">
             <div class="logo"><img src="img/logo.png" alt="Logo"></div>
@@ -25,22 +27,61 @@
                 </div>
                 <div class="nav-box"><a href="login.html">Mi cuenta</a></div>
             </nav>
-        </header>
-
-        <div class="contenido-principal">
-            <section class="damiano contenedor-estilo">
-                <div class="info">
-                    <h2>Your Damiano David</h2>
-                    <p><strong>Música</strong> / Presencial</p>
-                    <p>Damiano David en Lima</p>
-                    <p>14 al 18 mayo 2025</p>
-                    <a href="detalles.html" class="btn-vermas">Ver más</a>
+        </header>>
+<section class="carrusel">
+    <div class="slide activo">
+        <div class="info">
+            <h2>Nombre del evento paga</h2>
+            <p><strong>categoria</strong>
+            <p>Especificacion del evento</p>
+            <p>fecha del evento</p>
+            <a href="detalles.html" class="btn-vermas">Ver más</a>
+        </div>
+        <img src="img/imagen.jpg" alt="Imgen de referencia del evento">
+    </div>
+    <div class="slide">
+        <div class="info">
+            <h2>nombre del evento paga 2</h2>
+            <p><strong>categoria</strong>
+            <p>especificacion del evento</p>
+            <p>fecha del evento</p>
+            <a href="detalles.html" class="btn-vermas">Ver más</a>
+        </div>
+        <img src="img/imagen.jpg" alt="Damiano 2">
+    </div>
+</section>
+<div class="contenido-principal-doscolumnas">
+    <section class="eventos contenedor-estilo">
+        <div class="eventos-grid">
+            <h3>Próximos eventos</h3>
+    <div class="eventos-grid">
+        <a href="detalles.html" target="_blank" class="evento-link">
+            <div class="evento">
+                <img src="img/imagen.jpg" alt="Imgen de evento">
+                <div class="evento-info">
+                    <h4>nombre del evento</h4>
+                    <p>Lugar del evento</p>
+                    <p>fecha del evento</p>
                 </div>
-                <img src="img/damiano.jpg" alt="Damiano David">
-            </section>
+            </div>
+        </a>
 
-            <aside class="destacados contenedor-estilo">
-                <h3>Destacados</h3>
+        <a href="detalles.html" target="_blank" class="evento-link">
+            <div class="evento">
+                <img src="img/imagen.jpg" alt="iamgen de evento">
+                <div class="evento-info">
+                    <h4>nombre del evento</h4>
+                    <p>lugar del evento</p>
+                    <p>fecha del evento</p>
+                </div>
+            </div>
+        </a>
+    </div>
+        </div>
+    </section>
+
+    <aside class="destacados">
+                <h3>Ubicaciones destacadas</h3>
                 <div class="circulos">
                     <a href="sanmarcos.html" class="circulo">
                         <img src="img/sanmarcos.png" alt="San Marcos">
@@ -48,7 +89,7 @@
                     </a>
                     <a href="teatrocanut.html" class="circulo">
                         <img src="img/teatrocanout.jpg" alt="Canut">
-                        <span>Teatro Canut</span>
+                        <span>Parque de la exposicion</span>
                     </a>
                     <a href="teatronacional.html" class="circulo">
                         <img src="img/teatronacional.jpg" alt="Nacional">
@@ -56,34 +97,10 @@
                     </a>
                 </div>
             </aside>
-        </div>
+</div>
 
-       <section class="eventos contenedor-estilo">
-    <h3>Próximos eventos</h3>
-    <div class="eventos-grid">
-        <a href="grupo5.html" target="_blank" class="evento-link">
-            <div class="evento">
-                <img src="img/grupo5.jpg" alt="Gran Combo de Puerto Rico">
-                <div class="evento-info">
-                    <h4>Gran Combo de Puerto Rico</h4>
-                    <p>Gran Teatro Nacional - Lima</p>
-                    <p>16 agosto 2025</p>
-                </div>
-            </div>
-        </a>
 
-        <a href="ballet.html" target="_blank" class="evento-link">
-            <div class="evento">
-                <img src="img/ballet.jpg" alt="Ballet Cascanueces">
-                <div class="evento-info">
-                    <h4>Ballet Cascanueces</h4>
-                    <p>San Borja - Lima</p>
-                    <p>17 agosto 2025</p>
-                </div>
-            </div>
-        </a>
-    </div>
-</section>
+       
 
     </main>
  
@@ -139,4 +156,26 @@
     <img src="img/logo.png" alt="Logo Footer" class="logo-footer"/>
   </footer>
 </body>
+<script>
+  let index = 0;
+  const slides = document.querySelectorAll('.slide');
+
+  function mostrarSiguienteSlide() {
+    slides.forEach((slide, i) => {
+      slide.classList.remove('activo');
+      slide.style.left = '100%';
+    });
+
+    index = (index + 1) % slides.length;
+    slides[index].classList.add('activo');
+    slides[index].style.left = '0';
+  }
+
+  // Inicia el primer slide visible
+  slides[0].classList.add('activo');
+  slides[0].style.left = '0';
+
+  setInterval(mostrarSiguienteSlide, 10000);
+</script>
+
 </html>

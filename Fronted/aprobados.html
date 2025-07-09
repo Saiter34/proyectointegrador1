@@ -1,31 +1,84 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Panel de Administración - TEYCKETAN</title>
-  <link rel="stylesheet" href="solicitud.css">
+  <meta charset="UTF-8">
+  <title>Proveedores Aprobados - TEYCKETAN</title>
+  <link rel="stylesheet" href="panel.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-  <header>
-    <h1>Panel de Administración</h1>
-    <nav>
-      <ul>
-        <li><a href="solicitud.html">Solicitudes</a></li>
-        <li><a href="aprobados.html">Proveedores</a></li>
-        <li><a href="eventos.html">Eventos</a></li>
-      </ul>
-    </nav>
-  </header>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="barra-logo">
+      <img src="img/logo.png" alt="Logo Teycketan" class="logo-img" />
+    </div>
+    <ul class="nav-list">
+      <li><a href="admin.html"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
+      <li><a href="solicitud.html"><i class="fas fa-user-clock"></i><span>Solicitud de proveedores</span></a></li>
+      <li><a href="aprobados.html"><i class="fas fa-user-check"></i><span>Proveedores aprobados</span></a></li>
+      <li><a href="eventos.html"><i class="fas fa-tasks"></i><span>Solicitud de eventos</span></a></li>
+      <li><a href="eventoApro.html"><i class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
+    </ul>
+  </div>
 
-  <main>
-        <section id="proveedores-actuales">
-      <h2>Proveedores Actuales</h2>
-      <div class="contenedor-tabla" id="listaProveedoresAprobados">
-                <p>Cargando proveedores...</p>
-      </div>
-    </section>
-  </main>
+  <div class="main-content">
+    <header class="topbar">
+      <h1 class="titulo-seccion">Proveedores Aprobados</h1>
+      <div class="acciones">
+        <div class="notif-wrapper">
+          <button class="notif-btn" id="notifToggle">
+            <i class="fas fa-bell"></i>
+            <span class="notif-dot"></span>
+          </button>
+          <div class="notif-dropdown" id="notifDropdown">
+            <p class="notif-title">Notificaciones</p>
+            <ul>
+              <li>Proveedor aprobado correctamente</li>
+              <li>Nuevo mensaje interno</li>
+              <li>Se rechazó un proveedor</li>
+            </ul>
+          </div>
+        </div>
+        <button id="logoutButton" class="nuevo-evento" style="background-color:#dc3545;">Cerrar Sesión</button>
+      </div>
+    </header>
 
+    <section class="contenido">
+      <div class="bienvenida">Aquí puedes ver todos los proveedores que han sido aprobados.</div>
+
+      <div class="panel-tabla">
+        <table class="tabla-eventos">
+          <thead>
+            <tr>
+              <th>Empresa</th>
+              <th>Responsable</th>
+              <th>Email</th>
+              <th>Estado</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="listaProveedoresAprobados">
+            <tr>
+              <td>Eventos Lux S.A.</td>
+              <td>María Rodríguez</td>
+              <td>maria@eventoslux.com</td>
+              <td>Aprobado</td>
+              <td><button class="btn-eliminar">Eliminar</button></td>
+            </tr>
+            <tr>
+              <td>Conciertos Perú</td>
+              <td>José Medina</td>
+              <td>jose@conciertos.pe</td>
+              <td>Aprobado</td>
+              <td><button class="btn-eliminar">Eliminar</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+ <!-- S
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const token = localStorage.getItem('jwtToken');
@@ -110,6 +163,6 @@
 
             fetchApprovedOrganizers(); 
         });
-    </script>
+    </script> -->
 </body>
 </html>
