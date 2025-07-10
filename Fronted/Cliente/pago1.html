@@ -15,9 +15,10 @@
 
     <!-- Header estilo detalles -->
     <header class="encabezado">
-        <div class="barra-logo">
-              <a href="cliente.html"></a>
-            <img src="../img/logo.png" alt="Logo Teycketan" class="logo" />
+        <div class="logo">
+            <a href="cliente.html">
+                <img src="../img/logo.png" alt="Logo de Teycketan">
+            </a>
         </div>
         <div class="barra-pasos">
             <div class="paso activo">
@@ -309,13 +310,13 @@
                             <div class="cantidad">
                                 <button class="btn-menos" data-category-id="${category.id_categoria}">-</button>
                                 <input type="number" value="0" class="cantidad-input" 
-                                       data-category-id="${category.id_categoria}" 
-                                       data-zone-name="${category.Nom_Categoria}"
-                                       data-price-regular="${precioRegular.toFixed(2)}"
-                                       data-price-conadis="${parseFloat(category.precioConadis || 0).toFixed(2)}"
-                                       data-price-preventa="${parseFloat(category.precioPreventa || 0).toFixed(2)}"
-                                       data-max-stock="${stockDisponible}"
-                                       min="0" max="${stockDisponible}" readonly />
+                                        data-category-id="${category.id_categoria}" 
+                                        data-zone-name="${category.Nom_Categoria}"
+                                        data-price-regular="${precioRegular.toFixed(2)}"
+                                        data-price-conadis="${parseFloat(category.precioConadis || 0).toFixed(2)}"
+                                        data-price-preventa="${parseFloat(category.precioPreventa || 0).toFixed(2)}"
+                                        data-max-stock="${stockDisponible}"
+                                        min="0" max="${stockDisponible}" readonly />
                                 <button class="btn-mas" data-category-id="${category.id_categoria}">+</button>
                             </div>
                         </div>
@@ -429,11 +430,9 @@
             document.querySelectorAll('.cantidad-input').forEach(input => {
                 const quantity = parseInt(input.value) || 0;
                 if (quantity > 0) {
-                    const categoryId = input.dataset.categoryId;
+                    const categoryId = parseInt(input.dataset.categoryId); // Asegurarse de que sea un número
                     const zoneName = input.dataset.zoneName;
                     const priceRegular = parseFloat(input.dataset.priceRegular);
-                    const priceConadis = parseFloat(input.dataset.priceConadis);
-                    const pricePreventa = parseFloat(input.dataset.pricePreventa);
                     const maxStock = parseInt(input.dataset.maxStock);
 
                     // Re-validate against max stock (redundant but safe)
@@ -446,13 +445,10 @@
                     }
                     
                     selectedTickets.push({
-                        categoryId: categoryId,
-                        zone: zoneName,
-                        quantity: quantity,
-                        priceRegular: priceRegular,
-                        priceConadis: priceConadis,
-                        pricePreventa: pricePreventa,
-                        unitPrice: priceRegular // Default to regular price for initial total
+                        categoryId: categoryId, // ID de la categoría (numérico)
+                        name: zoneName, // Nombre de la zona (para mostrar en el ticket)
+                        quantity: quantity, // Cantidad de tickets de esta zona
+                        unitPrice: priceRegular // Precio unitario de esta zona
                     });
                     totalAmount += (priceRegular * quantity);
                     totalQuantitySelected += quantity;
@@ -478,27 +474,27 @@
                 const discountAmount = totalAmount * discountPercentage;
                 totalAmount -= discountAmount;
                 discountApplied = true;
-                // showModal(`¡Felicidades! Se ha aplicado un descuento del 15% por tu primera compra.`, 'success'); // This modal will show before redirect, might be better to show on pago2.html
             }
 
             // Store purchase details in localStorage
             localStorage.setItem('purchaseDetails', JSON.stringify({
-                eventId: eventId,
+                eventId: parseInt(eventId, 10), // Asegurarse de que el ID del evento sea un número
                 eventName: currentEventData.Nom_Evento,
-                tickets: selectedTickets,
-                totalAmount: totalAmount.toFixed(2),
-                discountApplied: discountApplied, // Indicate if discount was applied
-                // Add other relevant event details if needed for pago2.html
-                eventDate: currentEventData.Fecha,
-                eventTime: currentEventData.Horario_Inicio,
-                eventLocation: currentEventData.Ubicacion,
+                tickets: selectedTickets, // Array de tickets seleccionados
+                totalAmount: totalAmount, // Guardar como número, no como string toFixed(2)
+                discountApplied: discountApplied, // Indicar si el descuento fue aplicado
+                
+                // Detalles del evento para el ticket de pago2.html y pago3.html
+                eventDate: currentEventData.Fecha, // Fecha original del evento
+                eventTime: currentEventData.Horario_Inicio, // Hora de inicio del evento
+                eventLocation: currentEventData.Ubicacion, // Ubicación del evento
                 eventImageUrl: currentEventData.URL_Imagen_Evento,
-                // User data to pass for display in pago2.html (or for backend validation)
+
+                // Datos del usuario para pago2.html
                 userName: currentUserData ? currentUserData.Nom_Usuario : 'Invitado',
                 userPoints: currentUserData ? currentUserData.Puntos_Teycketan : 0,
-                // Pass the current Usado_Primera_Compra status to pago2.html
-                // This is important for the final backend call to mark it as used.
-                userUsedFirstPurchase: currentUserData ? currentUserData.Usado_Primera_Compra : true 
+                userUsedFirstPurchase: currentUserData ? currentUserData.Usado_Primera_Compra : true,
+                Rol_Usuario: currentUserData ? currentUserData.Rol_Usuario : 'cliente'
             }));
 
             // Redirect to pago2.html

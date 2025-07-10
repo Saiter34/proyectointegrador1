@@ -1,312 +1,411 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Método de Pago - TEYCKETAN</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="pago2.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Método de Pago - TEYCKETAN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="pago2.css" />
 </head>
 <body>
-  <!-- Capas de fondo -->
-  <div class="fondo-overlay-extra"></div>
-  <div class="fondo-overlay"></div>
+    <div class="fondo-overlay-extra"></div>
+    <div class="fondo-overlay"></div>
 
-  <!-- Header estilo Teycketan -->
-  <header class="encabezado">
-    <div class="barra-logo">
-        <a href="cliente.html"></a>
-      <img src="../img/logo.png" alt="Logo Teycketan" class="logo" />
+    <header class="encabezado">
+        <div class="logo">
+            <a href="cliente.html">
+                <img src="../img/logo.png" alt="Logo de Teycketan">
+            </a>
+        </div>
+        <div class="barra-pasos">
+            <div class="paso">
+                <div class="circulo">1</div>
+                <span>SELECCIÓN</span>
+            </div>
+            <div class="paso activo">
+                <div class="circulo">2</div>
+                <span>DATOS DE COMPRA</span>
+            </div>
+            <div class="paso">
+                <div class="circulo">3</div>
+                <span>CONFIRMACIÓN</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="contenedor">
+        <h2 class="subtitulo">Selecciona método de pago</h2>
+
+        <section class="event-info-summary">
+            <h3>EVENTO: <span id="eventNameSummary">Cargando...</span></h3>
+            <p><span id="eventDateSummary"></span> - <span id="eventTimeSummary"></span></p>
+            <p><span id="eventLocationSummary"></span></p>
+        </section>
+
+        <section class="ticket-names-section">
+            <h3>Nombres de los Titulares de los Tickets</h3>
+            <div id="ticketNamesInputs">
+            </div>
+        </section>
+
+        <section class="metodos-pago">
+            <label class="metodo">
+                <input type="radio" name="pago" value="efectivo" required />
+                <span>PAGO EFECTIVO</span>
+            </label>
+            <label class="metodo">
+                <input type="radio" name="pago" value="yape" />
+                <span>YAPE</span>
+            </label>
+        </section>
+
+        <section class="puntos-section">
+            <h3>PUNTOS TEYCKETAN: <span id="userPointsSoles" class="valor-soles">S/ 0.00</span></h3>
+            <div class="puntos-info">
+                <span>Equivale a: <strong id="userPointsRaw">0 Puntos Teycketan</strong></span>
+            </div>
+            <div class="puntos-checkbox">
+                <input type="checkbox" id="usarPuntos" />
+                <label for="usarPuntos">Usar puntos en esta compra</label>
+            </div>
+        </section>
+
+        <section class="resumen">
+            <h3>RESUMEN</h3>
+            <div class="linea">
+                <span class="item">TICKET</span>
+                <span class="item">PRECIO</span>
+            </div>
+            <div id="summaryTickets">
+            </div>
+            <div class="linea descuento" id="firstPurchaseDiscountLine" style="display: none;">
+                <span class="item">Descuento por primera compra (15%)</span>
+                <span class="item" id="firstPurchaseDiscountAmount"></span>
+            </div>
+            <div class="linea descuento" id="pointsDiscountLine" style="display: none;">
+                <span class="item">Puntos Teycketan aplicados</span>
+                <span class="item" id="pointsDiscountAmount"></span>
+            </div>
+            <div class="linea total">
+                <span class="item">TOTAL</span>
+                <span class="item" id="totalAmount">S/ 0.00</span>
+            </div>
+        </section>
+
+        <button id="btnSiguiente2" class="btn-siguiente">SIGUIENTE</button>
+    </main>
+
+    <footer>
+        <img src="../img/logo.png" alt="Logo Footer" class="logo-footer" />
+    </footer>
+
+    <div id="clientModal" class="client-modal">
+        <div class="client-modal-content">
+            <span class="client-close-button">&times;</span>
+            <p id="clientModalMessage" class="client-message-text"></p>
+            <div id="clientModalActions">
+            </div>
+        </div>
     </div>
-    <div class="barra-pasos">
-      <div class="paso">
-        <div class="circulo">1</div>
-        <span>SELECCIÓN</span>
-      </div>
-      <div class="paso activo">
-        <div class="circulo">2</div>
-        <span>DATOS DE COMPRA</span>
-      </div>
-      <div class="paso">
-        <div class="circulo">3</div>
-        <span>CONFIRMACIÓN</span>
-      </div>
-    </div>
-  </header>
 
-  <!-- Contenido principal -->
-  <main class="contenedor">
-    <h2 class="subtitulo">Selecciona método de pago</h2>
+    <script>
+        const API_URL = 'http://localhost:3000';
+        const POINTS_EXCHANGE_RATE = 100;
 
-    <!-- Información del Evento -->
-    <section class="event-info-summary">
-        <h3>EVENTO: <span id="eventNameSummary">Cargando...</span></h3>
-        <p><span id="eventDateSummary"></span> - <span id="eventTimeSummary"></span></p>
-        <p><span id="eventLocationSummary"></span></p>
-    </section>
+        let purchaseDetails = {};
+        let currentUserData = {};
+        let originalTotalAmount = 0;
+        let currentCalculatedTotal = 0;
 
-    <!-- Métodos de pago -->
-    <section class="metodos-pago">
-      <label class="metodo">
-        <input type="radio" name="pago" value="efectivo" required />
-        <span>PAGO EFECTIVO</span>
-      </label>
-      <label class="metodo">
-        <input type="radio" name="pago" value="yape" />
-        <span>YAPE</span>
-      </label>
-    </section>
+        document.addEventListener('DOMContentLoaded', function () {
+            const eventNameSummary = document.getElementById('eventNameSummary');
+            const eventDateSummary = document.getElementById('eventDateSummary');
+            const eventTimeSummary = document.getElementById('eventTimeSummary');
+            const eventLocationSummary = document.getElementById('eventLocationSummary');
+            const userPointsSoles = document.getElementById('userPointsSoles');
+            const userPointsRaw = document.getElementById('userPointsRaw');
+            const usarPuntosCheckbox = document.getElementById('usarPuntos');
+            const summaryTicketsDiv = document.getElementById('summaryTickets');
+            const firstPurchaseDiscountLine = document.getElementById('firstPurchaseDiscountLine');
+            const firstPurchaseDiscountAmount = document.getElementById('firstPurchaseDiscountAmount');
+            const pointsDiscountLine = document.getElementById('pointsDiscountLine');
+            const pointsDiscountAmount = document.getElementById('pointsDiscountAmount');
+            const totalAmountSpan = document.getElementById('totalAmount');
+            const btnSiguiente2 = document.getElementById('btnSiguiente2');
+            const ticketNamesInputsDiv = document.getElementById('ticketNamesInputs');
 
-    <!-- Puntos Teycketan -->
-    <section class="puntos-section">
-      <h3>PUNTOS TEYCKETAN: <span id="userPointsSoles" class="valor-soles">S/ 0.00</span></h3>
-      <div class="puntos-info">
-        <span>Equivale a: <strong id="userPointsRaw">0 Puntos Teycketan</strong></span>
-      </div>
-      <div class="puntos-checkbox">
-        <input type="checkbox" id="usarPuntos" />
-        <label for="usarPuntos">Usar puntos en esta compra</label>
-      </div>
-    </section>
+            const clientModal = document.getElementById('clientModal');
+            const clientModalMessage = document.getElementById('clientModalMessage');
+            const clientModalActions = document.getElementById('clientModalActions');
+            const clientCloseButton = document.querySelector('.client-modal-content .client-close-button');
 
-    <!-- Resumen de compra -->
-    <section class="resumen">
-      <h3>RESUMEN</h3>
-      <div class="linea">
-        <span class="item">TICKET</span>
-        <span class="item">PRECIO</span>
-      </div>
-      <div id="summaryTickets">
-        <!-- Tickets se cargarán aquí dinámicamente -->
-      </div>
-      <div class="linea descuento" id="firstPurchaseDiscountLine" style="display: none;">
-        <span class="item">Descuento por primera compra (15%)</span>
-        <span class="item" id="firstPurchaseDiscountAmount"></span>
-      </div>
-      <!-- Eliminado: Descuento promocional (si no es dinámico) -->
-      <div class="linea descuento" id="pointsDiscountLine" style="display: none;">
-        <span class="item">Puntos Teycketan aplicados</span>
-        <span class="item" id="pointsDiscountAmount"></span>
-      </div>
-      <div class="linea total">
-        <span class="item">TOTAL</span>
-        <span class="item" id="totalAmount">S/ 0.00</span>
-      </div>
-    </section>
+            function showModal(message, type = 'info', actions = []) {
+                clientModalMessage.textContent = message;
+                clientModalMessage.className = `client-message-text client-message-${type}`;
+                clientModalActions.innerHTML = '';
 
-    <button id="btnSiguiente2" class="btn-siguiente">SIGUIENTE</button>
-  </main>
-
-  <!-- Footer -->
-  <footer>
-    <img src="../img/logo.png" alt="Logo Footer" class="logo-footer" />
-  </footer>
-
-  <!-- Custom Modal for Alerts/Confirmations -->
-  <div id="clientModal" class="client-modal">
-      <div class="client-modal-content">
-          <span class="client-close-button">&times;</span>
-          <p id="clientModalMessage" class="client-message-text"></p>
-          <div id="clientModalActions">
-              <!-- Buttons are added here dynamically -->
-          </div>
-      </div>
-  </div>
-
-  <script>
-    const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta
-    const POINTS_EXCHANGE_RATE = 100; // 100 puntos = S/ 1.00
-
-    let purchaseDetails = {}; // Objeto para almacenar los detalles de la compra
-    let currentUserData = {}; // Objeto para almacenar los datos del usuario
-    let originalTotalAmount = 0; // Para guardar el total antes de aplicar puntos
-
-    document.addEventListener('DOMContentLoaded', function () {
-        // DOM Elements
-        const eventNameSummary = document.getElementById('eventNameSummary');
-        const eventDateSummary = document.getElementById('eventDateSummary');
-        const eventTimeSummary = document.getElementById('eventTimeSummary');
-        const eventLocationSummary = document.getElementById('eventLocationSummary');
-        const userPointsSoles = document.getElementById('userPointsSoles');
-        const userPointsRaw = document.getElementById('userPointsRaw');
-        const usarPuntosCheckbox = document.getElementById('usarPuntos');
-        const summaryTicketsDiv = document.getElementById('summaryTickets');
-        const firstPurchaseDiscountLine = document.getElementById('firstPurchaseDiscountLine');
-        const firstPurchaseDiscountAmount = document.getElementById('firstPurchaseDiscountAmount');
-        const pointsDiscountLine = document.getElementById('pointsDiscountLine');
-        const pointsDiscountAmount = document.getElementById('pointsDiscountAmount');
-        const totalAmountSpan = document.getElementById('totalAmount');
-        const btnSiguiente2 = document.getElementById('btnSiguiente2');
-
-        // Modal elements (re-declare for pago2.html as it's a separate file)
-        const clientModal = document.getElementById('clientModal');
-        const clientModalMessage = document.getElementById('clientModalMessage');
-        const clientModalActions = document.getElementById('clientModalActions');
-        const clientCloseButton = document.querySelector('.client-modal-content .client-close-button');
-
-        // Function to show custom modal
-        function showModal(message, type = 'info', actions = []) {
-            clientModalMessage.textContent = message;
-            clientModalMessage.className = `client-message-text client-message-${type}`;
-            clientModalActions.innerHTML = ''; // Clear previous actions
-
-            if (actions.length > 0) {
-                actions.forEach(action => {
-                    const button = document.createElement('button');
-                    button.textContent = action.text;
-                    button.className = `client-modal-btn client-modal-${action.type}`;
-                    button.onclick = () => {
-                        clientModal.style.display = 'none';
-                        if (action.handler) {
-                            action.handler();
-                        }
-                    };
-                    clientModalActions.appendChild(button);
-                });
-            } else {
-                const okButton = document.createElement('button');
-                okButton.textContent = 'OK';
-                okButton.className = 'client-modal-btn';
-                okButton.onclick = () => clientModal.style.display = 'none';
-                clientModalActions.appendChild(okButton);
-            }
-            clientModal.style.display = 'flex'; 
-        }
-
-        clientCloseButton.onclick = () => {
-            clientModal.style.display = 'none';
-        };
-        window.onclick = (event) => {
-            if (event.target === clientModal) {
-                clientModal.style.display = 'none';
-            }
-        };
-
-        // Initialize purchase details from localStorage
-        const storedPurchaseDetails = localStorage.getItem('purchaseDetails');
-        if (storedPurchaseDetails) {
-            purchaseDetails = JSON.parse(storedPurchaseDetails);
-            originalTotalAmount = parseFloat(purchaseDetails.totalAmount); // Store original total
-        } else {
-            showModal('No se encontraron detalles de la compra. Volviendo al paso anterior.', 'error', [{
-                text: 'Aceptar',
-                type: 'confirm',
-                handler: () => window.location.replace('pago1.html')
-            }]);
-            return;
-        }
-
-        // Initialize user data from purchaseDetails (pago1 passes it)
-        currentUserData = {
-            Nom_Usuario: purchaseDetails.userName,
-            Puntos_Teycketan: purchaseDetails.userPoints,
-            Usado_Primera_Compra: purchaseDetails.userUsedFirstPurchase,
-            Rol_Usuario: purchaseDetails.Rol_Usuario // Assuming Rol_Usuario is also passed
-        };
-
-        /**
-         * @brief Renders the summary of the purchase details.
-         */
-        function renderSummary() {
-            // Event Info
-            eventNameSummary.textContent = purchaseDetails.eventName || 'Evento Desconocido';
-            eventDateSummary.textContent = purchaseDetails.eventDate ? new Date(purchaseDetails.eventDate).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Fecha Desconocida';
-            eventTimeSummary.textContent = purchaseDetails.eventTime || 'Hora Desconocida';
-            eventLocationSummary.textContent = purchaseDetails.eventLocation || 'Ubicación Desconocida';
-
-            // Tickets Summary
-            summaryTicketsDiv.innerHTML = ''; // Clear previous content
-            purchaseDetails.tickets.forEach(ticket => {
-                const ticketLine = document.createElement('div');
-                ticketLine.className = 'linea';
-                ticketLine.innerHTML = `
-                    <span class="item">${ticket.quantity} x ${ticket.zone}</span>
-                    <span class="item">S/ ${(ticket.unitPrice * ticket.quantity).toFixed(2)}</span>
-                `;
-                summaryTicketsDiv.appendChild(ticketLine);
-            });
-
-            // First Purchase Discount
-            if (purchaseDetails.discountApplied) {
-                firstPurchaseDiscountLine.style.display = 'flex';
-                // Calculate original discount amount if needed, or pass it from pago1
-                const originalTotalWithoutDiscount = originalTotalAmount / (1 - 0.15); // Reverse calculation
-                const discountAmount = originalTotalWithoutDiscount * 0.15;
-                firstPurchaseDiscountAmount.textContent = `- S/ ${discountAmount.toFixed(2)}`;
-            } else {
-                firstPurchaseDiscountLine.style.display = 'none';
-            }
-
-            // Points Teycketan
-            const userPointsInSoles = (currentUserData.Puntos_Teycketan || 0) / POINTS_EXCHANGE_RATE;
-            userPointsSoles.textContent = `S/ ${userPointsInSoles.toFixed(2)}`;
-            userPointsRaw.textContent = `${currentUserData.Puntos_Teycketan || 0} Puntos Teycketan`;
-
-            // Initial state of points checkbox
-            usarPuntosCheckbox.checked = false; // Reset checkbox state on load
-            pointsDiscountLine.style.display = 'none'; // Hide points discount line initially
-
-            // Update total amount display
-            totalAmountSpan.textContent = `S/ ${parseFloat(purchaseDetails.totalAmount).toFixed(2)}`;
-        }
-
-        /**
-         * @brief Handles the change event for the "Usar puntos" checkbox.
-         */
-        usarPuntosCheckbox.addEventListener('change', () => {
-            let currentCalculatedTotal = parseFloat(purchaseDetails.totalAmount); // Use the current total from purchaseDetails
-            const userPointsInSoles = (currentUserData.Puntos_Teycketan || 0) / POINTS_EXCHANGE_RATE;
-
-            if (usarPuntosCheckbox.checked) {
-                // Apply points discount
-                let pointsToApply = userPointsInSoles;
-
-                // Ensure points don't make total negative
-                if (pointsToApply > currentCalculatedTotal) {
-                    pointsToApply = currentCalculatedTotal; // Only apply up to the current total
+                if (actions.length > 0) {
+                    actions.forEach(action => {
+                        const button = document.createElement('button');
+                        button.textContent = action.text;
+                        button.className = `client-modal-btn client-modal-${action.type}`;
+                        button.onclick = () => {
+                            clientModal.style.display = 'none';
+                            if (action.handler) {
+                                action.handler();
+                            }
+                        };
+                        clientModalActions.appendChild(button);
+                    });
+                } else {
+                    const okButton = document.createElement('button');
+                    okButton.textContent = 'OK';
+                    okButton.className = 'client-modal-btn';
+                    okButton.onclick = () => clientModal.style.display = 'none';
+                    clientModalActions.appendChild(okButton);
                 }
-
-                currentCalculatedTotal -= pointsToApply;
-                
-                purchaseDetails.pointsUsed = true;
-                purchaseDetails.pointsAmountUsed = pointsToApply; // Store how much was used
-                pointsDiscountAmount.textContent = `- S/ ${pointsToApply.toFixed(2)}`;
-                pointsDiscountLine.style.display = 'flex';
-                showModal(`Se han aplicado ${pointsToApply.toFixed(2)} soles de tus puntos Teycketan.`, 'success');
-
-            } else {
-                // Remove points discount
-                currentCalculatedTotal += purchaseDetails.pointsAmountUsed || 0; // Add back the amount that was used
-                purchaseDetails.pointsUsed = false;
-                purchaseDetails.pointsAmountUsed = 0;
-                pointsDiscountLine.style.display = 'none';
-                showModal('Se ha revertido el uso de puntos Teycketan.', 'info');
+                clientModal.style.display = 'flex';
             }
 
-            purchaseDetails.totalAmount = currentCalculatedTotal.toFixed(2); // Update total in purchaseDetails
-            totalAmountSpan.textContent = `S/ ${purchaseDetails.totalAmount}`;
-        });
+            clientCloseButton.onclick = () => {
+                clientModal.style.display = 'none';
+            };
+            window.onclick = (event) => {
+                if (event.target === clientModal) {
+                    clientModal.style.display = 'none';
+                }
+            };
 
-        /**
-         * @brief Handles the click event for the "SIGUIENTE" button.
-         */
-        btnSiguiente2.addEventListener('click', () => {
-            const selectedPaymentMethod = document.querySelector('input[name="pago"]:checked');
+            const storedPurchaseDetails = localStorage.getItem('purchaseDetails');
+            if (storedPurchaseDetails) {
+                purchaseDetails = JSON.parse(storedPurchaseDetails);
+                purchaseDetails.totalAmount = parseFloat(purchaseDetails.totalAmount);
+                originalTotalAmount = purchaseDetails.totalAmount;
+                currentCalculatedTotal = originalTotalAmount;
 
-            if (!selectedPaymentMethod) {
-                showModal('Por favor, selecciona un método de pago.', 'warning');
+                console.log('Purchase Details loaded from localStorage:', purchaseDetails);
+
+            } else {
+                showModal('No se encontraron detalles de la compra. Volviendo al paso anterior.', 'error', [{
+                    text: 'Aceptar',
+                    type: 'confirm',
+                    handler: () => window.location.replace('pago1.html')
+                }]);
                 return;
             }
 
-            purchaseDetails.paymentMethod = selectedPaymentMethod.value;
-            localStorage.setItem('purchaseDetails', JSON.stringify(purchaseDetails));
+            currentUserData = {
+                Nom_Usuario: purchaseDetails.userName,
+                Puntos_Teycketan: purchaseDetails.userPoints,
+                Usado_Primera_Compra: purchaseDetails.userUsedFirstPurchase,
+                Rol_Usuario: purchaseDetails.Rol_Usuario
+            };
 
-            window.location.href = 'pago3.html';
+            function renderSummary() {
+                eventNameSummary.textContent = purchaseDetails.eventName || 'Evento Desconocido';
+
+                let formattedEventDate = 'Fecha Desconocida';
+                if (purchaseDetails.eventDate) {
+                    const eventDateObj = new Date(purchaseDetails.eventDate);
+                    formattedEventDate = eventDateObj.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                }
+                eventDateSummary.textContent = formattedEventDate;
+                eventTimeSummary.textContent = purchaseDetails.eventTime || 'Hora Desconocida';
+                eventLocationSummary.textContent = purchaseDetails.eventLocation || 'Ubicación Desconocida';
+
+                summaryTicketsDiv.innerHTML = '';
+                ticketNamesInputsDiv.innerHTML = '';
+
+                purchaseDetails.tickets.forEach((ticket, categoryIndex) => {
+                    const ticketLine = document.createElement('div');
+                    ticketLine.className = 'linea';
+                    ticketLine.innerHTML = `
+                        <span class="item">${ticket.quantity} x ${ticket.name || 'Zona Desconocida'}</span>
+                        <span class="item">S/ ${(ticket.unitPrice * ticket.quantity).toFixed(2)}</span>
+                    `;
+                    summaryTicketsDiv.appendChild(ticketLine);
+
+                    if (ticket.quantity > 0) {
+                        const categoryNamesDiv = document.createElement('div');
+                        categoryNamesDiv.className = 'ticket-category-names';
+                        categoryNamesDiv.innerHTML = `<h4>Tickets para ${ticket.name || 'Zona Desconocida'} (${ticket.quantity} unidades):</h4>`;
+
+                        if (!ticket.nombresTitulares) {
+                            ticket.nombresTitulares = Array(ticket.quantity).fill('');
+                        } else {
+                            while (ticket.nombresTitulares.length < ticket.quantity) {
+                                ticket.nombresTitulares.push('');
+                            }
+                            ticket.nombresTitulares = ticket.nombresTitulares.slice(0, ticket.quantity);
+                        }
+
+                        for (let i = 0; i < ticket.quantity; i++) {
+                            const inputGroup = document.createElement('div');
+                            inputGroup.className = 'ticket-name-input-group';
+                            inputGroup.innerHTML = `
+                                <label for="name-${categoryIndex}-${i}">Ticket ${i + 1}:</label>
+                                <input type="text" id="name-${categoryIndex}-${i}"
+                                       placeholder="Nombre del titular" required
+                                       value="${ticket.nombresTitulares[i] || ''}"
+                                       data-category-index="${categoryIndex}" data-ticket-index="${i}">
+                            `;
+                            categoryNamesDiv.appendChild(inputGroup);
+                        }
+                        ticketNamesInputsDiv.appendChild(categoryNamesDiv);
+                    }
+                });
+
+                if (purchaseDetails.discountApplied) {
+                    firstPurchaseDiscountLine.style.display = 'flex';
+                    const totalBeforeFirstDiscount = originalTotalAmount / (1 - 0.15);
+                    const discountAmount = totalBeforeFirstDiscount * 0.15;
+                    firstPurchaseDiscountAmount.textContent = `- S/ ${discountAmount.toFixed(2)}`;
+                } else {
+                    firstPurchaseDiscountLine.style.display = 'none';
+                }
+
+                const userPointsInSoles = (currentUserData.Puntos_Teycketan || 0) / POINTS_EXCHANGE_RATE;
+                userPointsSoles.textContent = `S/ ${userPointsInSoles.toFixed(2)}`;
+                userPointsRaw.textContent = `${currentUserData.Puntos_Teycketan || 0} Puntos Teycketan`;
+
+                usarPuntosCheckbox.checked = false;
+                pointsDiscountLine.style.display = 'none';
+
+                totalAmountSpan.textContent = `S/ ${currentCalculatedTotal.toFixed(2)}`;
+            }
+
+            usarPuntosCheckbox.addEventListener('change', () => {
+                currentCalculatedTotal = originalTotalAmount;
+                if (purchaseDetails.discountApplied) {
+                    currentCalculatedTotal = currentCalculatedTotal * (1 - 0.15);
+                }
+
+                const userPointsInSoles = (currentUserData.Puntos_Teycketan || 0) / POINTS_EXCHANGE_RATE;
+                let pointsToApply = 0;
+
+                if (usarPuntosCheckbox.checked) {
+                    pointsToApply = userPointsInSoles;
+
+                    if (pointsToApply > currentCalculatedTotal) {
+                        pointsToApply = currentCalculatedTotal;
+                    }
+
+                    currentCalculatedTotal -= pointsToApply;
+
+                    purchaseDetails.pointsUsed = true;
+                    purchaseDetails.pointsAmountUsed = pointsToApply;
+                    pointsDiscountAmount.textContent = `- S/ ${pointsToApply.toFixed(2)}`;
+                    pointsDiscountLine.style.display = 'flex';
+                    showModal(`Se han aplicado ${pointsToApply.toFixed(2)} soles de tus puntos Teycketan.`, 'success');
+
+                } else {
+                    purchaseDetails.pointsUsed = false;
+                    purchaseDetails.pointsAmountUsed = 0;
+                    pointsDiscountLine.style.display = 'none';
+                    showModal('Se ha revertido el uso de puntos Teycketan.', 'info');
+                }
+
+                if (currentCalculatedTotal < 0) {
+                    currentCalculatedTotal = 0;
+                }
+
+                totalAmountSpan.textContent = `S/ ${currentCalculatedTotal.toFixed(2)}`;
+            });
+
+            function collectTicketHolderNames() {
+                let allNamesEntered = true;
+                purchaseDetails.tickets.forEach((ticket, categoryIndex) => {
+                    const namesForCategory = [];
+                    for (let i = 0; i < ticket.quantity; i++) {
+                        const inputElement = document.getElementById(`name-${categoryIndex}-${i}`);
+                        if (inputElement) {
+                            const name = inputElement.value.trim();
+                            if (name === '') {
+                                allNamesEntered = false;
+                                inputElement.focus();
+                                showModal('Por favor, ingresa el nombre de todos los titulares de los tickets.', 'warning');
+                                return;
+                            }
+                            namesForCategory.push(name);
+                        }
+                    }
+                    ticket.nombresTitulares = namesForCategory;
+                });
+
+                console.log('Purchase Details Tickets after collecting names:', purchaseDetails.tickets);
+
+                return allNamesEntered;
+            }
+
+            btnSiguiente2.addEventListener('click', async () => {
+                const selectedPaymentMethod = document.querySelector('input[name="pago"]:checked');
+
+                if (!selectedPaymentMethod) {
+                    showModal('Por favor, selecciona un método de pago.', 'warning');
+                    return;
+                }
+
+                if (!collectTicketHolderNames()) {
+                    return;
+                }
+
+                purchaseDetails.totalAmount = currentCalculatedTotal;
+                purchaseDetails.paymentMethod = selectedPaymentMethod.value;
+
+                const dataToSend = {
+                    tickets: purchaseDetails.tickets.map(ticket => ({
+                        categoriaId: ticket.categoryId,
+                        cantidad: ticket.quantity,
+                        nombresTitulares: ticket.nombresTitulares
+                    })),
+                    totalCompra: purchaseDetails.totalAmount,
+                    eventoId: purchaseDetails.eventId
+                };
+
+                console.log('Data to send to backend:', dataToSend);
+
+                try {
+                    // CORRECCIÓN CLAVE AQUÍ: Usar 'jwtToken' en lugar de 'token'
+                    const token = localStorage.getItem('jwtToken');
+                    console.log('Authentication Token:', token);
+
+                    if (!token) {
+                        showModal('No se encontró el token de autenticación. Por favor, inicia sesión de nuevo.', 'error', [{
+                            text: 'Aceptar',
+                            type: 'confirm',
+                            // Asegúrate de que la ruta a login.html sea correcta desde pago2.html
+                            handler: () => window.location.replace('../login.html') 
+                        }]);
+                        return;
+                    }
+
+                    const response = await fetch(`${API_URL}/api/compras/procesar-compra`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(dataToSend)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        console.log('Compra procesada exitosamente:', result);
+                        localStorage.setItem('purchaseDetails', JSON.stringify(purchaseDetails));
+                        window.location.href = 'pago3.html';
+                    } else {
+                        console.error('Error al procesar la compra:', result.message || result);
+                        showModal(`Error al procesar la compra: ${result.message || 'Error desconocido.'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error de red o del servidor:', error);
+                    showModal('Hubo un problema de conexión. Inténtalo de nuevo más tarde.', 'error');
+                }
+            });
+
+            renderSummary();
         });
-
-        // Initial render of summary
-        renderSummary();
-    });
-  </script>
+    </script>
 </body>
 </html>

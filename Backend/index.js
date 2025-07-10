@@ -30,7 +30,8 @@ const publicEventsRoutes = require('./routes/eventospublicos'); // Contendrá la
 const lugaresRoutes = require('./routes/lugares'); // Rutas para el catálogo de lugares
 const comprasRoutes = require('./routes/compras'); // Importa las rutas de compras
 const usuariosRoutes = require('./routes/usuarios'); // Importa las rutas de usuarios (para puntos, etc.)
-
+const notificacionesRoutes = require('./routes/notificaciones'); // <<-- NUEVA LÍNEA
+const contactoProveedorRoutes = require('./routes/contactoProveedor'); // Importa las rutas de contacto del proveedor
 
 // --- Middlewares Globales de Express ---
 app.use(cors({
@@ -234,6 +235,9 @@ app.use('/api/admin/eventos', authenticateToken, authorizeRole(['admin']), event
 // Monta las rutas para el panel del proveedor/organizador.
 app.use('/api/proveedor', authenticateToken, authorizeRole(['organizador']), eventosProveedorRoutes); 
 
+// Monta las rutas para el intermediario (gestión de solicitudes de reclamos de organizadores).
+
+app.use('/api/contactoProveedor', authenticateToken, contactoProveedorRoutes); 
 
 // Monta las rutas para la gestión de solicitudes de organizador (protegidas para admin).
 app.use('/api/admin/solicitudes', authenticateToken, authorizeRole(['admin']), intermediarioRoutes);
@@ -251,6 +255,9 @@ app.use('/api/compras', authenticateToken, comprasRoutes);
 
 // Monta las rutas de usuarios (protegidas para usuarios autenticados, para obtener puntos, etc.).
 app.use('/api/usuarios', authenticateToken, usuariosRoutes);
+
+// Monta las rutas de notificaciones (protegidas para usuarios autenticados). <<-- NUEVA LÍNEA
+app.use('/api/notificaciones', authenticateToken, notificacionesRoutes);
 
 
 // --- Rutas protegidas de ejemplo para diferentes roles ---

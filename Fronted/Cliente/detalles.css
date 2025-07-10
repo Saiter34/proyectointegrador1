@@ -76,9 +76,11 @@ header.encabezado {
     gap: 30px; /* Espacio entre el logo y los pasos */
 }
 
-.encabezado .barra-logo img.logo {
-    height: 48px; /* Ajusta el tamaño del logo en el encabezado */
-}
+
+.logo img {
+    height: 48px; /* Altura del logo que tenías */
+    }
+
 
 .encabezado .barra-pasos {
     display: flex;

@@ -1,7 +1,7 @@
 body { 
   margin: 0;
   font-family: 'Poppins', sans-serif;
-  background: url('img/fondometal.jpg') repeat;
+  background: url('../img/fondometal.jpg') repeat;
   background-size: cover;
   position: relative;
   color: white;
@@ -11,7 +11,7 @@ body::before {
   content: "";
   position: fixed; 
   inset: 0;
-  background: url('img/fondodetalles.jpg') no-repeat center;
+  background: url('../img/fondodetalles.jpg') no-repeat center;
   background-size: cover;
   opacity: 0.5;
   z-index: 0;
@@ -63,9 +63,11 @@ h1, h2, h3, h4 {
   z-index: 3;
 }
 
-.barra-logo .logo {
-  height: 40px;
+
+.logo img {
+  height: 48px; /* Altura del logo que tenías */
 }
+
 
 .barra-pasos {
   display: flex;

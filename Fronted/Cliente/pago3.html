@@ -1,110 +1,282 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Método de Pago - TEYCKETAN</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="pago3.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Método de Pago - TEYCKETAN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="pago3.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
-  <!-- Capas de fondo -->
-  <div class="fondo-overlay-extra"></div>
-  <div class="fondo-overlay"></div>
+    <div class="fondo-overlay-extra"></div>
+    <div class="fondo-overlay"></div>
 
-<body>
-  <header class="encabezado">
-    <div class="barra-logo">
-  <a href="cliente.html">
-      <img src="../img/logo.png" alt="Logo Teycketan" class="logo" />
+    <header class="encabezado">
+        <div class="logo">
+            <a href="cliente.html">
+                <img src="../img/logo.png" alt="Logo de Teycketan">
+            </a>
+        </div>
+        <div class="barra-pasos">
+            <div class="paso">
+                <div class="circulo">1</div>
+                <span>TICKETS</span>
+            </div>
+            <div class="paso">
+                <div class="circulo">2</div>
+                <span>DATOS DE COMPRA</span>
+            </div>
+            <div class="paso activo">
+                <div class="circulo">3</div>
+                <span>CONFIRMACIÓN</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="contenedor">
+        <div class="mensaje-confirmacion">
+            <h1>PAGO REALIZADO</h1>
+            <p>GRACIAS POR SU COMPRA</p>
+            <p>Se ha enviado un correo de confirmación a tu email.</p> 
+            <button onclick="descargarTicketsPDF()">Descargar Tickets</button> <!-- Changed function name -->
+
+            <!-- New container for all individual tickets -->
+            <div id="allTicketsContainer" style="display: none;">
+                <!-- Individual ticket divs will be appended here by JavaScript -->
+            </div>
+
+            <a href="cliente.html" class="btn-siguiente">Volver a inicio</a>
+        </div>
+    </main>
+
+    <footer>
+        <img src="../img/logo.png" alt="Logo Footer" class="logo-footer"/>
+    </footer>
+
+    <div id="clientModal" class="client-modal">
+        <div class="client-modal-content">
+            <span class="client-close-button">&times;</span>
+            <p id="clientModalMessage" class="client-message-text"></p>
+            <div id="clientModalActions">
+            </div>
+        </div>
     </div>
-    <div class="barra-pasos">
-      <div class="paso">
-        <div class="circulo">1</div>
-        <span>TICKETS</span>
-      </div>
-      <div class="paso">
-        <div class="circulo">2</div>
-        <span>DATOS DE COMPRA</span>
-      </div>
-      <div class="paso activo">
-        <div class="circulo">3</div>
-        <span>CONFIRMACIÓN</span>
-      </div>
-    </div>
-  </header>
 
-  <main class="contenedor">
-    <div class="mensaje-confirmacion">
-      <h1>PAGO REALIZADO</h1>
-      <p>GRACIAS POR SU COMPRA</p>
-      <p>Se ha enviado un correo de confirmación a tu email.</p> <button onclick="descargarTicket()">Descargar Ticket</button>
+    <script>
+        const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta
 
-      <div id="ticket" style="display: none; padding: 20px; border: 2px solid black; width: 400px; margin: 20px auto; background-color: white; color: black; font-family: sans-serif;">
-        <img src="img/logo.png" alt="Logo" style="width: 100px; margin-bottom: 10px;">
-        <h2>Ticket de Entrada</h2>
-        <p><strong>Evento:</strong> <span id="ticketEvento"></span></p>
-        <p><strong>Fecha:</strong> <span id="ticketFecha">14 - 18 mayo 2025</span></p> <p><strong>Hora:</strong> <span id="ticketHora">8:00 PM</span></p> <p><strong>Ubicación:</strong> <span id="ticketUbicacion">Jockey Club del Perú</span></p> <p><strong>Zona:</strong> <span id="ticketZona"></span></p>
-        <p><strong>Cantidad:</strong> <span id="ticketCantidad"></span></p>
-        <p><strong>Total Pagado:</strong> <span id="ticketTotal"></span></p>
-        <p style="margin-top: 20px; font-size: 0.8em;">¡Nos vemos en el evento!</p>
-      </div>
+        // Modal elements (copied from client.html and perfil.html for consistency)
+        const clientModal = document.getElementById('clientModal');
+        const clientModalMessage = document.getElementById('clientModalMessage');
+        const clientModalActions = document.getElementById('clientModalActions');
+        const clientCloseButton = document.querySelector('.client-modal-content .client-close-button');
 
-      <a href="principal.HTML" class="btn-siguiente">Volver a inicio</a>
-    </div>
-  </main>
+        /**
+         * @brief Displays a custom modal with a message and optional actions.
+         * @param {string} message - The message to display in the modal.
+         * @param {string} [type='info'] - Message type ('info', 'success', 'error', 'warning').
+         * @param {Array<Object>} [actions=[]] - Array of objects { text: string, type: string, handler: function }.
+         */
+        function showModal(message, type = 'info', actions = []) {
+            clientModalMessage.textContent = message;
+            clientModalMessage.className = `client-message-text client-message-${type}`;
+            clientModalActions.innerHTML = ''; // Clear previous actions
 
-  <footer>
-    <img src="img/logo.png" alt="Logo Footer" class="logo-footer"/>
-  </footer>
+            if (actions.length > 0) {
+                actions.forEach(action => {
+                    const button = document.createElement('button');
+                    button.textContent = action.text;
+                    button.className = `client-modal-btn client-modal-${action.type}`;
+                    button.onclick = () => {
+                        clientModal.style.display = 'none';
+                        if (action.handler) {
+                            action.handler();
+                        }
+                    };
+                    clientModalActions.appendChild(button);
+                });
+            } else {
+                const okButton = document.createElement('button');
+                okButton.textContent = 'OK';
+                okButton.className = 'client-modal-btn';
+                okButton.onclick = () => clientModal.style.display = 'none';
+                clientModalActions.appendChild(okButton);
+            }
+            clientModal.style.display = 'flex';
+        }
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const purchaseDetails = JSON.parse(localStorage.getItem('purchaseDetails'));
+        clientCloseButton.onclick = () => {
+            clientModal.style.display = 'none';
+        };
+        window.onclick = (event) => {
+            if (event.target === clientModal) {
+                clientModal.style.display = 'none';
+            }
+        };
 
-    if (!purchaseDetails || !purchaseDetails.tickets || purchaseDetails.tickets.length === 0) {
-        alert('No se encontraron detalles de la compra. Redirigiendo al inicio.');
-        window.location.href = 'principal.HTML';
-        return;
-    }
+        document.addEventListener('DOMContentLoaded', async () => {
+            const purchaseDetails = JSON.parse(localStorage.getItem('purchaseDetails'));
+            // Using 'jwtToken' for consistency with login.html
+            const token = localStorage.getItem('jwtToken');
+            const userId = localStorage.getItem('userId');
 
-    // Populate the ticket details for PDF download
-    const ticketEvento = document.getElementById('ticketEvento');
-    const ticketFecha = document.getElementById('ticketFecha');
-    const ticketHora = document.getElementById('ticketHora');
-    const ticketUbicacion = document.getElementById('ticketUbicacion');
-    const ticketZona = document.getElementById('ticketZona');
-    const ticketCantidad = document.getElementById('ticketCantidad');
-    const ticketTotal = document.getElementById('ticketTotal');
+            // Validate that all necessary data is present and valid
+            if (!purchaseDetails || !Array.isArray(purchaseDetails.tickets) || purchaseDetails.tickets.length === 0 || !token || !userId) {
+                showModal('No se encontraron detalles de la compra o no estás autenticado. Redirigiendo al inicio.', 'error', [{
+                    text: 'Volver al Inicio',
+                    type: 'confirm',
+                    handler: () => window.location.href = 'cliente.html'
+                }]);
+                return;
+            }
 
-    const firstTicket = purchaseDetails.tickets[0];
+            // Convert eventId to number if it's not already
+            const eventId = parseInt(purchaseDetails.eventId, 10);
+            if (isNaN(eventId)) {
+                showModal('Error: ID de evento inválido. Redirigiendo al inicio.', 'error', [{
+                    text: 'Volver al Inicio',
+                    type: 'confirm',
+                    handler: () => window.location.href = 'cliente.html'
+                }]);
+                return;
+            }
 
-    ticketEvento.textContent = purchaseDetails.eventName || '#';
-    ticketFecha.textContent = '14 - 18 mayo 2025';
-    ticketHora.textContent = '8:00 PM'; 
-    ticketUbicacion.textContent = 'Jockey Club del Perú'; 
-    ticketZona.textContent = firstTicket.name || '#';
-    ticketCantidad.textContent = firstTicket.quantity || '#';
-    ticketTotal.textContent = `S/ ${purchaseDetails.total.toFixed(2)}`;
+            // Map tickets and ensure categoryId and quantity are numbers
+            const processedTickets = purchaseDetails.tickets.map(t => {
+                const categoryId = parseInt(t.categoryId, 10); // Ensure it's a number
+                const quantity = parseInt(t.quantity, 10); // Ensure it's a number
 
-});
+                if (isNaN(categoryId) || isNaN(quantity)) {
+                    console.error(`Invalid ticket data detected: categoryId=${t.categoryId}, quantity=${t.quantity}`);
+                    return null; // Return null to filter later
+                }
+                return {
+                    categoriaId: categoryId, // Changed to 'categoriaId' to match backend
+                    cantidad: quantity,
+                    nombresTitulares: t.nombresTitulares // Ensure holder names are passed
+                };
+            }).filter(ticket => ticket !== null); // Filter null tickets
 
-function descargarTicket(){
-    const elemento = document.getElementById("ticket");
-    elemento.style.display = 'block';
+            if (processedTickets.length === 0) {
+                showModal('Error: No se pudieron procesar los detalles de los tickets. Redirigiendo al inicio.', 'error', [{
+                    text: 'Volver al Inicio',
+                    type: 'confirm',
+                    handler: () => window.location.href = 'cliente.html'
+                }]);
+                return;
+            }
 
-    const opciones = {
-        margin: 1,
-        filename: 'ticket_Teycketan.pdf',
-        image: {type:'jpeg', quality: 0.98},
-        html2canvas:{scale:2},
-        jsPDF:{unit: 'in', format: 'letter', orientation:'portrait'}
-    };
+            // --- PROCESS PURCHASE ON THE BACKEND ---
+            try {
+                const response = await fetch(`${API_URL}/api/compras/procesar-compra`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        tickets: processedTickets, // Use validated and mapped tickets
+                        totalCompra: parseFloat(purchaseDetails.totalAmount), // Use totalAmount
+                        eventoId: eventId // Use validated eventId
+                    })
+                });
 
-    html2pdf().set(opciones).from(elemento).save().then(()=>{
-        elemento.style.display='none'; 
-    });
-}
-</script>
+                const data = await response.json();
+
+                if (response.ok) {
+                    console.log('Compra procesada exitosamente:', data);
+                    localStorage.removeItem('purchaseDetails'); 
+
+                    const allTicketsContainer = document.getElementById('allTicketsContainer');
+                    allTicketsContainer.innerHTML = ''; // Clear previous content
+
+                    // Iterate over individual tickets returned by the backend
+                    // Assumes data.tickets is an array of individual ticket objects from the backend
+                    // Each object should have: Codigo_Ticket, Categoria_Nombre, Precio_Unitario, Nombre_Titular
+                    if (data.tickets && data.tickets.length > 0) {
+                        data.tickets.forEach(ticketData => {
+                            const ticketDiv = document.createElement('div');
+                            ticketDiv.className = 'ticket-individual'; // Add a class for styling if needed
+                            ticketDiv.style.cssText = "padding: 20px; border: 2px solid black; width: 400px; margin: 20px auto; background-color: white; color: black; font-family: sans-serif; page-break-after: always;"; // Added page-break-after for PDF
+
+                            const qrcodeId = `qrcode-${ticketData.Codigo_Ticket}`; // Unique ID for each QR code container
+
+                            ticketDiv.innerHTML = `
+                                <img src="../img/logo.png" alt="Logo" style="width: 100px; margin-bottom: 10px;">
+                                <h2>Ticket de Entrada</h2>
+                                <p><strong>Evento:</strong> <span>${purchaseDetails.eventName || 'Evento Desconocido'}</span></p>
+                                <p><strong>Fecha:</strong> <span>${new Date(purchaseDetails.eventDate).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) || 'Fecha Desconocida'}</span></p>
+                                <p><strong>Hora:</strong> <span>${purchaseDetails.eventTime || 'Hora Desconocida'}</span></p>
+                                <p><strong>Ubicación:</strong> <span>${purchaseDetails.eventLocation || 'Ubicación Desconocida'}</span></p>
+                                <p><strong>Zona:</strong> <span>${ticketData.Categoria_Nombre || 'Zona Desconocida'}</span></p>
+                                <p><strong>Precio Unitario:</strong> <span>S/ ${parseFloat(ticketData.Precio_Unitario || 0).toFixed(2)}</span></p>
+                                <p><strong>Titular:</strong> <span>${ticketData.Nombre_Titular || 'No especificado'}</span></p>
+                                <p><strong>Código Ticket:</strong> <span>${ticketData.Codigo_Ticket || 'No disponible'}</span></p>
+                                <div id="${qrcodeId}" style="width:128px; height:128px; margin-top:15px;"></div>
+                                <p style="margin-top: 20px; font-size: 0.8em;">¡Nos vemos en el evento!</p>
+                            `;
+                            allTicketsContainer.appendChild(ticketDiv);
+
+                            // Generate QR code for each ticket
+                            new QRCode(document.getElementById(qrcodeId), {
+                                text: ticketData.Codigo_Ticket || 'Error',
+                                width: 128,
+                                height: 128,
+                                colorDark : "#000000",
+                                colorLight : "#ffffff",
+                                correctLevel : QRCode.CorrectLevel.H
+                            });
+                        });
+                    } else {
+                        console.warn('Backend did not return individual ticket details in data.tickets.');
+                        // Fallback message if no individual tickets are returned
+                        allTicketsContainer.innerHTML = `
+                            <div style="padding: 20px; border: 2px solid black; width: 400px; margin: 20px auto; background-color: white; color: black; font-family: sans-serif;">
+                                <p>No se pudieron generar los tickets individuales. Por favor, contacta a soporte.</p>
+                            </div>
+                        `;
+                    }
+
+                } else {
+                    showModal(`Error al finalizar la compra: ${data.message || 'Error desconocido'}`, 'error', [{
+                        text: 'Volver al Inicio',
+                        type: 'confirm',
+                        handler: () => window.location.href = 'cliente.html'
+                    }]);
+                    console.error('Error al procesar la compra:', data);
+                }
+
+            } catch (error) {
+                showModal('Error de conexión con el servidor al procesar la compra. Detalles: ' + error.message, 'error', [{
+                    text: 'Volver al Inicio',
+                    type: 'confirm',
+                    handler: () => window.location.href = 'cliente.html'
+                }]);
+                console.error('Error de red al procesar la compra:', error);
+            }
+        });
+
+        /**
+         * @brief Downloads all generated tickets as a single PDF.
+         */
+        function descargarTicketsPDF(){ // Renamed function
+            const element = document.getElementById("allTicketsContainer");
+            element.style.display = 'block'; // Make visible for capture
+
+            const options = {
+                margin: 1,
+                filename: 'tickets_Teycketan.pdf', // Changed filename
+                image: {type:'jpeg', quality: 0.98},
+                html2canvas:{scale:2},
+                jsPDF:{unit: 'in', format: 'letter', orientation:'portrait'}
+            };
+
+            html2pdf().set(options).from(element).save().then(()=>{
+                element.style.display='none'; // Hide after download
+            });
+        }
+    </script>
 </body>
 </html>

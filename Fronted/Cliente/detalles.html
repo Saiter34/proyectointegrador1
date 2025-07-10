@@ -14,15 +14,11 @@
     <div class="fondo-overlay"></div>
 
     <header class="encabezado">
-        <div class="barra-logo">
-              <a href="cliente.html"></a>
-            <img src="../img/logo.png" alt="Logo Teycketan" class="logo" />
-        </div>
-        <div class="barra-pasos">
-            <a href="cliente.html" class="paso activo no-subrayado">
-                <span>INICIO</span>
-            </a>
-        </div>
+        <div class="logo">
+                <a href="cliente.html">
+                    <img src="../img/logo.png" alt="Logo de Teycketan">
+                </a>
+            </div>
     </header>
 
     <main class="main-content">
@@ -41,8 +37,8 @@
                         <div class="fila tabla-encabezado">
                             <div>Zona</div>
                             <div>Regular</div>
-                            <div>Conadis</div>
-                            <div>Preventa</div>
+                            <div>Preventa</div> <!-- Se muestra aquí el precio de preventa calculado -->
+                            <div>Disponible</div> <!-- Cambiado a "Stock Conadis" -->
                         </div>
                         <p class="loading-message">Cargando precios...</p>
                     </div>
@@ -71,7 +67,57 @@
             <div class="reglas-box">
                 <h2>Reglas del Evento</h2>
                 <ul id="eventRules">
-                    <li>Cargando reglas del evento...</li>
+                    <!-- Reglas genéricas del evento -->
+                    <li><strong>Ingreso al evento</strong>
+                        <ul>
+                            <li>El ingreso solo será permitido presentando una entrada válida, ya sea digital o impresa, junto con un documento de identidad.</li>
+                            <li>Se recomienda llegar con anticipación para evitar aglomeraciones y facilitar los controles de acceso.</li>
+                            <li>El acceso está sujeto a revisión por parte del personal de seguridad.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Prohibiciones</strong>
+                        <ul>
+                            <li>Está prohibido ingresar con objetos punzocortantes, armas, sustancias ilegales, bebidas alcohólicas externas, fuegos artificiales o cualquier elemento que pueda representar un riesgo.</li>
+                            <li>No se permite el ingreso con alimentos o bebidas adquiridos fuera del recinto, salvo indicación contraria del organizador.</li>
+                            <li>No está permitido grabar o transmitir el evento con fines comerciales sin autorización previa.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Conducta durante el evento</strong>
+                        <ul>
+                            <li>El público debe mantener una conducta respetuosa hacia el personal, los artistas y los demás asistentes.</li>
+                            <li>Comportamientos agresivos o peligrosos podrán ser motivo de expulsión inmediata del recinto, sin derecho a reclamo.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Seguridad y precauciones</strong>
+                        <ul>
+                            <li>Se recomienda mantener siempre ubicadas las salidas de emergencia.</li>
+                            <li>En caso de evacuación, siga las instrucciones del personal y mantenga la calma.</li>
+                            <li>El organizador no se responsabiliza por la pérdida de objetos personales.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Condiciones de cancelación o reprogramación</strong>
+                        <ul>
+                            <li>En caso de cancelación o postergación por causas de fuerza mayor (clima extremo, motivos sanitarios, etc.), se informará oportunamente a través de los canales oficiales.</li>
+                            <li>Las entradas seguirán siendo válidas si el evento es reprogramado.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Menores de edad</strong>
+                        <ul>
+                            <li>El ingreso de menores puede estar restringido dependiendo del tipo de evento. Es responsabilidad del asistente verificar la clasificación del espectáculo.</li>
+                            <li>En eventos familiares, los menores deben estar acompañados por un adulto responsable.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Uso de imagen</strong>
+                        <ul>
+                            <li>Al asistir al evento, el público acepta que su imagen pueda ser captada y utilizada en grabaciones, transmisiones o material promocional del evento.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Normas del recinto</strong>
+                        <ul>
+                            <li>El cumplimiento de las normas del local donde se desarrolla el evento es obligatorio.</li>
+                            <li>El organizador y el recinto se reservan el derecho de admisión y permanencia.</li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </section>
@@ -120,7 +166,7 @@
         </div>
         <img src="../img/logo.png" alt="Logo Teycketan" class="logo-footer"/>
     </footer>
- 
+    
     <div id="clientModal" class="client-modal">
         <div class="client-modal-content">
             <span class="client-close-button">&times;</span>
@@ -145,7 +191,7 @@
             const pricingTable = document.getElementById('pricingTable');
             const buyTicketsBtn = document.getElementById('buyTicketsBtn'); 
             const eventDescription = document.getElementById('eventDescription');
-            const eventRules = document.getElementById('eventRules');
+            const eventRules = document.getElementById('eventRules'); // Mantener la referencia al elemento
 
             const clientModal = document.getElementById('clientModal');
             const clientModalMessage = document.getElementById('clientModalMessage');
@@ -201,8 +247,7 @@
                 }
 
                 try {
-                    // ¡¡¡ CAMBIO CLAVE AQUÍ !!!
-                    // Ahora llama a /api/eventospublicos/:eventId para coincidir con el montaje en index.js
+                    // Llama a /api/eventos/:eventId (asumiendo que esta ruta es pública o no requiere autenticación aquí)
                     const response = await fetch(`${API_URL}/api/eventos/${eventId}`); 
                     const eventData = await response.json();
 
@@ -216,14 +261,14 @@
                         console.error('Error fetching event details:', eventData);
                         document.querySelector('.precios-box').innerHTML = '<p class="error-message">No se pudieron cargar los detalles del evento.</p>';
                         document.querySelector('.historia-box').innerHTML = '';
-                        document.querySelector('.reglas-box').innerHTML = '';
+                        // No modificar la sección de reglas aquí, ya que ahora es estática
                     }
                 } catch (error) {
                     showModal('Error de conexión con el servidor. No se pudieron cargar los detalles del evento.', 'error');
                     console.error('Network error fetching event details:', error);
                     document.querySelector('.precios-box').innerHTML = '<p class="error-message">Error de conexión con el servidor.</p>';
                     document.querySelector('.historia-box').innerHTML = '';
-                    document.querySelector('.reglas-box').innerHTML = '';
+                    // No modificar la sección de reglas aquí, ya que ahora es estática
                 }
             }
 
@@ -237,6 +282,8 @@
                 eventImage.src = eventImageUrl;
                 
                 let venueMapUrl;
+                // Asegúrate de que event.URL_Imagen_Asientos exista en tu respuesta del backend para el evento
+                // Esto viene de la tabla "Lugares" a través del JOIN en el backend.
                 if (event.URL_Imagen_Asientos) {
                     venueMapUrl = `${API_URL}${event.URL_Imagen_Asientos}`;
                 } else {
@@ -247,15 +294,16 @@
                 venueMap.src = venueMapUrl;
 
                 eventName.textContent = event.Nom_Evento || 'Unknown Event';
-                eventCategoryLocation.textContent = `${event.Categoria || 'Unknown Category'} / ${event.Ubicacion || 'Unknown Location'}`; 
+                // CORRECCIÓN: Usar event.Ubicacion_Lugar en lugar de event.Ubicacion
+                eventCategoryLocation.textContent = `${event.Categoria || 'Unknown Category'} / ${event.Ubicacion_Lugar || 'Unknown Location'}`; 
                 eventDate.textContent = event.Fecha ? new Date(event.Fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Unknown Date';
 
                 let pricingHtml = `
                     <div class="fila tabla-encabezado">
                         <div>Zona</div>
                         <div>Regular</div>
-                        <div>Conadis</div>
                         <div>Preventa</div>
+                        <div>Disponible</div>
                     </div>
                 `;
                 
@@ -263,12 +311,18 @@
                 // Asegúrate de que event.CategoriasDeEntradas esté presente y sea un array
                 if (event.CategoriasDeEntradas && Array.isArray(event.CategoriasDeEntradas) && event.CategoriasDeEntradas.length > 0) {
                     event.CategoriasDeEntradas.forEach(category => {
+                        const precioRegular = parseFloat(category.precioRegular || 0);
+                        // Calcula el precio de preventa como 20% menos del precio regular
+                        const precioPreventaCalculado = (precioRegular * 0.80).toFixed(2);
+                        // El stock disponible para CONADIS (o cualquier otra categoría)
+                        const stockDisponibleConadis = parseInt(category.stockDisponible || 0); 
+
                         pricingHtml += `
                             <div class="fila">
                                 <div>${category.Nom_Categoria || 'N/A'}</div>
-                                <div>S/. ${parseFloat(category.precioRegular || 0).toFixed(2)}</div>
-                                <div>S/. ${parseFloat(category.precioConadis || 0).toFixed(2)}</div>
-                                <div>S/. ${parseFloat(category.precioPreventa || 0).toFixed(2)}</div>
+                                <div>S/. ${precioRegular.toFixed(2)}</div>
+                                <div>S/. ${precioPreventaCalculado}</div>
+                                <div>${stockDisponibleConadis}</div> <!-- Muestra el stock sin "S/." -->
                             </div>
                         `;
                     });
@@ -279,15 +333,8 @@
 
                 eventDescription.textContent = event.Descripcion || 'No description available for this event.';
 
-                let rulesHtml = '';
-                if (event.Reglas && Array.isArray(event.Reglas) && event.Reglas.length > 0) {
-                    event.Reglas.forEach(rule => {
-                        rulesHtml += `<li>${rule}</li>`;
-                    });
-                } else {
-                    rulesHtml = `<li>No specific rules for this event.</li>`;
-                }
-                eventRules.innerHTML = rulesHtml;
+                // La sección de reglas ahora es estática en el HTML, no se modifica aquí
+                // eventRules.innerHTML = rulesHtml; // Esta línea se elimina o comenta
 
                 // Update the buy tickets button link to include the eventId
                 buyTicketsBtn.href = `pago1.html?eventId=${event.Id_Evento}`; 

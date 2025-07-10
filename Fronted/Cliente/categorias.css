@@ -83,9 +83,11 @@ header.encabezado {
   z-index: 1;
 }
 
-.barra-logo .logo {
-  height: 45px;
+
+.logo img {
+  height: 48px; /* Altura del logo que tenías */
 }
+
 .paso.activo {
   opacity: 1;
 }

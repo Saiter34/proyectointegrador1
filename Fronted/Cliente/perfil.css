@@ -1,472 +1,637 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap');
 
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 html, body {
-  height: 100%;
-  font-family: 'Orbitron', sans-serif;
-  background: url("../img/fmetal.jpg") no-repeat center center fixed;
-  background-size: cover;
-  color: #eee;
-  overflow-x: hidden;
-  position: relative;
-  z-index: 1;
+    height: 100%;
+    font-family: 'Poppins', sans-serif; /* Cambiado a Poppins para texto general, Orbitron para títulos */
+    background: url("../img/fondometal.jpg") no-repeat center center fixed;
+    background-size: cover;
+    color: #eee;
+    overflow-x: hidden;
+    position: relative;
+    z-index: 1;
 }
 
 /* Fondos superpuestos */
 .fondo-overlay-extra {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url("../img/fondodetalles.jpg") repeat;
-  opacity: 0.5;
-  z-index: -2;
-  pointer-events: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../img/fondodetalles.jpg'); /* Ruta de imagen más clara */
+    background-repeat: repeat;
+    opacity: 0.5;
+    z-index: -2;
+    pointer-events: none;
 }
 
 .fondo-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: -1;
-  pointer-events: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+    pointer-events: none;
 }
 
 /* --- ENCABEZADO ---*/
 header.encabezado {
-  background-color: #4c0000; /* Color de fondo que tenías */
-  padding: 10px 30px; /* Padding que tenías */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 70px; /* Altura que tenías */
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  z-index: 100;
-  backdrop-filter: blur(6px); /* Blur que tenías */
-  transition: all 0.3s ease-in-out;
+    background-color: #4c0000;
+    padding: 10px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 100;
+    backdrop-filter: blur(6px);
+    transition: all 0.3s ease-in-out;
 }
 
 .logo img {
-  height: 48px; /* Altura del logo que tenías */
+    height: 48px;
 }
 
 nav {
-  display: flex;
-  align-items: center;
-  gap: 15px; /* Espacio entre elementos de navegación que tenías */
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 .nav-box {
-  background-color: rgba(255, 0, 0, 0.1); /* Fondo que tenías */
-  padding: 6px 12px; /* Padding que tenías */
-  border-radius: 12px; /* Border-radius que tenías */
-  transition: background 0.3s ease;
-  backdrop-filter: blur(4px);
+    background-color: rgba(255, 0, 0, 0.1);
+    padding: 6px 12px;
+    border-radius: 12px;
+    transition: background 0.3s ease;
+    backdrop-filter: blur(4px);
 }
 
 .nav-box:hover {
-  background-color: rgba(255, 0, 0, 0.2); /* Efecto hover que tenías */
+    background-color: rgba(255, 0, 0, 0.2);
 }
-
-/* Nota: Eliminado .nav-box input ya que no está en el HTML */
 
 .nav-box a,
 .nav-box button {
-  color: #fff;
-  font-family: 'Orbitron', sans-serif;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  text-decoration: none;
-  font-size: 0.9rem; /* Tamaño de fuente que tenías */
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px 10px; /* Padding que tenías */
-  border-radius: 6px; /* Border-radius que tenías */
-  transition: background 0.3s ease;
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: background 0.3s ease;
 }
 
 .nav-box a:hover,
 .nav-box button:hover {
-  background-color: rgba(255, 0, 0, 0.3); /* Efecto hover que tenías */
+    background-color: rgba(255, 0, 0, 0.3);
 }
 
 .dropdown {
-  position: relative;
+    position: relative;
 }
 
 .dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: rgba(0, 0, 0, 0.9);
-  border: 1px solid #ff3333;
-  box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
-  padding: 10px;
-  top: 40px; /* Posición que tenías */
-  z-index: 20;
-  border-radius: 8px;
-  min-width: 150px; /* Añadido min-width para evitar que se encoja demasiado */
+    display: none;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.9);
+    border: 1px solid #ff3333;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+    padding: 10px;
+    top: 40px;
+    z-index: 20;
+    border-radius: 8px;
+    min-width: 150px;
 }
 
 .dropdown:hover .dropdown-content {
-  display: block;
+    display: block;
 }
 
 .dropdown-content a {
-  color: white;
-  display: block;
-  padding: 5px 10px;
-  border-radius: 5px;
+    color: white;
+    display: block;
+    padding: 5px 10px;
+    border-radius: 5px;
 }
 
 .dropdown-content a:hover {
-  background-color: #4c0000;
-}
-/* Contenedor principal */
-main.perfil-contenedor {
-  max-width: 900px;
-  margin: 100px auto 40px auto;
-  padding: 30px;
-  background-color: rgba(0, 0, 0, 0.6);
-  border-radius: 15px;
-  box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+    background-color: #4c0000;
 }
 
-/* Cajas del perfil */
-.perfil-box {
-  background-color: rgba(50, 0, 0, 0.6);
-  border: 1px solid #ff0000;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 30px;
+/* Client Notification Wrapper (Bell icon and dropdown) */
+.client-notif-wrapper {
+    position: relative;
+    display: inline-block;
 }
 
-/* Botón editar */
-.btn-editar {
-  background-color: #7a0000;
-  color: #fff;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 10px;
-  font-family: 'Orbitron', sans-serif;
-  margin-top: 10px;
-  cursor: pointer;
-  transition: 0.3s ease;
+.client-notif-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem; /* Adjust size as needed */
+    cursor: pointer;
+    position: relative;
+    padding: 5px;
 }
 
-.btn-editar:hover {
-  background-color: #ff0000;
-  box-shadow: 0 0 10px #ff0000;
-}
-/* Alineación de datos y foto */
-.perfil-datos-flex .perfil-contenido {
-  display: flex;
-  align-items: center;
-  gap: 30px;
-}
-
-.perfil-foto img {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  border: 3px solid #ff3333;
-  object-fit: cover;
+.client-notif-dot {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 10px;
+    height: 10px;
+    background-color: crimson;
+    border-radius: 50%;
+    display: none; /* Hidden by default, shown when unread notifications exist */
 }
 
-/* Botón ver historial */
-.btn-ver-historial {
-  background-color: #4c0000;
-  color: #fff;
-  padding: 10px 20px;
-  font-family: 'Orbitron', sans-serif;
-  border: none;
-  border-radius: 10px;
-  margin-bottom: 15px;
-  cursor: pointer;
-  transition: 0.3s ease;
+.client-notif-dropdown {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: 50px; /* Adjust as needed to be below the bell icon */
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.95);
+    border: 1px solid crimson;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    min-width: 280px;
+    max-height: 300px; /* Max height for scrollability */
+    overflow-y: auto;
+    z-index: 1000;
+    padding: 10px;
 }
 
-.btn-ver-historial:hover {
-  background-color: #7a0000;
-  box-shadow: 0 0 10px #ff0000;
+.client-notif-dropdown p.client-notif-title {
+    color: crimson;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 10px;
 }
 
-/* Mostrar/Ocultar historial */
-.oculto {
-  display: none;
+.client-notif-dropdown ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.client-notif-dropdown ul li {
+    padding: 8px 0;
+    color: #eee;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-family: 'Poppins', sans-serif; /* Ensure Poppins for notification text */
+}
+
+.client-notif-dropdown ul li:last-child {
+    border-bottom: none;
+}
+
+.client-notif-dropdown ul li:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.client-notif-dropdown ul li.unread {
+    font-weight: bold;
+    color: #fff;
+    background-color: rgba(255, 0, 0, 0.1); /* Slightly red background for unread in dropdown */
 }
 
 
-/* Puntos */
-.puntos-box {
-  background-color: rgba(129, 197, 52, 0.3);
-  border: 1px solid yellow;
-  color: #baffba;
-}
-
-.puntos-box p strong {
-  color: #fff;
-}
-
-/* Historial */
-.historial-box {
-  background-color: rgba(30, 0, 0, 0.5);
-  border: 1px solid #990000;
-}
-
-.tabla-historial {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-.tabla-historial th,
-.tabla-historial td {
-  border: 1px solid #990000;
-  padding: 10px;
-  text-align: left;
-}
-
-.tabla-historial th {
-  background-color: #660000;
-  color: #ff9999;
-  font-family: 'Orbitron', sans-serif;
-}
-
-.tabla-historial tr:nth-child(even) {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-/* Footer */
-footer {
-  text-align: center;
-  padding: 20px;
-  background-color: rgba(0, 0, 0, 0.6);
-  margin-top: 30px;
-}
-
-footer .logo-footer {
-  height: 45px;
-  filter: brightness(0.9);
-}
+/* Perfil Dashboard Layout */
 .perfil-dashboard {
-  display: flex;
-  max-width: 1200px;
-  margin: 50px auto;
-  padding: 20px;
+    display: flex;
+    max-width: 1200px;
+    margin: 100px auto 40px auto; /* Adjust top margin to clear fixed header */
+    padding: 20px;
+    gap: 40px; /* Space between sidebar and panel */
 }
 
 .perfil-sidebar {
-  width: 280px;
-  background-color: rgba(0, 0, 0, 0.6);
-  border: 2px solid crimson;
-  padding: 30px 20px;
-  border-radius: 10px;
-  text-align: center;
-  flex-direction: column;
-  font-family: 'Orbitron', sans-serif;
+    width: 280px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border: 2px solid crimson;
+    padding: 30px 20px;
+    border-radius: 10px;
+    text-align: center;
+    display: flex; /* Use flex for column layout */
+    flex-direction: column;
+    font-family: 'Orbitron', sans-serif;
+    flex-shrink: 0; /* Prevent sidebar from shrinking */
 }
 
 .perfil-foto-box img {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 3px solid crimson;
-  margin-bottom: 10px;
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid crimson;
+    margin-bottom: 10px;
 }
 
 .perfil-sidebar h3 {
-  color: #fff;
-  flex-direction: column;
-  margin-bottom: 5px;
-  font-size: 18px;
+    color: #fff;
+    margin-bottom: 5px;
+    font-size: 1.2rem; /* Adjusted font size */
 }
 
 .perfil-rol {
-  color: crimson;
-  font-size: 13px;
-  font-weight: bold;
-  display: block;
-  margin-bottom: 20px;
+    color: crimson;
+    font-size: 0.9rem; /* Adjusted font size */
+    font-weight: bold;
+    display: block;
+    margin-bottom: 20px;
+}
+
+.perfil-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Space between menu items */
 }
 
 .perfil-menu a {
-  display: block;
-  padding: 10px;
-  margin-bottom: 10px;
-  color: #eee;
-  text-decoration: none;
-  border-left: 3px solid transparent;
-  transition: 0.3s;
-  width: 100%;
-}
-.perfil-menu{
-  display: flex;
-  flex-direction: column;
+    display: block;
+    padding: 10px;
+    color: #eee;
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: 0.3s;
+    width: 100%;
+    text-align: left; /* Align text to left */
+    font-family: 'Poppins', sans-serif; /* Poppins for menu items */
 }
 
 .perfil-menu a:hover,
 .perfil-menu a.active {
-  border-left: 3px solid crimson;
-  flex-direction: column;
-  background-color: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid crimson;
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .perfil-panel {
-  flex: 1;
-  padding-left: 40px;
+    flex: 1;
+    min-width: 0; /* Allow content to shrink if needed */
 }
 
-/* Adaptaciones a tus cajas */
+/* General Perfil Box Styling (for all sections) */
 .perfil-box {
-  background-color: rgba(0, 0, 0, 0.7);
-  border: 2px solid crimson;
-  border-radius: 10px;
-  padding: 25px;
-  margin-bottom: 25px;
-  color: #eee;
-  box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 2px solid crimson;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 25px;
+    color: #eee;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
 }
 
 .perfil-box h2 {
-  font-family: 'Orbitron', sans-serif;
-  color: crimson;
-  margin-bottom: 20px;
+    font-family: 'Orbitron', sans-serif;
+    color: crimson;
+    margin-bottom: 20px;
+    font-size: 1.5rem; /* Adjusted font size */
 }
 
 .perfil-datos p {
-  margin-bottom: 10px;
+    margin-bottom: 10px;
+    font-family: 'Poppins', sans-serif;
 }
 
 .btn-editar {
-  margin-top: 10px;
-  padding: 10px 20px;
-  background: crimson;
-  border: none;
-  color: white;
-  font-weight: bold;
-  border-radius: 5px;
-  cursor: pointer;
+    margin-top: 10px;
+    padding: 10px 20px;
+    background: crimson;
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .btn-editar:hover {
-  background: #ff3c3c;
+    background: #ff3c3c;
+    box-shadow: 0 0 10px #ff0000;
 }
 
-.tabla-historial {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
+/* Historial de Compras Table */
+.perfil-historial table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+.perfil-historial th, .perfil-historial td {
+    border: 1px solid #444; /* Darker border for contrast */
+    padding: 12px;
+    text-align: left;
+    font-family: 'Poppins', sans-serif;
+    color: #eee;
+}
+.perfil-historial th {
+    background-color: #1a0000; /* Darker background for header */
+    font-weight: bold;
+    color: crimson;
+    font-family: 'Orbitron', sans-serif;
+}
+.perfil-historial tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.03); /* Slight tint for even rows */
+}
+.perfil-historial tr:hover {
+    background-color: rgba(255, 255, 255, 0.08); /* Highlight on hover */
+}
+.no-data-message {
+    text-align: center;
+    color: #999;
+    margin-top: 20px;
+    font-style: italic;
+    font-family: 'Poppins', sans-serif;
 }
 
-.tabla-historial th,
-.tabla-historial td {
-  padding: 12px;
-  border-bottom: 1px solid #444;
-  color: #eee;
+/* Notificaciones Section */
+.perfil-notificaciones ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.tabla-historial th {
-  background-color: #111;
-  color: crimson;
+.perfil-notificaciones ul li.notification-item {
+    background-color: rgba(0, 0, 0, 0.7);
+    border-left: 5px solid crimson;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: 'Poppins', sans-serif;
 }
 
-.oculto {
-  display: none;
-}
-.notificacion-box {
-  background-color: rgba(0, 0, 0, 0.7);
-  border-left: 5px solid crimson;
-  padding: 20px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 20px;
-  flex-wrap: wrap;
+.perfil-notificaciones ul li.notification-item:hover {
+    background-color: rgba(20, 0, 0, 0.8);
 }
 
-.notificacion-info {
-  flex: 1;
+.perfil-notificaciones ul li.notification-item.unread {
+    font-weight: bold;
+    background-color: #f0f8ff; /* Lighter background for unread */
+    color: #333; /* Darker text for unread */
+    border-left: 4px solid #007bff; /* Blue bar for unread */
 }
 
-.notificacion-mensaje {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 1rem;
-  color: #eee;
-  margin-bottom: 8px;
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.6);
+    margin-top: 30px;
+    width: 100%;
 }
 
-.notificacion-fecha {
-  font-size: 0.85rem;
-  color: #aaa;
+footer .logo-footer {
+    height: 45px;
+    filter: brightness(0.9);
 }
 
-.notificacion-acciones {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+/* Custom Modal (General Purpose) */
+.client-modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 10000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.7); /* Black w/ opacity */
+    /* REMOVED: display: flex; from here. It should only be set by JS when needed. */
+    align-items: center;
+    justify-content: center;
 }
 
-.btn-ver-detalles,
-.btn-marcar-leido {
-  background-color: #4c0000;
-  border: none;
-  color: #fff;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background 0.3s ease, box-shadow 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.client-modal-content {
+    background-color: #1a0000; /* Dark red background */
+    margin: auto;
+    padding: 30px;
+    border: 1px solid crimson;
+    border-radius: 15px;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    position: relative;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
 }
 
-.btn-ver-detalles:hover {
-  background-color: #7a0000;
-  box-shadow: 0 0 10px #ff0000;
+.client-close-button {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
-.btn-marcar-leido:hover {
-  background-color: #006600;
-  box-shadow: 0 0 10px #00ff00;
-}
-.notificacion-detalles {
-  width: 100%;
-  background-color: rgba(255, 255, 255, 0.05);
-  border-top: 1px solid crimson;
-  padding: 15px;
-  margin-top: 10px;
-  color: #ccc;
-  font-size: 0.9rem;
-  display: none;
-  animation: fadeIn 0.3s ease-in-out;
+.client-close-button:hover,
+.client-close-button:focus {
+    color: crimson;
+    text-decoration: none;
 }
 
-.notificacion-box.leido {
-  opacity: 0.5;
-  border-left: 5px solid gray;
+.client-message-text {
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    color: #eee;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: scaleY(0.9); }
-  to { opacity: 1; transform: scaleY(1); }
+.client-message-text.client-message-info { color: #87ceeb; } /* Light blue */
+.client-message-text.client-message-success { color: #32cd32; } /* Lime green */
+.client-message-text.client-message-error { color: #dc143c; } /* Crimson */
+.client-message-text.client-message-warning { color: #ffd700; } /* Gold */
+
+.client-modal-btn {
+    background-color: crimson;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin: 5px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.client-modal-btn:hover {
+    background-color: #ff3c3c;
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.5);
+}
+
+.client-modal-btn.client-modal-confirm {
+    background-color: #007bff; /* Blue for confirm */
+}
+.client-modal-btn.client-modal-confirm:hover {
+    background-color: #0056b3;
+}
+
+.client-modal-btn.client-modal-cancel {
+    background-color: #6c757d; /* Gray for cancel */
+}
+.client-modal-btn.client-modal-cancel:hover {
+    background-color: #5a6268;
+}
+
+/* Estilos para el formulario de edición de perfil */
+.edit-profile-form {
+    text-align: left;
+    padding: 10px;
+}
+
+.edit-profile-form h2 {
+    text-align: center;
+    color: crimson;
+    margin-bottom: 25px;
+    font-family: 'Orbitron', sans-serif;
+    text-transform: uppercase;
+    font-size: 1.8em;
+}
+
+.edit-profile-form .form-group {
+    margin-bottom: 15px;
+}
+
+.edit-profile-form label {
+    display: block;
+    margin-bottom: 5px;
+    color: #eee;
+    font-weight: 600;
+}
+
+.edit-profile-form input[type="text"],
+.edit-profile-form input[type="email"],
+.edit-profile-form input[type="tel"] { /* Changed to type="tel" for phone number */
+    width: calc(100% - 20px); /* Resta el padding para el ancho total */
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #333;
+    color: #fff;
+    font-size: 1em;
+}
+
+.edit-profile-form input[disabled] {
+    background-color: #444;
+    color: #bbb;
+    cursor: not-allowed;
+}
+
+.edit-profile-form .form-actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+    .perfil-dashboard {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .perfil-sidebar {
+        width: 90%;
+        max-width: 400px;
+        position: static; /* No sticky en pantallas pequeñas */
+        margin-bottom: 30px;
+    }
+
+    .perfil-panel {
+        width: 90%;
+        max-width: 600px;
+    }
+
+    header.encabezado {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    nav {
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 10px;
+        gap: 10px;
+    }
+
+    .nav-box {
+        padding: 4px 8px;
+    }
+
+    .nav-box a, .nav-box button {
+        font-size: 0.8rem;
+        padding: 4px 8px;
+    }
+
+    .dropdown-content {
+        top: 35px;
+        min-width: unset;
+        width: 100%;
+        left: 0;
+        right: 0;
+    }
+
+    .client-notif-dropdown {
+        min-width: unset;
+        width: 100%;
+        left: 0;
+        right: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .perfil-dashboard {
+        padding: 20px 10px;
+    }
+
+    .perfil-box {
+        padding: 20px;
+    }
+
+    .perfil-historial th, .perfil-historial td {
+        padding: 8px;
+        font-size: 0.85em;
+    }
+
+    .client-modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+    
+    .edit-profile-form h2 {
+        font-size: 1.5em;
+    }
 }

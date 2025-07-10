@@ -464,6 +464,356 @@ router.get('/eventos/:id', async (req, res) => {
     }
 });
 
+/*----------------------------------------------------------------------------------------------------*/
+// Ruta para obtener todos los eventos creados por el organizador autenticado (sin filtrar por estado).
+// Se asume que authenticateToken se usa como middleware en index.js o aquí.
+router.get('/eventos', async (req, res) => {
+    // req.user.id viene del middleware de autenticación, que decodifica el token JWT.
+    const Id_Usuario_Organizador = req.user.id; 
+
+    let client;
+    try {
+        client = await pool.connect();
+
+        // Obtener el Id_Organizador asociado al Id_Usuario autenticado
+        const orgResult = await client.query('SELECT "Id_Organizador" FROM "Organizadores" WHERE "Id_Usuario" = $1', [Id_Usuario_Organizador]);
+        if (orgResult.rows.length === 0) {
+            return res.status(404).json({ message: 'Organizador no encontrado para el usuario autenticado.' });
+        }
+        const Id_Organizador = orgResult.rows[0].Id_Organizador;
+
+        // Consulta principal para obtener los eventos del organizador
+        const result = await client.query(
+            `SELECT
+                e."Id_Evento", e."Nom_Evento", e."Fecha", e."Horario_Inicio", e."Horario_Fin", e."Categoria",
+                e."Descripcion", e."Estado", 
+                e."URL_Imagen_Evento", 
+                l."URL_Imagen_Asientos", 
+                e."Reglas",
+                e."SolicitudDestacar",
+                l."Nom_Lugar", 
+                l."Ubicacion_Lugar" AS "Ubicacion_Lugar",
+                e."Id_Lugar" -- Añadir Id_Lugar para el formulario de edición
+            FROM "Eventos" e
+            LEFT JOIN "Lugares" l ON e."Id_Lugar" = l."Id_Lugar" 
+            WHERE e."Id_Organizador" = $1
+            ORDER BY e."Fecha" DESC`,
+            [Id_Organizador]
+        );
+
+        // Para cada evento, obtener sus categorías de entradas
+        const eventsWithFullDetails = await Promise.all(result.rows.map(async (event) => {
+            const categoriasDeEntradasResult = await client.query(
+                `SELECT 
+                    "Id_Categoria", -- Incluir Id_Categoria para el frontend
+                    "Nom_Categoria", 
+                    "Precio" AS "precioRegular", 
+                    "Stock_Total" AS "stockTotal", -- Renombrado para claridad
+                    "Stock_Disponible" AS "stockDisponible" -- Renombrado para claridad
+                 FROM "Categorías de entradas"
+                 WHERE "Id_Evento" = $1
+                 ORDER BY "Nom_Categoria" ASC;`,
+                [event.Id_Evento]
+            );
+
+            const categoriasDeEntradas = categoriasDeEntradasResult.rows.map(cat => ({
+                Id_Categoria: cat.Id_Categoria,
+                Nom_Categoria: cat.Nom_Categoria,
+                precioRegular: parseFloat(cat.precioRegular || 0).toFixed(2),
+                // precioPreventa y precioConadis se calculan en el frontend o se obtienen si existen como columnas separadas
+                stockTotal: parseInt(cat.stockTotal || 0),
+                stockDisponible: parseInt(cat.stockDisponible || 0)
+            }));
+
+            return {
+                ...event,
+                Reglas: event.Reglas || [], // Asegura que Reglas sea un array, incluso si es nulo
+                CategoriasDeEntradas: categoriasDeEntradas
+            };
+        }));
+
+        res.status(200).json({ message: 'Eventos obtenidos exitosamente.', events: eventsWithFullDetails });
+    } catch (error) {
+        console.error('Error al obtener eventos del proveedor:', error.message);
+        res.status(500).json({ message: 'Error interno del servidor al obtener eventos.' });
+    } finally {
+        if (client) client.release(); // Asegura liberar el cliente en cualquier caso
+    }
+});
+
+// Ruta para obtener solo los eventos creados por el organizador autenticado que están 'aprobados'.
+// Se asume que authenticateToken se usa como middleware en index.js o aquí.
+router.get('/eventos-aprobados', async (req, res) => {
+    const Id_Usuario_Organizador = req.user.id; 
+
+    let client;
+    try {
+        client = await pool.connect();
+
+        // Obtener el Id_Organizador asociado al Id_Usuario autenticado
+        const orgResult = await client.query('SELECT "Id_Organizador" FROM "Organizadores" WHERE "Id_Usuario" = $1', [Id_Usuario_Organizador]);
+        if (orgResult.rows.length === 0) {
+            return res.status(404).json({ message: 'Organizador no encontrado para el usuario autenticado.' });
+        }
+        const Id_Organizador = orgResult.rows[0].Id_Organizador;
+
+        // Consulta principal para obtener los eventos aprobados del organizador
+        const result = await client.query(
+            `SELECT
+                e."Id_Evento", e."Nom_Evento", e."Fecha", e."Horario_Inicio", e."Horario_Fin", e."Categoria",
+                e."Descripcion", e."Estado", 
+                e."URL_Imagen_Evento", 
+                l."URL_Imagen_Asientos", 
+                e."Reglas",
+                e."SolicitudDestacar",
+                l."Nom_Lugar", 
+                l."Ubicacion_Lugar" AS "Ubicacion_Lugar",
+                e."Id_Lugar" -- Añadir Id_Lugar para el formulario de edición
+            FROM "Eventos" e
+            LEFT JOIN "Lugares" l ON e."Id_Lugar" = l."Id_Lugar" 
+            WHERE e."Id_Organizador" = $1 AND e."Estado" = 'aprobado'
+            ORDER BY e."Fecha" DESC`,
+            [Id_Organizador]
+        );
+
+        // Para cada evento, obtener sus categorías de entradas
+        const eventsWithFullDetails = await Promise.all(result.rows.map(async (event) => {
+            const categoriasDeEntradasResult = await client.query(
+                `SELECT 
+                    "Id_Categoria", 
+                    "Nom_Categoria", 
+                    "Precio" AS "precioRegular", 
+                    "Stock_Total" AS "stockTotal", 
+                    "Stock_Disponible" AS "stockDisponible" 
+                 FROM "Categorías de entradas"
+                 WHERE "Id_Evento" = $1
+                 ORDER BY "Nom_Categoria" ASC;`,
+                [event.Id_Evento]
+            );
+
+            const categoriasDeEntradas = categoriasDeEntradasResult.rows.map(cat => ({
+                Id_Categoria: cat.Id_Categoria,
+                Nom_Categoria: cat.Nom_Categoria,
+                precioRegular: parseFloat(cat.precioRegular || 0).toFixed(2),
+                stockTotal: parseInt(cat.stockTotal || 0),
+                stockDisponible: parseInt(cat.stockDisponible || 0)
+            }));
+
+            return {
+                ...event,
+                Reglas: event.Reglas || [],
+                CategoriasDeEntradas: categoriasDeEntradas
+            };
+        }));
+
+        res.status(200).json({ message: 'Eventos aprobados obtenidos exitosamente.', events: eventsWithFullDetails });
+    } catch (error) {
+        console.error('Error al obtener eventos aprobados del proveedor:', error.message);
+        res.status(500).json({ message: 'Error interno del servidor al obtener eventos aprobados.' });
+    } finally {
+        if (client) client.release();
+    }
+});
+
+// Ruta para obtener los detalles de un evento específico del organizador autenticado.
+// Se asume que authenticateToken se usa como middleware en index.js o aquí.
+router.get('/eventos/:id', async (req, res) => {
+    const { id } = req.params;
+    const Id_Usuario_Organizador = req.user.id; 
+
+    let client;
+    try {
+        client = await pool.connect();
+        const orgResult = await client.query('SELECT "Id_Organizador" FROM "Organizadores" WHERE "Id_Usuario" = $1', [Id_Usuario_Organizador]);
+        if (orgResult.rows.length === 0) {
+            return res.status(404).json({ message: 'Organizador no encontrado.' });
+        }
+        const Id_Organizador = orgResult.rows[0].Id_Organizador;
+
+        const eventResult = await client.query(
+            `SELECT
+                e."Id_Evento", e."Nom_Evento", e."Fecha", e."Horario_Inicio", e."Horario_Fin", e."Categoria",
+                e."Descripcion", e."Estado", 
+                e."URL_Imagen_Evento", 
+                l."URL_Imagen_Asientos", 
+                e."Reglas",
+                e."SolicitudDestacar",
+                l."Nom_Lugar", l."Ubicacion_Lugar" AS "Ubicacion_Lugar", 
+                l."Capacidad_Total", l."Cantidad_General", l."Cantidad_VIP", l."Cantidad_Conadis", l."URL_Imagen_Referencial",
+                e."Id_Lugar" -- Añadir Id_Lugar para el formulario de edición
+            FROM "Eventos" e
+            LEFT JOIN "Lugares" l ON e."Id_Lugar" = l."Id_Lugar" 
+            WHERE e."Id_Evento" = $1 AND e."Id_Organizador" = $2`,
+            [id, Id_Organizador]
+        );
+        if (eventResult.rows.length === 0) {
+            return res.status(404).json({ message: 'Evento no encontrado o no pertenece a este organizador.' });
+        }
+
+        const event = eventResult.rows[0];
+
+        const categoriasDeEntradasResult = await client.query(
+            `SELECT 
+                "Id_Categoria", 
+                "Nom_Categoria", 
+                "Precio" AS "precioRegular", 
+                "Stock_Total" AS "stockTotal", 
+                "Stock_Disponible" AS "stockDisponible" 
+             FROM "Categorías de entradas"
+             WHERE "Id_Evento" = $1
+             ORDER BY "Nom_Categoria" ASC;`,
+            [id]
+        );
+
+        const categoriasDeEntradas = categoriasDeEntradasResult.rows.map(cat => ({
+            Id_Categoria: cat.Id_Categoria,
+            Nom_Categoria: cat.Nom_Categoria,
+            precioRegular: parseFloat(cat.precioRegular || 0).toFixed(2),
+            stockTotal: parseInt(cat.stockTotal || 0),
+            stockDisponible: parseInt(cat.stockDisponible || 0)
+        }));
+
+        event.CategoriasDeEntradas = categoriasDeEntradas;
+        event.Reglas = event.Reglas || [];
+
+        res.status(200).json(event);
+    } catch (error) {
+        console.error('Error al obtener evento por ID para el proveedor:', error.message);
+        res.status(500).json({ message: 'Error interno del servidor al obtener evento.' });
+    } finally {
+        if (client) client.release();
+    }
+});
+
+// Ruta para obtener las estadísticas de venta para un evento específico del organizador.
+// Se asume que authenticateToken se usa como middleware en index.js o aquí.
+router.get('/eventos/:id/stats', async (req, res) => {
+    const { id } = req.params; 
+    const Id_Usuario_Organizador = req.user.id;
+
+    let client;
+    try {
+        client = await pool.connect();
+
+        // Validar que el evento pertenece al organizador autenticado
+        const eventDetailsResult = await client.query(
+            `SELECT
+                e."Id_Organizador", e."Nom_Evento"
+             FROM "Eventos" e
+             WHERE e."Id_Evento" = $1`,
+            [id]
+        );
+        if (eventDetailsResult.rows.length === 0) {
+            return res.status(404).json({ message: 'Evento no encontrado.' });
+        }
+        const eventDetails = eventDetailsResult.rows[0];
+
+        const orgResult = await client.query('SELECT "Id_Organizador" FROM "Organizadores" WHERE "Id_Usuario" = $1', [Id_Usuario_Organizador]);
+        if (orgResult.rows.length === 0) {
+            return res.status(404).json({ message: 'Organizador no encontrado para el usuario autenticado.' });
+        }
+        const Id_Organizador_Auth = orgResult.rows[0].Id_Organizador;
+
+        if (eventDetails.Id_Organizador !== Id_Organizador_Auth) {
+            return res.status(403).json({ message: 'Acceso denegado. Este evento no pertenece a tu organización.' });
+        }
+
+        // Obtener tickets vendidos y sumar las ganancias usando el PrecioUnitario de cada ticket
+        const ticketsSoldResult = await client.query(
+            `SELECT 
+                "Tipo_Ticket", 
+                COUNT("Id_Ticket") AS total_tickets_vendidos,
+                SUM("PrecioUnitario") AS total_ganancias_por_tipo -- Sumar el precio unitario de cada ticket
+             FROM "Tickets"
+             WHERE "Id_Evento" = $1
+             GROUP BY "Tipo_Ticket"`, 
+            [id]
+        );
+
+        let general_vendidos = 0;
+        let vip_vendidos = 0;
+        let conadis_vendidos = 0;
+        let ganancias_estimadas = 0;
+
+        ticketsSoldResult.rows.forEach(row => {
+            const cantidad = parseInt(row.total_tickets_vendidos, 10);
+            const gananciasTipo = parseFloat(row.total_ganancias_por_tipo || 0);
+
+            // *** CORRECCIÓN CLAVE AQUÍ: Usar los nombres de categoría exactos de tu base de datos ***
+            if (row.Tipo_Ticket === 'ZONA GENERAL') { 
+                general_vendidos = cantidad;
+                ganancias_estimadas += gananciasTipo;
+            } else if (row.Tipo_Ticket === 'ZONA VIP') { 
+                vip_vendidos = cantidad;
+                ganancias_estimadas += gananciasTipo;
+            } else if (row.Tipo_Ticket === 'ZONA CONADIS') { 
+                conadis_vendidos = cantidad;
+                ganancias_estimadas += gananciasTipo;
+            }
+        });
+
+        const total_vendidos = general_vendidos + vip_vendidos + conadis_vendidos;
+
+        res.status(200).json({
+            message: 'Estadísticas obtenidas exitosamente.',
+            statistics: {
+                general_vendidos: general_vendidos,
+                vip_vendidos: vip_vendidos,
+                conadis_vendidos: conadis_vendidos,
+                total_vendidos: total_vendidos,
+                ganancias_estimadas: parseFloat(ganancias_estimadas).toFixed(2) 
+            }
+        });
+
+    } catch (error) {
+        console.error('Error al obtener estadísticas del evento:', error.message);
+        res.status(500).json({ message: 'Error interno del servidor al obtener estadísticas del evento.' });
+    } finally {
+        if (client) client.release();
+    }
+});
+
+// NUEVA RUTA: Obtiene las estadísticas de ventas generales para el proveedor autenticado
+// Se asume que authenticateToken se usa como middleware en index.js o aquí.
+router.get('/ventas/resumen', async (req, res) => {
+    const Id_Usuario_Organizador = req.user.id; // ID del usuario autenticado
+
+    let client;
+    try {
+        client = await pool.connect();
+
+        const orgResult = await client.query('SELECT "Id_Organizador" FROM "Organizadores" WHERE "Id_Usuario" = $1', [Id_Usuario_Organizador]);
+        if (orgResult.rows.length === 0) {
+            return res.status(404).json({ message: 'Organizador no encontrado para el usuario autenticado.' });
+        }
+        const Id_Organizador = orgResult.rows[0].Id_Organizador;
+
+        // Consulta para obtener el resumen de ventas del organizador
+        const salesSummaryResult = await client.query(
+            `SELECT
+                COALESCE(SUM(t."PrecioUnitario"), 0) AS "totalSalesAmount", -- Sumar PrecioUnitario de Tickets
+                COALESCE(COUNT(t."Id_Ticket"), 0) AS "totalTicketsSold",
+                COUNT(DISTINCT e."Id_Evento") AS "eventsWithSales"
+            FROM "Eventos" e
+            LEFT JOIN "Categorías de entradas" ce ON e."Id_Evento" = ce."Id_Evento"
+            LEFT JOIN "Tickets" t ON ce."Id_Categoria" = t."Id_Categoria"
+            -- No es necesario unirse a "Compras" aquí si solo necesitamos el total de tickets y el monto de los tickets vendidos
+            WHERE e."Id_Organizador" = $1`,
+            [Id_Organizador]
+        );
+
+        const salesData = salesSummaryResult.rows[0];
+
+        res.status(200).json({ message: 'Estadísticas de ventas obtenidas exitosamente.', salesData });
+
+    } catch (error) {
+        console.error('Error al obtener estadísticas de ventas generales del proveedor:', error.message);
+        res.status(500).json({ message: 'Error interno del servidor al obtener estadísticas de ventas.' });
+    } finally {
+        if (client) client.release();
+    }
+});
+
 /**
  * @route PUT /eventos/:id
  * @description Actualiza un evento existente del organizador autenticado.
@@ -476,35 +826,48 @@ router.put('/eventos/:id', uploadMiddleware, async (req, res) => {
         Id_Lugar, 
         Descripcion, 
         AsientosGeneral, AsientosVIP, AsientosConadis, // Campos de stock para actualizar
-        CostoGeneral, CostoVIP, CostoConadis, Reglas 
+        CostoGeneral, CostoVIP, CostoConadis, Reglas,
+        SolicitudDestacar // Asegúrate de incluir SolicitudDestacar si se envía desde el frontend
     } = req.body;
     const Id_Usuario_Organizador = req.user.id;
 
+    // Validaciones básicas (ajusta según tus necesidades)
     if (!Nom_Evento || !Fecha || !Horario_Inicio || !Horario_Fin || !Categoria || !Id_Lugar || !Descripcion || !CostoGeneral || !AsientosGeneral) {
+        // Si hay un archivo subido y la validación falla, elimínalo
         if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
         return res.status(400).json({ message: 'Todos los campos obligatorios deben ser proporcionados para la actualización.' });
     }
 
+    // Validación de categoría (si CATEGORIAS_VALIDAS está definido)
     if (!CATEGORIAS_VALIDAS.includes(Categoria)) {
         if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
         return res.status(400).json({ message: `Categoría inválida. Las categorías permitidas son: ${CATEGORIAS_VALIDAS.join(', ')}.` });
     }
 
     let reglasParsed = '[]';
+    // Asume que Reglas viene como un array o una cadena JSON de array.
+    // Si viene como una cadena separada por comas (del frontend), conviértela a array.
     try {
         if (Reglas) {
-            reglasParsed = JSON.stringify(JSON.parse(Reglas));
+            if (Array.isArray(Reglas)) { // Si ya es un array (como se envía desde verEvento.html)
+                reglasParsed = JSON.stringify(Reglas);
+            } else if (typeof Reglas === 'string') { // Si es una cadena (ej. "regla1, regla2")
+                reglasParsed = JSON.stringify(Reglas.split(',').map(item => item.trim()).filter(item => item !== ''));
+            } else {
+                reglasParsed = '[]'; // Valor por defecto si no es válido
+            }
         }
     } catch (e) {
-        console.warn('Advertencia: Reglas no es un JSON válido en PUT, se guardará como array vacío.', e);
+        console.warn('Advertencia: Reglas no es un formato válido en PUT, se guardará como array vacío.', e);
         reglasParsed = '[]';
     }
 
-    let client; // Declarar client aquí
+    let client;
     try {
-        client = await pool.connect(); // Asignar client aquí
+        client = await pool.connect();
         await client.query('BEGIN');
 
+        // Verificar que el organizador existe
         const orgResult = await client.query('SELECT "Id_Organizador" FROM "Organizadores" WHERE "Id_Usuario" = $1', [Id_Usuario_Organizador]);
         if (orgResult.rows.length === 0) {
             await client.query('ROLLBACK');
@@ -513,17 +876,19 @@ router.put('/eventos/:id', uploadMiddleware, async (req, res) => {
         }
         const Id_Organizador = orgResult.rows[0].Id_Organizador;
 
-        let oldImageUrl = null;
-        if (req.file) { 
-            const oldImageResult = await client.query(
-                `SELECT "URL_Imagen_Evento" FROM "Eventos" WHERE "Id_Evento" = $1 AND "Id_Organizador" = $2`,
-                [id, Id_Organizador]
-            );
-            if (oldImageResult.rows.length > 0) {
-                oldImageUrl = oldImageResult.rows[0].URL_Imagen_Evento;
-            }
+        // Verificar que el evento pertenece a este organizador
+        const checkEventOwnership = await client.query(
+            `SELECT "Id_Evento", "URL_Imagen_Evento" FROM "Eventos" WHERE "Id_Evento" = $1 AND "Id_Organizador" = $2`,
+            [id, Id_Organizador]
+        );
+        if (checkEventOwnership.rows.length === 0) {
+            await client.query('ROLLBACK');
+            if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+            return res.status(403).json({ message: 'Acceso denegado. Este evento no pertenece a tu organización.' });
         }
+        const oldImageUrl = checkEventOwnership.rows[0].URL_Imagen_Evento;
 
+        // Validar la capacidad del lugar
         const lugarCheck = await client.query(
             'SELECT "Capacidad_Total", "Cantidad_General", "Cantidad_VIP", "Cantidad_Conadis" FROM "Lugares" WHERE "Id_Lugar" = $1', 
             [Id_Lugar]
@@ -535,7 +900,7 @@ router.put('/eventos/:id', uploadMiddleware, async (req, res) => {
         }
         const capacidadesRealesLugar = lugarCheck.rows[0];
 
-        // Parsear los asientos solicitados, si no se proporcionan, se asume 0.
+        // Parsear los asientos solicitados (asegurarse de que sean números)
         const requestedAsientosGeneral = parseInt(AsientosGeneral || 0);
         const requestedAsientosVIP = parseInt(AsientosVIP || 0);
         const requestedAsientosConadis = parseInt(AsientosConadis || 0);
@@ -557,13 +922,14 @@ router.put('/eventos/:id', uploadMiddleware, async (req, res) => {
             return res.status(400).json({ error: `La cantidad de asientos CONADIS (${requestedAsientosConadis}) excede la capacidad disponible del lugar (${capacidadesRealesLugar.Cantidad_Conadis}).` });
         }
 
-        const finalImageUrl = req.file ? `/img/event_images/${req.file.filename}` : oldImageUrl; 
-        const URL_Mapa_Eventos = null; // No usamos URL_Mapa en Eventos para la imagen de asientos
+        // Determinar la URL final de la imagen del evento
+        const finalImageUrl = req.file ? `/img/event_images/${req.file.filename}` : (req.body.URL_Imagen_Evento || oldImageUrl); // Usa la nueva imagen, o la URL enviada, o la antigua.
+        const URL_Mapa_Eventos = null; // Si no usas esta columna, mantenla nula o elimínala de la consulta.
 
         const costoVIPValue = CostoVIP ? parseFloat(CostoVIP) : null;
         const costoConadisValue = CostoConadis ? parseFloat(CostoConadis) : null;
 
-        // --- CAMBIO CLAVE AQUÍ: Eliminar las columnas de stock de la actualización en "Eventos" ---
+        // Actualizar el evento en la tabla "Eventos"
         const updateEventQuery = `
             UPDATE "Eventos" SET
                 "Nom_Evento" = $1,
@@ -579,8 +945,9 @@ router.put('/eventos/:id', uploadMiddleware, async (req, res) => {
                 "URL_Imagen_Evento" = $11, 
                 "URL_Mapa" = $12, 
                 "Reglas" = $13,
+                "SolicitudDestacar" = $14, -- Incluir SolicitudDestacar en la actualización
                 "Estado" = 'pendiente' 
-            WHERE "Id_Evento" = $14 AND "Id_Organizador" = $15
+            WHERE "Id_Evento" = $15 AND "Id_Organizador" = $16
             RETURNING "Id_Evento";
         `;
 
@@ -588,6 +955,7 @@ router.put('/eventos/:id', uploadMiddleware, async (req, res) => {
             Nom_Evento, Fecha, Horario_Inicio, Horario_Fin, Categoria, Id_Lugar, Descripcion, 
             parseFloat(CostoGeneral), costoVIPValue, costoConadisValue,
             finalImageUrl, URL_Mapa_Eventos, reglasParsed, 
+            SolicitudDestacar === 'true', // Convertir a booleano si viene como string
             id, Id_Organizador
         ]);
 
@@ -599,8 +967,8 @@ router.put('/eventos/:id', uploadMiddleware, async (req, res) => {
 
         const updatedEventId = eventUpdateResult.rows[0].Id_Evento;
 
-        // --- NUEVO: Actualizar las categorías de entradas y su stock en "Categorías de entradas" ---
-        // Actualizar General
+        // Actualizar las categorías de entradas y su stock en "Categorías de entradas"
+        // Insertar/Actualizar General
         await client.query(
             `INSERT INTO "Categorías de entradas" ("Id_Evento", "Nom_Categoria", "Precio", "Stock_Total", "Stock_Disponible")
              VALUES ($1, 'ZONA GENERAL', $2, $3, $3)
@@ -611,7 +979,7 @@ router.put('/eventos/:id', uploadMiddleware, async (req, res) => {
             [updatedEventId, parseFloat(CostoGeneral), requestedAsientosGeneral]
         );
 
-        // Actualizar VIP (si se proporcionó)
+        // Insertar/Actualizar VIP (si se proporcionó y es mayor que 0)
         if (requestedAsientosVIP > 0 && CostoVIP) {
             await client.query(
                 `INSERT INTO "Categorías de entradas" ("Id_Evento", "Nom_Categoria", "Precio", "Stock_Total", "Stock_Disponible")
@@ -623,16 +991,16 @@ router.put('/eventos/:id', uploadMiddleware, async (req, res) => {
                 [updatedEventId, parseFloat(CostoVIP), requestedAsientosVIP]
             );
         } else {
-            // Si VIP es 0 o no se proporcionó, podríamos eliminar la categoría si existe
+            // Si VIP es 0 o no se proporcionó, eliminar la categoría si existe
             await client.query(
                 `DELETE FROM "Categorías de entradas" WHERE "Id_Evento" = $1 AND "Nom_Categoria" = 'ZONA VIP';`,
                 [updatedEventId]
             );
         }
 
-        // Actualizar CONADIS (si se proporcionó)
+        // Insertar/Actualizar CONADIS (si se proporcionó y es mayor que 0)
         if (requestedAsientosConadis > 0 && CostoConadis) {
-             await client.query(
+            await client.query(
                 `INSERT INTO "Categorías de entradas" ("Id_Evento", "Nom_Categoria", "Precio", "Stock_Total", "Stock_Disponible")
                  VALUES ($1, 'ZONA CONADIS', $2, $3, $3)
                  ON CONFLICT ("Id_Evento", "Nom_Categoria") DO UPDATE
@@ -642,13 +1010,14 @@ router.put('/eventos/:id', uploadMiddleware, async (req, res) => {
                 [updatedEventId, parseFloat(CostoConadis), requestedAsientosConadis]
             );
         } else {
-            // Si CONADIS es 0 o no se proporcionó, podríamos eliminar la categoría si existe
+            // Si CONADIS es 0 o no se proporcionó, eliminar la categoría si existe
             await client.query(
                 `DELETE FROM "Categorías de entradas" WHERE "Id_Evento" = $1 AND "Nom_Categoria" = 'ZONA CONADIS';`,
                 [updatedEventId]
             );
         }
 
+        // Eliminar imagen antigua si se subió una nueva
         if (req.file && oldImageUrl && oldImageUrl.includes('/img/event_images/')) {
             const oldImagePath = path.join(__dirname, '..', '..', 'Fronted', oldImageUrl);
             if (fs.existsSync(oldImagePath)) {
@@ -665,6 +1034,7 @@ router.put('/eventos/:id', uploadMiddleware, async (req, res) => {
     } catch (error) {
         if (client) await client.query('ROLLBACK');
         console.error('Error al actualizar evento:', error.message);
+        // Si hay un error y se subió un archivo, intentar eliminarlo para evitar basura
         if (req.file && fs.existsSync(req.file.path)) {
             fs.unlink(req.file.path, (err) => {
                 if (err) console.error('Error al eliminar archivo subido tras un error:', err);
@@ -685,9 +1055,9 @@ router.delete('/eventos/:id', async (req, res) => {
     const { id } = req.params;
     const Id_Usuario_Organizador = req.user.id;
 
-    let client; // Declarar client aquí
+    let client;
     try {
-        client = await pool.connect(); // Asignar client aquí
+        client = await pool.connect();
         await client.query('BEGIN');
 
         const orgResult = await client.query('SELECT "Id_Organizador" FROM "Organizadores" WHERE "Id_Usuario" = $1', [Id_Usuario_Organizador]);
@@ -730,11 +1100,8 @@ router.delete('/eventos/:id', async (req, res) => {
     } catch (error) {
         if (client) await client.query('ROLLBACK');
         console.error('Error al eliminar evento:', error.message);
-        // Asegurarse de liberar el cliente en caso de error
-        if (client) client.release();
         res.status(500).json({ message: 'Error interno del servidor al eliminar el evento.' });
     } finally {
-        // Asegurarse de liberar el cliente si no se ha hecho en el catch
         if (client) client.release();
     }
 });
@@ -749,9 +1116,9 @@ router.post('/eventos/:id/solicitar-destacar', async (req, res) => {
     const { id } = req.params;
     const Id_Usuario_Organizador = req.user.id; 
 
-    let client; // Declarar client aquí
+    let client;
     try {
-        client = await pool.connect(); // Asignar client aquí
+        client = await pool.connect();
         await client.query('BEGIN');
 
         const orgResult = await client.query('SELECT "Id_Organizador" FROM "Organizadores" WHERE "Id_Usuario" = $1', [Id_Usuario_Organizador]);
@@ -789,102 +1156,10 @@ router.post('/eventos/:id/solicitar-destacar', async (req, res) => {
     } catch (error) {
         if (client) await client.query('ROLLBACK');
         console.error('Error al solicitar destacar evento:', error.message);
-        // Asegurarse de liberar el cliente en caso de error
-        if (client) client.release();
         res.status(500).json({ message: 'Error interno del servidor al solicitar destacar el evento.' });
     } finally {
-        // Asegurarse de liberar el cliente si no se ha hecho en el catch
         if (client) client.release();
     }
 });
-
-/**
- * @route GET /eventos/:id/stats
- * @description Obtiene las estadísticas de venta para un evento específico del organizador.
- * @access Privado (Organizador - middleware aplicado en index.js)
- */
-router.get('/eventos/:id/stats', async (req, res) => {
-    const { id } = req.params; 
-    const Id_Usuario_Organizador = req.user.id;
-
-    let client; // Declarar client aquí
-    try {
-        client = await pool.connect(); // Asignar client aquí
-
-        const eventDetailsResult = await client.query(
-            `SELECT
-                "Id_Organizador", "Nom_Evento", "PrecioGeneral", "PrecioVIP", "PrecioConadis"
-             FROM "Eventos"
-             WHERE "Id_Evento" = $1`,
-            [id]
-        );
-        if (eventDetailsResult.rows.length === 0) {
-            return res.status(404).json({ message: 'Evento no encontrado.' });
-        }
-        const eventDetails = eventDetailsResult.rows[0];
-
-        const orgResult = await client.query('SELECT "Id_Organizador" FROM "Organizadores" WHERE "Id_Usuario" = $1', [Id_Usuario_Organizador]);
-        if (orgResult.rows.length === 0) {
-            return res.status(404).json({ message: 'Organizador no encontrado para el usuario autenticado.' });
-        }
-        const Id_Organizador_Auth = orgResult.rows[0].Id_Organizador;
-
-        if (eventDetails.Id_Organizador !== Id_Organizador_Auth) {
-            return res.status(403).json({ message: 'Acceso denegado. Este evento no pertenece a tu organización.' });
-        }
-
-        const ticketsSoldResult = await client.query(
-            `SELECT 
-                "Tipo_Ticket", 
-                COUNT("Id_Ticket") AS total_tickets_vendidos
-            FROM "Tickets"
-            WHERE "Id_Evento" = $1
-            GROUP BY "Tipo_Ticket"`, 
-            [id]
-        );
-
-        let general_vendidos = 0;
-        let vip_vendidos = 0;
-        let conadis_vendidos = 0;
-        let ganancias_estimadas = 0;
-
-        ticketsSoldResult.rows.forEach(row => {
-            const cantidad = parseInt(row.total_tickets_vendidos, 10);
-            if (row.Tipo_Ticket === 'General') { 
-                general_vendidos = cantidad;
-                ganancias_estimadas += cantidad * parseFloat(eventDetails.PrecioGeneral || 0);
-            } else if (row.Tipo_Ticket === 'VIP') { 
-                vip_vendidos = cantidad;
-                ganancias_estimadas += cantidad * parseFloat(eventDetails.PrecioVIP || 0);
-            } else if (row.Tipo_Ticket === 'CONADIS') { 
-                conadis_vendidos = cantidad;
-                ganancias_estimadas += cantidad * parseFloat(eventDetails.PrecioConadis || 0);
-            }
-        });
-
-        const total_vendidos = general_vendidos + vip_vendidos + conadis_vendidos;
-
-        res.status(200).json({
-            message: 'Estadísticas obtenidas exitosamente.',
-            statistics: {
-                general_vendidos: general_vendidos,
-                vip_vendidos: vip_vendidos,
-                conadis_vendidos: conadis_vendidos,
-                total_vendidos: total_vendidos,
-                ganancias_estimadas: parseFloat(ganancias_estimadas).toFixed(2) 
-            }
-        });
-
-    } catch (error) {
-        console.error('Error al obtener estadísticas del evento:', error.message);
-        // Asegurarse de liberar el cliente en caso de error
-        if (client) client.release();
-        res.status(500).json({ message: 'Error interno del servidor al obtener estadísticas del evento.' });
-    } finally {
-        // Asegurarse de liberar el cliente si no se ha hecho en el catch
-        if (client) client.release();
-    }
-});
-
 
 module.exports = router;

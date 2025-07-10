@@ -3,40 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proveedores Aprobados - TEYCKETAN</title>
+    <title>Bandeja de Reclamos - Panel de Administración</title>
     <!-- Usar el nuevo archivo CSS del panel de administración -->
     <link rel="stylesheet" href="admin.css"> 
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* Estilos específicos para reclamos.html */
+        .reclamos-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #333; /* Fondo oscuro para la tabla */
+            color: #eee; /* Texto claro */
+            border-radius: 8px;
+            overflow: hidden; /* Para que los bordes redondeados se apliquen al contenido */
+        }
+
+        .reclamos-table th, .reclamos-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #555; /* Separador de filas */
+        }
+
+        .reclamos-table th {
+            background-color: #444; /* Fondo para encabezados */
+            font-weight: bold;
+            color: #fff;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+
+        .reclamos-table tbody tr:hover {
+            background-color: #555; /* Efecto hover en filas */
+        }
+
+        .reclamos-table .reclamo-estado-pendiente { color: #ffc107; } /* Amarillo */
+        .reclamos-table .reclamo-estado-leido { color: #17a2b8; } /* Azul claro */
+        .reclamos-table .reclamo-estado-resuelto { color: #28a745; } /* Verde */
+
+        .reclamos-actions button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin-right: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .reclamos-actions button:hover {
+            background-color: #0056b3;
+        }
+
+        .reclamos-actions button.view-attachment {
+            background-color: #6c757d;
+        }
+        .reclamos-actions button.view-attachment:hover {
+            background-color: #5a6268;
+        }
+        .reclamos-actions button.mark-read {
+            background-color: #17a2b8;
+        }
+        .reclamos-actions button.mark-read:hover {
+            background-color: #138496;
+        }
+        .reclamos-actions button.mark-resolved {
+            background-color: #28a745;
+        }
+        .reclamos-actions button.mark-resolved:hover {
+            background-color: #218838;
+        }
+
+        /* Estilos para el modal de visualización de adjuntos */
+        .attachment-modal-content {
+            background-color: #2c2c2c; /* Fondo oscuro para el modal */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto; /* Para scroll si el contenido es grande */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .attachment-modal-content img, .attachment-modal-content iframe {
+            max-width: 100%;
+            max-height: 80vh; /* Limita la altura para que no desborde */
+            display: block;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        .attachment-modal-content iframe {
+            min-height: 500px; /* Altura mínima para PDFs */
+        }
+    </style>
 </head>
 <body>
 
-    <!-- SIDEBAR - Reutilizando la estructura del admin.html -->
+    <!-- SIDEBAR -->
     <div class="admin-sidebar">
         <div class="admin-barra-logo">
-            <!-- RUTA CORREGIDA: Acceso absoluto desde la raíz del servidor estático -->
-            <img src="../img/logo.png" alt="Logo Teycketan" class="admin-logo-img" />
-        </div>
-        <ul class="admin-nav-list">
-            <li><a href="admin.html" class="admin-nav-item"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
-            <li><a href="solicitud.html" class="admin-nav-item"><i class="fas fa-user-clock"></i><span>Solicitud de proveedores</span></a></li>
-            <li><a href="aprobados.html" class="admin-nav-item active"><i class="fas fa-user-check"></i><span>Proveedores aprobados</span></a></li>
-            <li><a href="eventos.html" class="admin-nav-item"><i class="fas fa-tasks"></i><span>Solicitud de eventos</span></a></li>
-            <li><a href="eventoApro.html" class="admin-nav-item"><i class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
-            <li><a href="categorias.html" class="admin-nav-item"><i class="fas fa-tags"></i><span>Eventos por categorias</span></a></li>
-            <li><a href="eventoDestacado.html" class="admin-nav-item"><i class="fas fa-star"></i><span>Eventos Destacados</span></a></li>
-            <li><a href="solicitudDestacar.html" class="admin-nav-item"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
-            <li><a href="catalogoDeLugares.html" class="admin-nav-item"><i  class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
-            <li><a href="reclamos.html" class="prov-nav-item active"><i  class="fas fa-envelope"></i><span>Reclamos</span></a></li>
-        </ul>
-    </div>
-
-    <body>
-
-    <!-- SIDEBAR - Reutilizando la estructura del admin.html -->
-    <div class="admin-sidebar">
-        <div class="admin-barra-logo">
-            <!-- RUTA CORREGIDA: Acceso absoluto desde la raíz del servidor estático -->
             <img src="../img/logo.png" alt="Logo Teycketan" class="admin-logo-img" />
         </div>
         <ul class="admin-nav-list">
@@ -45,71 +116,481 @@
             <li><a href="aprobados.html" class="admin-nav-item"><i class="fas fa-user-check"></i><span>Proveedores aprobados</span></a></li>
             <li><a href="eventos.html" class="admin-nav-item"><i class="fas fa-tasks"></i><span>Solicitud de eventos</span></a></li>
             <li><a href="eventoApro.html" class="admin-nav-item"><i class="fas fa-check-circle"></i><span>Eventos aprobados</span></a></li>
-            <li><a href="categorias.html" class="admin-nav-item"><i class="fas fa-tags"></i><span>Eventos por categorias</span></a></li>
+            <li><a href="categorias.html" class="admin-nav-item"><i class="fas fa-tags"></i><span>Eventos por categorías</span></a></li>
             <li><a href="eventoDestacado.html" class="admin-nav-item"><i class="fas fa-star"></i><span>Eventos Destacados</span></a></li>
             <li><a href="solicitudDestacar.html" class="admin-nav-item"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
-            <li><a href="catalogoDeLugares.html" class="admin-nav-item"><i  class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
-            <li><a href="reclamos.html" class="admin-nav-item active"><i  class="fas fa-envelope"></i><span>Reclamos</span></a></li>
+            <li><a href="catalogoDeLugares.html" class="admin-nav-item"><i class="fas fa-map-marker-alt"></i><span>Catálogo de lugares</span></a></li>
+            <li><a href="reclamos.html" class="admin-nav-item active"><i class="fas fa-envelope"></i><span>Reclamos</span></a></li>
         </ul>
     </div>
 
-    <!-- MAIN CONTENT - Reutilizando la estructura del admin.html -->
+    <!-- MAIN CONTENT -->
     <div class="admin-main-content">
         <header class="admin-topbar">
-            <h1 class="admin-titulo-seccion">Reclamos</h1>
+            <h1 class="admin-titulo-seccion">Bandeja de Reclamos</h1>
             <div class="admin-acciones">
                 <div class="admin-notif-wrapper">
                     <button class="admin-notif-btn" id="adminNotifToggle">
                         <i class="fas fa-bell"></i>
-                        <span class="admin-notif-dot"></span>
+                        <span class="admin-notif-dot" id="notifDot" style="display:none;"></span>
                     </button>
                     <div class="admin-notif-dropdown" id="adminNotifDropdown">
                         <p class="admin-notif-title">Notificaciones</p>
-                        <ul>
-                            <li>Proveedor aprobado correctamente</li>
-                            <li>Nuevo mensaje interno</li>
-                            <li>Se rechazó un proveedor</li>
+                        <ul id="notifList">
+                            <!-- Las notificaciones se cargarán aquí dinámicamente -->
                         </ul>
+                        <button id="markAllReadBtn" style="width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">Marcar todas como leídas</button>
                     </div>
                 </div>
                 <button id="adminLogoutButton" class="admin-btn-logout">Cerrar Sesión</button>
             </div>
         </header>
 
-                <section class="admin-contenido">
-            <div class="admin-bienvenida">Aqui puedes ver los reclamos que se te hayan enviado.</div>
+        <section class="admin-contenido">
+            <div class="admin-bienvenida">Aquí puedes gestionar los reclamos enviados por los proveedores.</div>
+
+            <!-- Contenedor para mensajes (para modales) -->
+            <div id="adminMessageContainer" class="admin-message-container"></div>
 
             <div class="admin-tabla-container">
-                <table class="admin-tabla-reclamos">
+                <table class="reclamos-table">
                     <thead>
                         <tr>
-                            <th>ID Usuario</th>
+                            <th>ID Reclamo</th>
+                            <th>Empresa</th>
+                            <th>Email</th>
                             <th>Tipo de Problema</th>
                             <th>Descripción</th>
-                            <th>Evidencia</th>
-                            <th>Acción</th>
+                            <th>Fecha Envío</th>
+                            <th>Adjunto</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>id</td>
-                            <td>tipo de problema</td>
-                            <td>descripcion</td>
-                            <td><img src="../img/imagen.jpg" alt="Evidencia 1" class="admin-img-evidencia"></td>
-                            <td><button class="admin-btn-resuelto">Marcar como resuelto</button></td>
-                        </tr>
-                        <tr>
-                            <td>id</td>
-                            <td>tipo de problema</td>
-                            <td>descripcion</td>
-                            <td><img src="../img/imagen.jpg" alt="Evidencia 1" class="admin-img-evidencia"></td>
-                            <td><button class="admin-btn-resuelto">Marcar como resuelto</button></td>
-                        </tr>
+                    <tbody id="reclamosListBody">
+                        <!-- Los reclamos se cargarán aquí dinámicamente -->
+                        <tr><td colspan="9" class="admin-loading-message">Cargando reclamos...</td></tr>
                     </tbody>
                 </table>
+                <p id="noReclamosMessage" class="admin-no-data-message" style="display: none;">No hay reclamos pendientes.</p>
             </div>
         </section>
     </div>
 
+    <!-- Modales -->
+    <div id="adminConfirmationModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="admin-close-button">&times;</span>
+            <p id="adminModalMessage">¿Estás seguro de realizar esta acción?</p>
+            <button id="adminModalConfirmBtn" class="admin-modal-btn admin-modal-confirm">Confirmar</button>
+            <button id="adminModalCancelBtn" class="admin-modal-btn admin-modal-cancel">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="adminMessageModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="admin-close-button">&times;</span>
+            <p id="adminMessageModalText"></p>
+            <button id="adminMessageModalCloseBtn" class="admin-modal-btn admin-modal-confirm">Aceptar</button>
+        </div>
+    </div>
+
+    <!-- Modal para visualizar archivos adjuntos -->
+    <div id="attachmentViewerModal" class="admin-modal">
+        <div class="attachment-modal-content">
+            <span class="admin-close-button">&times;</span>
+            <h3>Archivo Adjunto</h3>
+            <div id="attachmentContent">
+                <!-- El contenido del adjunto (imagen o iframe de PDF) se cargará aquí -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000'; 
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // --- Lógica de Autenticación al cargar la página ---
+            const token = localStorage.getItem('jwtToken');
+            const userRole = localStorage.getItem('userRole');
+            const userId = localStorage.getItem('userId');
+
+            // Seguridad: Redirige si no hay token o el rol no es 'admin'
+            if (!token || userRole !== 'admin') {
+                showAdminMessageModal('Acceso denegado. Debes ser un administrador autenticado para ver esta página.', 'error');
+                setTimeout(() => {
+                    window.location.replace('../login.html');
+                }, 2000);
+                return;
+            }
+
+            // Elementos DOM principales
+            const adminLogoutButton = document.getElementById('adminLogoutButton');
+            const adminNotifToggle = document.getElementById('adminNotifToggle');
+            const adminNotifDropdown = document.getElementById('adminNotifDropdown');
+            const notifList = document.getElementById('notifList');
+            const notifDot = document.getElementById('notifDot');
+            const markAllReadBtn = document.getElementById('markAllReadBtn');
+            const reclamosListBody = document.getElementById('reclamosListBody');
+            const noReclamosMessage = document.getElementById('noReclamosMessage');
+
+            // Referencias a los IDs de modales
+            const adminConfirmationModal = document.getElementById('adminConfirmationModal');
+            const adminModalMessage = document.getElementById('adminModalMessage');
+            const adminModalConfirmBtn = document.getElementById('adminModalConfirmBtn');
+            const adminModalCancelBtn = document.getElementById('adminModalCancelBtn');
+            const adminMessageModal = document.getElementById('adminMessageModal');
+            const adminMessageModalText = document.getElementById('adminMessageModalText');
+            const adminMessageModalCloseBtn = document.getElementById('adminMessageModalCloseBtn');
+            const attachmentViewerModal = document.getElementById('attachmentViewerModal');
+            const attachmentContent = document.getElementById('attachmentContent');
+
+            // --- Funciones para Modales ---
+            function showAdminConfirmationModal(message) {
+                return new Promise((resolve) => {
+                    adminModalMessage.textContent = message;
+                    adminConfirmationModal.style.display = 'flex';
+
+                    const confirmHandler = () => {
+                        adminConfirmationModal.style.display = 'none';
+                        adminModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        adminModalCancelBtn.removeEventListener('click', cancelHandler);
+                        adminConfirmationModal.querySelector('.admin-close-button').removeEventListener('click', cancelHandler);
+                        resolve(true);
+                    };
+
+                    const cancelHandler = () => {
+                        adminConfirmationModal.style.display = 'none';
+                        adminModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        adminModalCancelBtn.removeEventListener('click', cancelHandler);
+                        adminConfirmationModal.querySelector('.admin-close-button').removeEventListener('click', cancelHandler);
+                        resolve(false);
+                    };
+
+                    adminModalConfirmBtn.addEventListener('click', confirmHandler);
+                    adminModalCancelBtn.addEventListener('click', cancelHandler);
+                    adminConfirmationModal.querySelector('.admin-close-button').addEventListener('click', cancelHandler);
+                });
+            }
+
+            function showAdminMessageModal(message, type = '') {
+                adminMessageModalText.textContent = message;
+                adminMessageModalText.className = `admin-message-text ${type ? 'admin-message-' + type : ''}`; 
+                adminMessageModal.style.display = 'flex';
+
+                adminMessageModalCloseBtn.onclick = () => {
+                    adminMessageModal.style.display = 'none';
+                };
+                adminMessageModal.querySelector('.admin-close-button').onclick = () => {
+                    adminMessageModal.style.display = 'none';
+                };
+            }
+
+            // --- Event Listener para Cerrar Sesión ---
+            adminLogoutButton.addEventListener('click', async () => {
+                const confirmLogout = await showAdminConfirmationModal('¿Estás seguro de que quieres cerrar sesión?');
+                if (confirmLogout) {
+                    localStorage.removeItem('jwtToken');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('userId');
+                    showAdminMessageModal('Sesión cerrada correctamente.', 'success');
+                    setTimeout(() => {
+                        window.location.replace('../login.html');
+                    }, 500);
+                }
+            });
+
+            // --- Lógica para Notificaciones (Dropdown) ---
+            adminNotifToggle.addEventListener('click', async (event) => {
+                event.stopPropagation();
+                if (adminNotifDropdown.style.display === 'block') {
+                    adminNotifDropdown.style.display = 'none';
+                } else {
+                    adminNotifDropdown.style.display = 'block';
+                    await fetchNotifications(); // Cargar notificaciones cada vez que se abre
+                }
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!adminNotifDropdown.contains(event.target) && !adminNotifToggle.contains(event.target)) {
+                    adminNotifDropdown.style.display = 'none';
+                }
+            });
+
+            async function fetchNotifications() {
+                try {
+                    const response = await fetch(`${API_URL}/api/notificaciones/usuario/${userId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok && data.notifications) {
+                        notifList.innerHTML = ''; // Limpiar lista actual
+                        let unreadCount = 0;
+                        if (data.notifications.length > 0) {
+                            data.notifications.forEach(notif => {
+                                const listItem = document.createElement('li');
+                                listItem.textContent = notif.Mensaje;
+                                if (!notif.Leida) {
+                                    listItem.classList.add('unread');
+                                    unreadCount++;
+                                }
+                                listItem.dataset.notificationId = notif.Id_Notificacion;
+                                listItem.addEventListener('click', () => markNotificationAsRead(notif.Id_Notificacion));
+                                notifList.appendChild(listItem);
+                            });
+                        } else {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = 'No tienes notificaciones nuevas.';
+                            notifList.appendChild(listItem);
+                        }
+
+                        if (unreadCount > 0) {
+                            notifDot.style.display = 'block';
+                        } else {
+                            notifDot.style.display = 'none';
+                        }
+                    } else {
+                        showAdminMessageModal(`Error al cargar notificaciones: ${data.message || 'Desconocido'}`, 'error');
+                        notifDot.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Error al cargar notificaciones:', error);
+                    showAdminMessageModal('Error de red al cargar notificaciones.', 'error');
+                    notifDot.style.display = 'none';
+                }
+            }
+
+            async function markNotificationAsRead(notificationId) {
+                try {
+                    const response = await fetch(`${API_URL}/api/notificaciones/${notificationId}/mark-as-read`, { 
+                        method: 'PUT',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (response.ok) {
+                        const listItem = notifList.querySelector(`li[data-notification-id="${notificationId}"]`);
+                        if (listItem) {
+                            listItem.classList.remove('unread');
+                            const unreadItems = notifList.querySelectorAll('li.unread');
+                            if (unreadItems.length === 0) {
+                                notifDot.style.display = 'none';
+                            }
+                        }
+                    } else {
+                        const errorData = await response.json();
+                        showAdminMessageModal(`Error al marcar notificación: ${errorData.message || 'Desconocido'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error al marcar notificación como leída:', error);
+                    showAdminMessageModal('Error de red al marcar notificación.', 'error');
+                }
+            }
+
+            markAllReadBtn.addEventListener('click', async () => {
+                const confirmRead = await showAdminConfirmationModal('¿Estás seguro de que quieres marcar todas las notificaciones como leídas?');
+                if (confirmRead) {
+                    try {
+                        const response = await fetch(`${API_URL}/api/notificaciones/marcarTodasLeidas/${userId}`, {
+                            method: 'PUT',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        if (response.ok) {
+                            showAdminMessageModal('Todas las notificaciones han sido marcadas como leídas.', 'success');
+                            fetchNotifications(); // Recargar para actualizar la UI
+                        } else {
+                            const errorData = await response.json();
+                            showAdminMessageModal(`Error al marcar todas como leídas: ${errorData.message || 'Desconocido'}`, 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error al marcar todas las notificaciones como leídas:', error);
+                        showAdminMessageModal('Error de red al marcar todas las notificaciones.', 'error');
+                    }
+                }
+            });
+
+            // Añadir clase 'active' al enlace de la página actual en el sidebar
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.admin-nav-item').forEach(link => {
+                // Asegúrate de que el href coincida con el nombre del archivo
+                if (link.href.includes('reclamos.html')) { 
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+
+            /**
+             * @brief Carga todos los reclamos/mensajes para el administrador.
+             */
+            async function fetchReclamos() {
+                reclamosListBody.innerHTML = '<tr><td colspan="9" class="admin-loading-message">Cargando reclamos...</td></tr>';
+                noReclamosMessage.style.display = 'none';
+
+                try {
+                    // CAMBIO CLAVE AQUÍ: Llama a la ruta /api/contactoProveedor
+                    const response = await fetch(`${API_URL}/api/contactoProveedor`, { 
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok && data.mensajesContacto) { // Data ahora viene como 'mensajesContacto'
+                        if (data.mensajesContacto.length === 0) {
+                            reclamosListBody.innerHTML = '';
+                            noReclamosMessage.style.display = 'block';
+                        } else {
+                            renderReclamosTable(data.mensajesContacto); // Pasa 'mensajesContacto' a la función de renderizado
+                        }
+                    } else {
+                        showAdminMessageModal(`Error al cargar reclamos: ${data.message || 'Desconocido'}`, 'error');
+                        reclamosListBody.innerHTML = `<tr><td colspan="9" class="admin-no-data-message admin-error-text">No se pudieron cargar los reclamos.</td></tr>`;
+                    }
+                } catch (error) {
+                    console.error('Error al cargar reclamos:', error);
+                    showAdminMessageModal('Error de red al cargar reclamos.', 'error');
+                    reclamosListBody.innerHTML = `<tr><td colspan="9" class="admin-no-data-message admin-error-text">Error de red.</td></tr>`;
+                }
+            }
+
+            /**
+             * @brief Renderiza la tabla de reclamos.
+             * @param {Array<Object>} mensajesContacto - Array de objetos de reclamo (ahora se llaman mensajesContacto).
+             */
+            function renderReclamosTable(mensajesContacto) { // Cambiado el parámetro a mensajesContacto
+                reclamosListBody.innerHTML = ''; // Limpiar tbody
+                noReclamosMessage.style.display = 'none';
+
+                if (mensajesContacto.length === 0) {
+                    noReclamosMessage.style.display = 'block';
+                    return;
+                }
+
+                mensajesContacto.forEach(mensaje => { // Iterar sobre 'mensaje'
+                    const row = document.createElement('tr');
+                    const fechaEnvio = new Date(mensaje.Fecha_Envio).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+                    
+                    row.innerHTML = `
+                        <td>${mensaje.Id_Contacto}</td> <!-- Usar Id_Contacto -->
+                        <td>${mensaje.Nombre_Empresa_Organizador || 'N/A'}</td>
+                        <td>${mensaje.Email_Organizador || 'N/A'}</td>
+                        <td>${mensaje.Tipo_Problema || 'N/A'}</td>
+                        <td>${mensaje.Descripcion || 'N/A'}</td>
+                        <td>${fechaEnvio}</td>
+                        <td>
+                            ${mensaje.URL_Archivo_Adjunto ? `<button class="admin-btn-details view-attachment" data-url="${API_URL}${mensaje.URL_Archivo_Adjunto}">Ver</button>` : 'Ninguno'}
+                        </td>
+                        <td><span class="reclamo-estado-${mensaje.Estado}">${mensaje.Estado}</span></td>
+                        <td class="reclamos-actions">
+                            ${mensaje.Estado === 'pendiente' ? `<button class="mark-read" data-id="${mensaje.Id_Contacto}">Marcar como Leído</button>` : ''}
+                            ${mensaje.Estado !== 'resuelto' ? `<button class="mark-resolved" data-id="${mensaje.Id_Contacto}">Marcar como Resuelto</button>` : ''}
+                        </td>
+                    `;
+                    reclamosListBody.appendChild(row);
+                });
+
+                // Añadir event listeners a los botones de acción
+                reclamosListBody.querySelectorAll('.view-attachment').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const fileUrl = e.target.dataset.url;
+                        viewAttachment(fileUrl);
+                    });
+                });
+
+                reclamosListBody.querySelectorAll('.mark-read').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const mensajeId = e.target.dataset.id; // Usar mensajeId
+                        updateReclamoStatus(mensajeId, 'leido', '¿Estás seguro de marcar este reclamo como leído?');
+                    });
+                });
+
+                reclamosListBody.querySelectorAll('.mark-resolved').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const mensajeId = e.target.dataset.id; // Usar mensajeId
+                        updateReclamoStatus(mensajeId, 'resuelto', '¿Estás seguro de marcar este reclamo como resuelto?');
+                    });
+                });
+            }
+
+            /**
+             * @brief Abre un modal para visualizar el archivo adjunto.
+             * @param {string} fileUrl - La URL completa del archivo adjunto.
+             */
+            function viewAttachment(fileUrl) {
+                attachmentContent.innerHTML = ''; // Limpiar contenido anterior
+                const fileExtension = fileUrl.split('.').pop().toLowerCase();
+
+                if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension)) {
+                    const img = document.createElement('img');
+                    img.src = fileUrl;
+                    img.alt = 'Archivo Adjunto';
+                    attachmentContent.appendChild(img);
+                } else if (fileExtension === 'pdf') {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = fileUrl;
+                    iframe.style.width = '100%';
+                    iframe.style.height = '600px';
+                    iframe.style.border = 'none';
+                    attachmentContent.appendChild(iframe);
+                } else {
+                    attachmentContent.innerHTML = `<p>Tipo de archivo no soportado para previsualización. <a href="${fileUrl}" target="_blank" style="color: #007bff;">Descargar archivo</a></p>`;
+                }
+                attachmentViewerModal.style.display = 'flex';
+            }
+
+            // Cerrar modal de adjuntos
+            attachmentViewerModal.querySelector('.admin-close-button').onclick = () => {
+                attachmentViewerModal.style.display = 'none';
+            };
+            window.onclick = (event) => {
+                if (event.target === attachmentViewerModal) {
+                    attachmentViewerModal.style.display = 'none';
+                }
+            };
+
+            /**
+             * @brief Actualiza el estado de un reclamo en el backend.
+             * @param {number} reclamoId - El ID del reclamo a actualizar.
+             * @param {string} newStatus - El nuevo estado ('leido' o 'resuelto').
+             * @param {string} confirmationMessage - Mensaje para el modal de confirmación.
+             */
+            async function updateReclamoStatus(reclamoId, newStatus, confirmationMessage) {
+                const confirmUpdate = await showAdminConfirmationModal(confirmationMessage);
+                if (!confirmUpdate) {
+                    return;
+                }
+
+                showAdminMessageModal(`Actualizando estado a '${newStatus}'...`, 'info');
+
+                try {
+                    // CAMBIO CLAVE AQUÍ: Llama a la ruta /api/contactoProveedor/:id/estado
+                    const response = await fetch(`${API_URL}/api/contactoProveedor/${reclamoId}/estado`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ estado: newStatus })
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showAdminMessageModal(data.message, 'success');
+                        fetchReclamos(); // Recargar la tabla para ver los cambios
+                    } else {
+                        showAdminMessageModal(`Error al actualizar estado: ${data.message || 'Desconocido'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error de red al actualizar estado del reclamo:', error);
+                    showAdminMessageModal('Error de conexión con el servidor al actualizar el estado.', 'error');
+                }
+            }
+
+            // Cargar reclamos al inicio
+            fetchReclamos();
+        });
+    </script>
 </body>
 </html>

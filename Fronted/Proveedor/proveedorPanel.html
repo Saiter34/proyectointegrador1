@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Proveedor - TEYCKETAN</title>
-    <!-- Usar el nuevo archivo CSS específico para el panel de proveedor -->
+    <!-- Usar el archivo CSS específico para el panel de proveedor -->
     <link rel="stylesheet" href="proveedor.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -14,16 +14,16 @@
     <!-- SIDEBAR -->
     <div class="prov-sidebar">
         <div class="prov-barra-logo">
-            <!-- RUTA CORREGIDA: Acceso absoluto desde la raíz del servidor estático o subiendo un nivel -->
             <img src="../img/logo.png" alt="Logo Teycketan" class="prov-logo-img" />
         </div>
         <ul class="prov-nav-list">
-            <li><a href="proveedorPanel.html" class="prov-nav-item active"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
+            <li><a href="proveedorPanel.html" class="prov-nav-item active" data-section="welcome"><i class="fas fa-home"></i><span>Bienvenido</span></a></li>
             <li><a href="crearevento.html" class="prov-nav-item"><i class="fas fa-plus-circle"></i><span>Crear evento</span></a></li>
             <li><a href="verEvento.html" class="prov-nav-item"><i class="fas fa-calendar-alt"></i><span>Ver eventos</span></a></li>
+            <!-- Las entradas de menú para Editar Datos y Reporte de Ventas se han movido a la sección principal -->
             <li><a href="contactarEmpresa.html" class="prov-nav-item"><i class="fas fa-envelope"></i><span>Contactar empresa</span></a></li>
             <li><a href="eventosAprov.html" class="prov-nav-item"><i class="fas fa-check-circle"></i><span>Eventos Aprobados</span></a></li>
-            <li><a href="catalogoDeLugares.html" class="prov-nav-item active"><i  class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
+            <li><a href="catalogoDeLugares.html" class="prov-nav-item"><i class="fas fa-map-marker-alt"></i><span>Catálogo de lugares</span></a></li>
         </ul>
     </div>
 
@@ -35,44 +35,108 @@
                 <div class="prov-notif-wrapper">
                     <button class="prov-notif-btn" id="provNotifToggle">
                         <i class="fas fa-bell"></i>
-                        <span class="prov-notif-dot"></span>
+                        <span class="prov-notif-dot" id="notifDot" style="display:none;"></span>
                     </button>
                     <div class="prov-notif-dropdown" id="provNotifDropdown">
                         <p class="prov-notif-title">Notificaciones</p>
-                        <ul>
-                            <li>Tu evento “Damiano David” fue aprobado</li>
-                            <li>Nuevo mensaje de TEYCKETAN</li>
-                            <li>Revisa el estado de tu evento</li>
+                        <ul id="notifList">
+                            <!-- Las notificaciones se cargarán aquí dinámicamente -->
                         </ul>
+                        <button id="markAllReadBtn" style="width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">Marcar todas como leídas</button>
                     </div>
                 </div>
-                <!-- Este botón podría redirigir a crear evento o ser solo estético si ya hay un link en el sidebar -->
-                <!-- <button class="prov-btn-crear-evento">+ Nuevo evento</button> -->
                 <button id="provLogoutButton" class="prov-btn-logout">Cerrar Sesión</button>
             </div>
         </header>
 
         <section class="prov-contenido">
-            <div class="prov-bienvenida">Bienvenido a TEYCKETAN, aquí puedes gestionar tus eventos.</div>
+            <div id="welcome-section" class="prov-bienvenida prov-section">
+                <h3>Bienvenido a TEYCKETAN</h3>
+                <p>Aquí puedes gestionar tus eventos y el rendimiento de tus ventas.</p>
+                <div class="prov-info-cards-grid">
+                    <div class="prov-info-card">
+                        <h4>Eventos Pendientes</h4>
+                        <p id="pendingEventsCount">0</p>
+                        <small>Eventos esperando aprobación.</small>
+                    </div>
+                    <div class="prov-info-card">
+                        <h4>Eventos Aprobados</h4>
+                        <p id="approvedEventsCount">0</p>
+                        <small>Eventos listos para publicar/celebrarse.</small>
+                    </div>
+                    <div class="prov-info-card">
+                        <h4>Eventos Rechazados</h4>
+                        <p id="rejectedEventsCount">0</p>
+                        <small>Eventos que necesitan revisión.</small>
+                    </div>
+                </div>
 
-            <!-- Puedes añadir aquí tarjetas o resúmenes si los necesitas en la página de inicio del proveedor -->
-            <!-- Ejemplo de tarjeta de información -->
-            <div class="prov-info-cards-grid">
-                <div class="prov-info-card">
-                    <h4>Eventos Pendientes</h4>
-                    <p id="pendingEventsCount">0</p>
-                    <small>Eventos esperando aprobación.</small>
+                <!-- Botones para acceder a Editar Datos y Reporte de Ventas dentro de la sección de bienvenida -->
+                <div style="display: flex; justify-content: center; gap: 20px; margin-top: 30px;">
+                    <button class="prov-btn-submit" id="showEditProfileBtn" style="background-color: #007bff;"><i class="fas fa-user-edit"></i> Editar Datos</button>
+                    <button class="prov-btn-submit" id="showSalesReportBtn" style="background-color: #28a745;"><i class="fas fa-chart-line"></i> Reporte de Ventas</button>
                 </div>
-                <div class="prov-info-card">
-                    <h4>Eventos Aprobados</h4>
-                    <p id="approvedEventsCount">0</p>
-                    <small>Eventos listos para publicar/celebrarse.</small>
+
+                <!-- Sección de Editar Datos (inicialmente oculta) -->
+                <div id="edit-profile-section" class="prov-section" style="display: none; margin-top: 30px;">
+                    <h3>Editar Datos de Perfil</h3>
+                    <form id="editProfileForm" class="prov-form">
+                        <div class="form-group">
+                            <label for="profileName">Nombre:</label>
+                            <input type="text" id="profileName" name="Nom_Usuario" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileApellido">Apellido:</label>
+                            <input type="text" id="profileApellido" name="Ape_Usuario" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileEmail">Email:</label>
+                            <input type="email" id="profileEmail" name="Correo_Usuario" required readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="profilePhone">Teléfono:</label>
+                            <input type="tel" id="profilePhone" name="Tlf_Usuario">
+                        </div>
+                        <div class="form-group">
+                            <label for="profileOldPassword">Contraseña Antigua (opcional):</label>
+                            <input type="password" id="profileOldPassword" name="oldPassword">
+                        </div>
+                        <div class="form-group">
+                            <label for="profileNewPassword">Nueva Contraseña (opcional):</label>
+                            <input type="password" id="profileNewPassword" name="newPassword">
+                        </div>
+                        <div class="form-group">
+                            <label for="profileConfirmNewPassword">Confirmar Nueva Contraseña:</label>
+                            <input type="password" id="profileConfirmNewPassword" name="confirmNewPassword">
+                        </div>
+                        <button type="submit" class="prov-btn-submit">Guardar Cambios</button>
+                        <button type="button" class="prov-btn-cancel" id="cancelEditProfile">Cancelar</button>
+                    </form>
                 </div>
-                <div class="prov-info-card">
-                    <h4>Eventos Rechazados</h4>
-                    <p id="rejectedEventsCount">0</p>
-                    <small>Eventos que necesitan revisión.</small>
+
+                <!-- Sección de Reporte de Ventas (inicialmente oculta) -->
+                <div id="sales-report-section" class="prov-section" style="display: none; margin-top: 30px;">
+                    <h3>Reporte de Ventas</h3>
+                    <div class="prov-info-cards-grid">
+                        <div class="prov-info-card">
+                            <h4>Total de Ventas Realizadas</h4>
+                            <p id="totalSalesAmount">S/ 0.00</p>
+                            <small>Monto total de tickets vendidos.</small>
+                        </div>
+                        <div class="prov-info-card">
+                            <h4>Tickets Vendidos</h4>
+                            <p id="totalTicketsSold">0</p>
+                            <small>Cantidad total de tickets vendidos.</small>
+                        </div>
+                        <div class="prov-info-card">
+                            <h4>Eventos con Ventas</h4>
+                            <p id="eventsWithSales">0</p>
+                            <small>Número de eventos con al menos una venta.</small>
+                        </div>
+                        <!-- Gráficos o tablas adicionales se pueden agregar aquí -->
+                    </div>
                 </div>
+
             </div>
 
             <!-- Contenedor para mensajes (para modales) -->
@@ -80,7 +144,7 @@
         </section>
     </div>
 
-    <!-- Modales (copiados de admin.html/eventoAprov.html, pero con prefijo prov-) -->
+    <!-- Modales -->
     <div id="provConfirmationModal" class="prov-modal">
         <div class="prov-modal-content">
             <span class="prov-close-button">&times;</span>
@@ -100,12 +164,12 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            const API_URL = 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta
+            const API_URL = 'http://localhost:3000'; 
 
             // --- Lógica de Autenticación al cargar la página ---
             const token = localStorage.getItem('jwtToken');
             const userRole = localStorage.getItem('userRole');
-            const userId = localStorage.getItem('userId'); // Necesitarás el userId para las solicitudes de eventos del proveedor
+            const userId = localStorage.getItem('userId');
 
             console.log('Proveedor Panel Page Loaded.');
             console.log('JWT Token:', token ? 'Exists' : 'Missing');
@@ -116,21 +180,49 @@
             if (!token || userRole !== 'organizador' || !userId) {
                 showProvMessageModal('Acceso denegado. Debes ser un proveedor autenticado para ver esta página.', 'error');
                 setTimeout(() => {
-                    window.location.replace('../login.html'); // Redirige al login.html (un nivel arriba de Proveedor/)
+                    window.location.replace('../login.html');
                 }, 2000);
-                return; // Detener la ejecución del script aquí
+                return;
             }
 
             // Elementos DOM principales
             const provLogoutButton = document.getElementById('provLogoutButton');
             const provNotifToggle = document.getElementById('provNotifToggle');
             const provNotifDropdown = document.getElementById('provNotifDropdown');
-            const provMessageContainer = document.getElementById('provMessageContainer');
+            const notifList = document.getElementById('notifList');
+            const notifDot = document.getElementById('notifDot');
+            const markAllReadBtn = document.getElementById('markAllReadBtn');
 
             // Elementos para los contadores de eventos
             const pendingEventsCount = document.getElementById('pendingEventsCount');
             const approvedEventsCount = document.getElementById('approvedEventsCount');
             const rejectedEventsCount = document.getElementById('rejectedEventsCount');
+
+            // Elementos para las nuevas secciones
+            const welcomeSection = document.getElementById('welcome-section');
+            const editProfileSection = document.getElementById('edit-profile-section');
+            const salesReportSection = document.getElementById('sales-report-section');
+
+            // Nuevos botones para mostrar sub-secciones
+            const showEditProfileBtn = document.getElementById('showEditProfileBtn');
+            const showSalesReportBtn = document.getElementById('showSalesReportBtn');
+
+
+            // Elementos del formulario de edición de perfil
+            const editProfileForm = document.getElementById('editProfileForm');
+            const profileNameInput = document.getElementById('profileName');
+            const profileApellidoInput = document.getElementById('profileApellido');
+            const profileEmailInput = document.getElementById('profileEmail');
+            const profilePhoneInput = document.getElementById('profilePhone');
+            const profileOldPasswordInput = document.getElementById('profileOldPassword');
+            const profileNewPasswordInput = document.getElementById('profileNewPassword');
+            const profileConfirmNewPasswordInput = document.getElementById('profileConfirmNewPassword');
+            const cancelEditProfileButton = document.getElementById('cancelEditProfile');
+
+            // Elementos de reporte de ventas
+            const totalSalesAmount = document.getElementById('totalSalesAmount');
+            const totalTicketsSold = document.getElementById('totalTicketsSold');
+            const eventsWithSales = document.getElementById('eventsWithSales');
 
             // Referencias a los IDs de modales
             const provConfirmationModal = document.getElementById('provConfirmationModal');
@@ -141,17 +233,11 @@
             const provMessageModalText = document.getElementById('provMessageModalText');
             const provMessageModalCloseBtn = document.getElementById('provMessageModalCloseBtn');
 
-            // --- Funciones para Modales (adaptadas para proveedor) ---
-
-            /**
-             * @brief Muestra un modal de confirmación al usuario (específico para Proveedor).
-             * @param {string} message - El mensaje a mostrar en el modal.
-             * @returns {Promise<boolean>} Una promesa que se resuelve a `true` si el usuario confirma, `false` si cancela.
-             */
+            // --- Funciones para Modales ---
             function showProvConfirmationModal(message) {
                 return new Promise((resolve) => {
                     provModalMessage.textContent = message;
-                    provConfirmationModal.style.display = 'flex'; // Usar flex para centrar
+                    provConfirmationModal.style.display = 'flex';
 
                     const confirmHandler = () => {
                         provConfirmationModal.style.display = 'none';
@@ -175,15 +261,10 @@
                 });
             }
 
-            /**
-             * @brief Muestra un modal de mensaje informativo al usuario (específico para Proveedor).
-             * @param {string} message - El mensaje a mostrar en el modal.
-             * @param {string} type - Tipo de mensaje ('success' o 'error') para estilos. Opcional.
-             */
             function showProvMessageModal(message, type = '') {
                 provMessageModalText.textContent = message;
-                provMessageModalText.className = `prov-message-text ${type ? 'prov-message-' + type : ''}`; // Añadir clase para estilo
-                provMessageModal.style.display = 'flex'; // Usar flex para centrar
+                provMessageModalText.className = `prov-message-text ${type ? 'prov-message-' + type : ''}`;
+                provMessageModal.style.display = 'flex';
 
                 provMessageModalCloseBtn.onclick = () => {
                     provMessageModal.style.display = 'none';
@@ -192,6 +273,34 @@
                     provMessageModal.style.display = 'none';
                 };
             }
+
+            // --- Función para mostrar/ocultar sub-secciones dentro de welcome-section ---
+            function toggleSubSection(sectionToShow) {
+                // Ocultar todas las sub-secciones primero
+                editProfileSection.style.display = 'none';
+                salesReportSection.style.display = 'none';
+
+                // Mostrar la sección deseada
+                if (sectionToShow) {
+                    sectionToShow.style.display = 'block';
+                }
+            }
+
+            // Manejar clics en los nuevos botones para mostrar sub-secciones
+            showEditProfileBtn.addEventListener('click', () => {
+                toggleSubSection(editProfileSection); // Mostrar editar perfil, ocultar otros
+                fetchProfileData(); // Cargar datos del perfil al mostrar la sección
+            });
+
+            showSalesReportBtn.addEventListener('click', () => {
+                toggleSubSection(salesReportSection); // Mostrar reporte, ocultar otros
+                fetchSalesStatistics(); // Cargar estadísticas al mostrar la sección
+            });
+
+            cancelEditProfileButton.addEventListener('click', () => {
+                toggleSubSection(null); // Ocultar todas las sub-secciones
+            });
+
 
             // --- Event Listener para Cerrar Sesión ---
             provLogoutButton.addEventListener('click', async () => {
@@ -209,10 +318,15 @@
                 }
             });
 
-            // --- Lógica para Notificaciones (Dropdown) ---
-            provNotifToggle.addEventListener('click', (event) => {
+            // --- Lógica para Notificaciones (Dropdown) y fetch ---
+            provNotifToggle.addEventListener('click', async (event) => {
                 event.stopPropagation();
-                provNotifDropdown.style.display = provNotifDropdown.style.display === 'block' ? 'none' : 'block';
+                if (provNotifDropdown.style.display === 'block') {
+                    provNotifDropdown.style.display = 'none';
+                } else {
+                    provNotifDropdown.style.display = 'block';
+                    await fetchNotifications(); // Cargar notificaciones cada vez que se abre
+                }
             });
 
             document.addEventListener('click', (event) => {
@@ -221,21 +335,105 @@
                 }
             });
 
-            // Añadir clase 'active' al enlace de la página actual en el sidebar
-            const currentPath = window.location.pathname;
-            document.querySelectorAll('.prov-nav-item').forEach(link => {
-                if (link.href.includes('proveedorPanel.html')) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active'); // Remover de otros enlaces por si acaso
+            async function fetchNotifications() {
+                try {
+                    const response = await fetch(`${API_URL}/api/notificaciones/usuario/${userId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok && data.notifications) {
+                        notifList.innerHTML = ''; // Limpiar lista actual
+                        let unreadCount = 0;
+                        if (data.notifications.length > 0) {
+                            data.notifications.forEach(notif => {
+                                const listItem = document.createElement('li');
+                                listItem.textContent = notif.Mensaje;
+                                if (!notif.Leida) {
+                                    listItem.classList.add('unread');
+                                    unreadCount++;
+                                }
+                                listItem.dataset.notificationId = notif.Id_Notificacion;
+                                listItem.addEventListener('click', () => markNotificationAsRead(notif.Id_Notificacion));
+                                notifList.appendChild(listItem);
+                            });
+                        } else {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = 'No tienes notificaciones nuevas.';
+                            notifList.appendChild(listItem);
+                        }
+
+                        if (unreadCount > 0) {
+                            notifDot.style.display = 'block';
+                        } else {
+                            notifDot.style.display = 'none';
+                        }
+                    } else {
+                        showProvMessageModal(`Error al cargar notificaciones: ${data.message || 'Desconocido'}`, 'error');
+                        notifDot.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Error al cargar notificaciones:', error);
+                    showProvMessageModal('Error de red al cargar notificaciones.', 'error');
+                    notifDot.style.display = 'none';
+                }
+            }
+
+            async function markNotificationAsRead(notificationId) {
+                try {
+                    const response = await fetch(`${API_URL}/api/notificaciones/${notificationId}/mark-as-read`, { 
+                        method: 'PUT',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (response.ok) {
+                        // Actualizar la UI
+                        const listItem = notifList.querySelector(`li[data-notification-id="${notificationId}"]`);
+                        if (listItem) {
+                            listItem.classList.remove('unread');
+                            // Actualizar el contador de notificaciones no leídas
+                            const unreadItems = notifList.querySelectorAll('li.unread');
+                            if (unreadItems.length === 0) {
+                                notifDot.style.display = 'none';
+                            }
+                        }
+                    } else {
+                        const errorData = await response.json();
+                        showProvMessageModal(`Error al marcar notificación: ${errorData.message || 'Desconocido'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error al marcar notificación como leída:', error);
+                    showProvMessageModal('Error de red al marcar notificación.', 'error');
+                }
+            }
+
+            markAllReadBtn.addEventListener('click', async () => {
+                const confirmRead = await showProvConfirmationModal('¿Estás seguro de que quieres marcar todas las notificaciones como leídas?');
+                if (confirmRead) {
+                    try {
+                        const response = await fetch(`${API_URL}/api/notificaciones/marcarTodasLeidas/${userId}`, {
+                            method: 'PUT',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        if (response.ok) {
+                            showProvMessageModal('Todas las notificaciones han sido marcadas como leídas.', 'success');
+                            fetchNotifications(); // Recargar para actualizar la UI
+                        } else {
+                            const errorData = await response.json();
+                            showProvMessageModal(`Error al marcar todas como leídas: ${errorData.message || 'Desconocido'}`, 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error al marcar todas las notificaciones como leídas:', error);
+                        showProvMessageModal('Error de red al marcar todas las notificaciones.', 'error');
+                    }
                 }
             });
+
 
             // --- Funcionalidad para cargar estadísticas de eventos del proveedor ---
             async function fetchEventStatistics() {
                 try {
                     // Endpoint para obtener los eventos del organizador autenticado
-                    const response = await fetch(`${API_URL}/api/proveedor/eventos`, {
+                    const response = await fetch(`${API_URL}/api/proveedor/eventos`, { 
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}` // Aquí se usa el token
@@ -278,8 +476,125 @@
                 }
             }
 
-            // Llamar a la función para cargar estadísticas al cargar la página
+            // --- Funcionalidad para cargar datos del perfil del proveedor ---
+            async function fetchProfileData() {
+                try {
+                    const response = await fetch(`${API_URL}/api/usuarios/me`, { // Usar /me para obtener los datos del usuario logueado
+                        method: 'GET',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok && data.usuario) { // Cambiado de data.user a data.usuario
+                        profileNameInput.value = data.usuario.Nom_Usuario || '';
+                        profileApellidoInput.value = data.usuario.Ape_Usuario || '';
+                        profileEmailInput.value = data.usuario.Correo_Usuario || '';
+                        profilePhoneInput.value = data.usuario.Tlf_Usuario || '';
+                        // No cargar la contraseña actual por seguridad
+                        profileOldPasswordInput.value = '';
+                        profileNewPasswordInput.value = '';
+                        profileConfirmNewPasswordInput.value = '';
+                    } else {
+                        showProvMessageModal(`Error al cargar datos del perfil: ${data.message || 'Desconocido'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error al cargar datos del perfil:', error);
+                    showProvMessageModal('Error de red al cargar datos del perfil.', 'error');
+                }
+            }
+
+            // --- Funcionalidad para actualizar datos del perfil del proveedor ---
+            editProfileForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const newPassword = profileNewPasswordInput.value;
+                const confirmNewPassword = profileConfirmNewPasswordInput.value;
+
+                if (newPassword && newPassword !== confirmNewPassword) {
+                    showProvMessageModal('Las nuevas contraseñas no coinciden.', 'error');
+                    return;
+                }
+
+                const confirmSave = await showProvConfirmationModal('¿Estás seguro de que quieres guardar los cambios?');
+                if (!confirmSave) {
+                    return;
+                }
+
+                const updateData = {
+                    Nom_Usuario: profileNameInput.value,
+                    Ape_Usuario: profileApellidoInput.value,
+                    Tlf_Usuario: profilePhoneInput.value,
+                };
+
+                // Incluir contraseñas solo si se proporcionan
+                if (profileOldPasswordInput.value && newPassword) { // Ambos deben estar presentes para cambiar contraseña
+                    updateData.oldPassword = profileOldPasswordInput.value;
+                    updateData.newPassword = newPassword;
+                }
+
+                try {
+                    const response = await fetch(`${API_URL}/api/usuarios/${userId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(updateData)
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showProvMessageModal('Datos del perfil actualizados correctamente.', 'success');
+                        // Opcional: limpiar campos de contraseña después de un éxito
+                        profileOldPasswordInput.value = '';
+                        profileNewPasswordInput.value = '';
+                        profileConfirmNewPasswordInput.value = '';
+                        // Si el nombre de usuario es parte del encabezado, podrías actualizarlo aquí
+                        localStorage.setItem('userName', data.usuario.Nom_Usuario); // Actualizar localStorage si el nombre cambia
+                    } else {
+                        showProvMessageModal(`Error al actualizar el perfil: ${data.message || 'Desconocido'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error al actualizar el perfil:', error);
+                    showProvMessageModal('Error de red al actualizar el perfil.', 'error');
+                }
+            });
+
+            // --- Funcionalidad para cargar estadísticas de ventas del proveedor ---
+            async function fetchSalesStatistics() {
+                try {
+                    // Llamar a la nueva ruta /ventas/resumen
+                    const response = await fetch(`${API_URL}/api/proveedor/ventas/resumen`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok && data.salesData) {
+                        totalSalesAmount.textContent = `S/ ${parseFloat(data.salesData.totalSalesAmount || 0).toFixed(2)}`;
+                        totalTicketsSold.textContent = data.salesData.totalTicketsSold || 0;
+                        eventsWithSales.textContent = data.salesData.eventsWithSales || 0;
+                    } else {
+                        showProvMessageModal(`Error al cargar estadísticas de ventas: ${data.message || 'Desconocido'}`, 'error');
+                        totalSalesAmount.textContent = 'S/ N/A';
+                        totalTicketsSold.textContent = 'N/A';
+                        eventsWithSales.textContent = 'N/A';
+                    }
+                } catch (error) {
+                    console.error('Error al cargar estadísticas de ventas:', error);
+                    showProvMessageModal('Error de red al cargar estadísticas de ventas.', 'error');
+                    totalSalesAmount.textContent = 'S/ N/A';
+                    totalTicketsSold.textContent = 'N/A';
+                    eventsWithSales.textContent = 'N/A';
+                }
+            }
+
+
+            // Llamar a las funciones para cargar datos iniciales al cargar la página
             fetchEventStatistics();
+            fetchNotifications(); // Cargar notificaciones al inicio
         });
     </script>
 </body>

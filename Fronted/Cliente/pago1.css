@@ -38,9 +38,10 @@ body {
   z-index: 5;
 }
 
-.barra-logo .logo {
-  height: 50px;
+.logo img {
+  height: 48px; /* Altura del logo que tenías */
 }
+
 
 .barra-pasos {
   display: flex;
