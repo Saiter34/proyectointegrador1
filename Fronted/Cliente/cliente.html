@@ -16,28 +16,29 @@
     <main>
         <header class="encabezado">
             <div class="logo">
-                <a href="cliente.html">
-                    <img src="../img/logo.png" alt="Logo de Teycketan">
-                </a>
+                  <a href="cliente.html"></a>
+                <img src="../img/logo.png" alt="Logo de Teycketan">
             </div>
             <nav>
                 <div class="nav-box" id="organizerLinkContainer">
-                    <a href="bienvenidoprov.html" id="organizerLink">¿Quieres ser organizador?</a>
+                    <a href="../Proveedor/bienvenidoprov.html" id="organizerLink">¿Quieres ser organizador?</a>
                 </div>
 
                 <div class="nav-box dropdown">
                     <button>Categorías</button>
                     <div class="dropdown-content">
+                        <!-- Nombres de categorías ajustados según tu posible backend -->
                         <a href="categorias.html?categoria=Conciertos">Conciertos</a>
                         <a href="categorias.html?categoria=Teatro">Teatro</a>
-                        <a href="categorias.html?categoria=Deportiva">Deportes</a>
+                        <a href="categorias.html?categoria=Deportiva">Deportes</a> <!-- Cambiado a 'Deportiva' -->
+                        <!-- Agrega más categorías aquí si existen en tu backend -->
                     </div>
                 </div>
 
                 <div class="nav-box dropdown" id="miCuentaContainer">
                     <button id="miCuentaButton">Mi Cuenta</button>
                     <div class="dropdown-content" id="miCuentaDropdownContent">
-                        <a href="#" id="viewProfileLink">Ver Perfil</a>
+                        <a href="perfil.html" id="viewProfileLink">Ver Perfil</a>
                         <a href="#" id="logoutLink">Cerrar Sesión</a>
                     </div>
                 </div>
@@ -49,9 +50,10 @@
                     </button>
                     <div class="client-notif-dropdown" id="clientNotifDropdown">
                         <p class="client-notif-title">Notificaciones</p>
-                        <!-- ID añadido para cargar notificaciones dinámicamente -->
-                        <ul id="notificationListHeader">
-                            <li>Cargando notificaciones...</li> 
+                        <ul>
+                            <li>Tu compra de "Concierto XYZ" fue exitosa!</li>
+                            <li>Recordatorio: "Evento ABC" es mañana.</li>
+                            <li>Nuevo evento "Festival de Verano" disponible.</li>
                         </ul>
                     </div>
                 </div>
@@ -60,6 +62,7 @@
 
         <section class="carrusel" id="carrusel-eventos-destacados">
             <p class="loading-carousel-message">Cargando eventos destacados...</p>
+            <!-- Los slides y botones de control se añadirán aquí dinámicamente -->
         </section>
 
         <div class="contenido-principal-doscolumnas">
@@ -116,6 +119,7 @@
                     <ul>
                         <li><a href="#">Teléfono: (999-999-999)</a></li>
                         <li><a href="#">Correo: Teycketan@gmail.com</a></li>
+                        <li><a href="formularioCliente.html">¿Hay algun evento que desees? </a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
@@ -156,7 +160,6 @@
             const clientNotifToggle = document.getElementById('clientNotifToggle');
             const clientNotifDropdown = document.getElementById('clientNotifDropdown');
             const clientNotifDot = document.querySelector('.client-notif-dot');
-            const notificationListHeader = document.getElementById('notificationListHeader'); // Referencia al ul de notificaciones
 
             let carouselInterval; // Variable para almacenar el intervalo del carrusel
 
@@ -166,17 +169,8 @@
             const clientModalActions = document.getElementById('clientModalActions');
             const clientCloseButton = document.querySelector('.client-modal-content .client-close-button');
 
-            /**
-             * @brief Muestra un modal personalizado con un mensaje y acciones opcionales.
-             * @param {string} message - El mensaje a mostrar en el modal.
-             * @param {string} [type='info'] - Tipo de mensaje ('info', 'success', 'error', 'warning').
-             * @param {Array<Object>} [actions=[]] - Array de objetos { text: string, type: string, handler: function }.
-             */
+            // Function to show custom modal
             function showModal(message, type = 'info', actions = []) {
-                if (!message || message.trim() === '') {
-                    console.warn('showModal called with empty message. Not displaying modal.');
-                    return;
-                }
                 clientModalMessage.textContent = message;
                 clientModalMessage.className = `client-message-text client-message-${type}`;
                 clientModalActions.innerHTML = ''; // Clear previous actions
@@ -212,54 +206,35 @@
                 if (event.target === clientModal) {
                     clientModal.style.display = 'none';
                 }
-                // Close notification dropdown if clicked outside
-                if (!clientNotifDropdown.contains(event.target) && !clientNotifToggle.contains(event.target)) {
-                    clientNotifDropdown.style.display = 'none';
-                }
             };
-
-            /**
-             * @brief Limpia el localStorage y redirige al login.
-             * @param {string} message - Mensaje a mostrar al usuario.
-             */
-            function forceLogout(message) {
-                localStorage.removeItem('jwtToken');
-                localStorage.removeItem('userName');
-                localStorage.removeItem('userEmail');
-                localStorage.removeItem('userRole');
-                localStorage.removeItem('userId');
-                localStorage.removeItem('puntos');
-                localStorage.removeItem('usadoPrimeraCompra');
-                showModal(message, 'error', [{
-                    text: 'Ir a Iniciar Sesión',
-                    type: 'confirm',
-                    handler: () => window.location.replace('../login.html')
-                }]);
-            }
 
             // --- Lógica de Redirección y Control de Sesión ---
             const token = localStorage.getItem('jwtToken');
             const userName = localStorage.getItem('userName');
             const userRole = localStorage.getItem('userRole');
-            const userEmail = localStorage.getItem('userEmail');
-            const userId = localStorage.getItem('userId');
 
             // Si no hay token, o falta información esencial, redirigir a la página principal (pública).
-            if (!token || !userName || !userRole || !userEmail || !userId) {
+            if (!token || !userName || !userRole) {
                 console.warn('No hay sesión activa en cliente.html. Redirigiendo a la página principal.');
-                // No forzar logout aquí, ya que la página principal puede mostrar contenido público.
-                // Sin embargo, las funciones que requieran autenticación deben manejarlo.
+                showModal('Para acceder a tu perfil, necesitas iniciar sesión primero.', 'error', [{
+                    text: 'Ir a Iniciar Sesión',
+                    type: 'confirm',
+                    // Ruta corregida a login.html (desde Clientes/ a Fronted/)
+                    handler: () => window.location.replace('../login.html') 
+                }]);
+                // No detener la ejecución aquí para permitir que se carguen los eventos públicos.
             }
 
             // Si hay token y userName, el usuario está logueado.
-            if (userName) {
+            if (userName) { // Solo si userName existe
                 miCuentaButton.textContent = `Hola, ${userName}`;
             } else {
                 miCuentaButton.textContent = `Mi Cuenta`; // Default text if not logged in
             }
 
             // Mostrar u ocultar "¿Quieres ser organizador?" según el rol
-            if (userRole === 'organizador' || userRole === 'admin' || userRole === 'pendiente_organizador') {
+            // 'pendiente_organizador' indica que ya envió la solicitud
+            if (userRole === 'organizador' || userRole === 'admin' || userRole === 'pendiente_organizador') { 
                 if (organizerLinkContainer) {
                     organizerLinkContainer.style.display = 'none';
                 }
@@ -269,129 +244,25 @@
                 }
             }
 
-            /**
-             * @brief Obtiene y renderiza las notificaciones del usuario en el dropdown del encabezado.
-             */
-            async function fetchNotifications() {
-                if (!userId || !token) {
-                    notificationListHeader.innerHTML = '<li>Inicia sesión para ver tus notificaciones.</li>';
-                    clientNotifDot.style.display = 'none';
-                    return;
-                }
-
-                notificationListHeader.innerHTML = '<li>Cargando notificaciones...</li>';
-                clientNotifDot.style.display = 'none'; // Ocultar el punto mientras se cargan
-
-                try {
-                    const response = await fetch(`${API_URL}/api/notificaciones/usuario/${userId}`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                    const data = await response.json();
-                    // console.log('Datos de notificaciones recibidos (cliente.html):', data);
-
-                    if (response.ok) {
-                        const notifications = data.notifications;
-                        if (notifications && notifications.length > 0) {
-                            notificationListHeader.innerHTML = '';
-                            let unreadCount = 0;
-
-                            notifications.forEach(notif => {
-                                const formattedDate = new Date(notif.Fecha_Creacion).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
-                                
-                                const li = document.createElement('li');
-                                li.textContent = `${formattedDate}: ${notif.Mensaje}`;
-                                li.classList.add('notification-item'); 
-                                if (!notif.Leida) {
-                                    li.classList.add('unread');
-                                    unreadCount++;
-                                }
-                                // Al hacer clic en la notificación en el dropdown, marcar como leída y redirigir
-                                li.addEventListener('click', async () => {
-                                    await markNotificationAsRead(notif.Id_Notificacion);
-                                    window.location.href = 'perfil.html#notificaciones'; // Redirige a la sección de notificaciones
-                                    clientNotifDropdown.style.display = 'none'; // Oculta el dropdown
-                                });
-                                notificationListHeader.appendChild(li);
-                            });
-
-                            if (unreadCount > 0) {
-                                clientNotifDot.style.display = 'block';
-                            } else {
-                                clientNotifDot.style.display = 'none';
-                            }
-
-                        } else {
-                            notificationListHeader.innerHTML = '<li>No tienes notificaciones nuevas.</li>';
-                            clientNotifDot.style.display = 'none';
-                        }
-                    } else if (response.status === 401 || response.status === 403) {
-                        forceLogout('Tu sesión ha caducado. Por favor, inicia sesión de nuevo para ver tus notificaciones.');
-                    } else {
-                        console.error('Error al cargar notificaciones (cliente.html):', data.message || 'Error desconocido');
-                        notificationListHeader.innerHTML = '<li>Error al cargar notificaciones.</li>';
-                    }
-                } catch (error) {
-                    console.error('Error de red al cargar notificaciones (cliente.html):', error);
-                    notificationListHeader.innerHTML = '<li>Error de conexión al cargar notificaciones.</li>';
-                }
-            }
-
-            /**
-             * @brief Marca una notificación como leída en el backend y actualiza el frontend.
-             * @param {number} notificationId - El ID de la notificación a marcar como leída.
-             */
-            async function markNotificationAsRead(notificationId) {
-                try {
-                    const response = await fetch(`${API_URL}/api/notificaciones/${notificationId}/mark-as-read`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-
-                    if (response.ok) {
-                        // console.log(`Notificación ${notificationId} marcada como leída.`);
-                        fetchNotifications(); // Recargar notificaciones para actualizar el estado del punto
-                    } else if (response.status === 401 || response.status === 403) {
-                        forceLogout('Tu sesión ha caducado. Por favor, inicia sesión de nuevo.');
-                    } else {
-                        const data = await response.json();
-                        console.error('Error al marcar notificación como leída:', data.message || 'Error desconocido');
-                    }
-                } catch (error) {
-                    console.error('Error de red al marcar notificación como leída:', error);
-                }
-            }
-
-
             // --- Lógica para cargar eventos destacados (para el carrusel) ---
             async function fetchFeaturedEvents() {
                 carruselEventosDestacados.innerHTML = '<p class="loading-carousel-message">Cargando eventos destacados...</p>';
                 try {
+                    // Endpoint para obtener eventos destacados (público)
                     const response = await fetch(`${API_URL}/api/eventos/destacados`);
-                    const data = await response.json();
+                    const data = await response.json(); // Leer la respuesta como JSON
 
                     if (response.ok) {
-                        const events = data.events;
+                        const events = data.events; // Asumiendo que el backend envía { events: [...] }
                         if (events && events.length === 0) {
                             carruselEventosDestacados.innerHTML = '<p class="no-events-found-message">No hay eventos destacados por el momento.</p>';
                         } else if (events) {
                             renderFeaturedEvents(events);
-                            initCarousel();
+                            initCarousel(); // Inicializar carrusel después de renderizar
                         } else {
                             carruselEventosDestacados.innerHTML = `<p class="error-message">Formato de datos inesperado para eventos destacados.</p>`;
-                            console.error('Unexpected data format for featured events:', data);
+                             console.error('Unexpected data format for featured events:', data);
                         }
-                    } else if (response.status === 401 || response.status === 403) {
-                        // No forzar logout aquí, ya que es una ruta pública.
-                        // Simplemente mostrar un mensaje o no cargar los eventos.
-                        carruselEventosDestacados.innerHTML = `<p class="error-message">Error al cargar eventos destacados: ${data.message || 'Error desconocido'}</p>`;
-                        console.error('Error fetching featured events (public route):', data);
                     } else {
                         carruselEventosDestacados.innerHTML = `<p class="error-message">Error al cargar eventos destacados: ${data.message || 'Error desconocido'}</p>`;
                         console.error('Error fetching featured events:', data);
@@ -411,7 +282,11 @@
                 let slidesHtml = '';
                 events.forEach((event, index) => {
                     const formattedDate = new Date(event.Fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
+                    // Depuración: Log el valor crudo de event.URL_Imagen_Evento (ahora se espera este nombre)
+                    console.log(`Valor de event.URL_Imagen_Evento (carrusel):`, event.URL_Imagen_Evento); 
+                    // --- CORRECCIÓN AQUÍ: Usar event.URL_Imagen_Evento ---
                     const imageUrl = event.URL_Imagen_Evento ? `${API_URL}${event.URL_Imagen_Evento}` : 'https://placehold.co/800x450/cccccc/000000?text=No+Img';
+                    console.log(`URL final de imagen para carrusel: ${imageUrl}`); 
 
                     slidesHtml += `
                         <div class="slide ${index === 0 ? 'activo' : ''}">
@@ -426,9 +301,10 @@
                         </div>
                     `;
                 });
-                carruselEventosDestacados.innerHTML = slidesHtml;
-
-                if (events.length > 1) {
+                carruselEventosDestacados.innerHTML = slidesHtml; 
+                
+                // Añadir los botones de control después de los slides, si hay más de uno
+                if (events.length > 1) { 
                     const prevButton = document.createElement('button');
                     prevButton.classList.add('carousel-control', 'prev');
                     prevButton.id = 'prevSlide';
@@ -449,33 +325,38 @@
             function initCarousel() {
                 let slideIndex = 0;
                 const slides = carruselEventosDestacados.querySelectorAll('.carrusel .slide');
-
+                
+                // Limpiar cualquier intervalo existente
                 if (carouselInterval) {
                     clearInterval(carouselInterval);
                 }
 
                 if (slides.length <= 1) {
+                    // Ocultar botones si hay 0 o 1 slide
                     const prevBtn = carruselEventosDestacados.querySelector('#prevSlide');
                     const nextBtn = carruselEventosDestacados.querySelector('#nextSlide');
                     if (prevBtn) prevBtn.style.display = 'none';
                     if (nextBtn) nextBtn.style.display = 'none';
-                    return;
+                    return; // No hay suficientes slides para un carrusel
                 } else {
+                    // Mostrar botones si hay más de un slide
                     const prevBtn = carruselEventosDestacados.querySelector('#prevSlide');
                     const nextBtn = carruselEventosDestacados.querySelector('#nextSlide');
-                    if (prevBtn) prevBtn.style.display = 'block';
-                    if (nextBtn) nextBtn.style.display = 'block';
+                    if (prevBtn) prevBtn.style.display = 'block'; 
+                    if (nextBtn) nextBtn.style.display = 'block'; 
                 }
 
+                // Asegurarse de que solo el primer slide esté activo inicialmente
                 slides.forEach((slide, i) => {
-                    slide.style.transition = 'transform 0.5s ease-in-out, opacity 0.5s ease-in-out';
+                    slide.style.transition = 'transform 0.5s ease-in-out, opacity 0.5s ease-in-out'; 
                     if (i === 0) {
                         slide.classList.add('activo');
                         slide.style.transform = 'translateX(0)';
                         slide.style.opacity = '1';
                     } else {
                         slide.classList.remove('activo');
-                        slide.style.transform = 'translateX(100%)';
+                        // Posicionar los slides no activos fuera de la vista para la transición
+                        slide.style.transform = 'translateX(100%)'; 
                         slide.style.opacity = '0';
                     }
                 });
@@ -485,16 +366,22 @@
                     const newIndex = (n + slides.length) % slides.length;
                     const nextSlide = slides[newIndex];
 
+                    // Determinar la dirección de la transición
                     const direction = (newIndex > slideIndex || (newIndex === 0 && slideIndex === slides.length - 1)) ? 1 : -1;
 
+                    // Mover el slide actual fuera de la vista
                     currentSlide.style.transform = `translateX(${-100 * direction}%)`;
                     currentSlide.style.opacity = '0';
                     currentSlide.classList.remove('activo');
 
+                    // Posicionar el nuevo slide en la posición de entrada
                     nextSlide.style.transform = `translateX(${100 * direction}%)`;
-                    nextSlide.style.opacity = '0';
-                    void nextSlide.offsetWidth;
+                    nextSlide.style.opacity = '0'; // Asegurarse de que esté oculto antes de la transición
 
+                    // Forzar un reflow para que la transición de transform se aplique desde la posición correcta
+                    void nextSlide.offsetWidth; 
+
+                    // Mover el nuevo slide a la vista
                     nextSlide.style.transform = 'translateX(0)';
                     nextSlide.style.opacity = '1';
                     nextSlide.classList.add('activo');
@@ -519,8 +406,8 @@
                         carouselInterval = setInterval(() => showSlide(slideIndex + 1), 10000);
                     });
                 }
-
-                carouselInterval = setInterval(() => showSlide(slideIndex + 1), 10000);
+                
+                carouselInterval = setInterval(() => showSlide(slideIndex + 1), 10000); // Auto-avance cada 10 segundos
             }
 
 
@@ -529,10 +416,10 @@
                 proximosEventosGrid.innerHTML = '<p class="loading-events-message">Cargando próximos eventos...</p>';
                 try {
                     const response = await fetch(`${API_URL}/api/eventos/aprobados-para-cliente`);
-                    const data = await response.json();
+                    const data = await response.json(); // Leer la respuesta como JSON
 
                     if (response.ok) {
-                        const events = data.events;
+                        const events = data.events; // Asumiendo que el backend envía { events: [...] }
                         if (events && events.length === 0) {
                             proximosEventosGrid.innerHTML = '<p class="no-events-found-message">No hay eventos disponibles por el momento. ¡Vuelve pronto!</p>';
                         } else if (events) {
@@ -541,11 +428,6 @@
                             proximosEventosGrid.innerHTML = `<p class="error-message">Formato de datos inesperado para próximos eventos.</p>`;
                             console.error('Unexpected data format for approved events:', data);
                         }
-                    } else if (response.status === 401 || response.status === 403) {
-                        // No forzar logout aquí, ya que es una ruta pública.
-                        // Simplemente mostrar un mensaje o no cargar los eventos.
-                        proximosEventosGrid.innerHTML = `<p class="error-message">Error al cargar eventos: ${data.message || 'Error desconocido'}</p>`;
-                        console.error('Error fetching approved events (public route):', data);
                     } else {
                         proximosEventosGrid.innerHTML = `<p class="error-message">Error al cargar eventos: ${data.message || 'Error desconocido'}</p>`;
                         console.error('Error fetching approved events:', data);
@@ -561,7 +443,11 @@
                 let eventsHtml = '';
                 events.forEach(event => {
                     const formattedDate = new Date(event.Fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
+                    // Depuración: Log el valor crudo de event.URL_Imagen_Evento (ahora se espera este nombre)
+                    console.log(`Valor de event.URL_Imagen_Evento (eventos):`, event.URL_Imagen_Evento); 
+                    // --- CORRECCIÓN AQUÍ: Usar event.URL_Imagen_Evento ---
                     const imageUrl = event.URL_Imagen_Evento ? `${API_URL}${event.URL_Imagen_Evento}` : 'https://placehold.co/150x100/cccccc/000000?text=No+Img';
+                    console.log(`URL final de imagen para evento: ${imageUrl}`); 
 
                     eventsHtml += `
                         <a href="detalles.html?eventId=${event.Id_Evento}" class="evento-link">
@@ -582,12 +468,11 @@
             // Iniciar la carga de eventos destacados y aprobados al cargar la página
             fetchFeaturedEvents();
             fetchApprovedEvents();
-            fetchNotifications(); // Cargar notificaciones al inicio para el punto rojo
 
             // --- Event Listeners para la navegación de usuario logueado ---
             viewProfileLink.addEventListener('click', (e) => {
                 e.preventDefault();
-                window.location.href = 'perfil.html';
+                showModal('La visualización del perfil está en desarrollo.', 'info');
             });
 
             logoutLink.addEventListener('click', (e) => {
@@ -596,44 +481,37 @@
                     {
                         text: 'Sí, Cerrar Sesión',
                         type: 'confirm',
+                        // Ruta corregida a principal.html (desde Clientes/ a Fronted/)
                         handler: () => {
                             localStorage.removeItem('jwtToken');
                             localStorage.removeItem('userName');
                             localStorage.removeItem('userEmail');
                             localStorage.removeItem('userRole');
                             localStorage.removeItem('userId');
-                            localStorage.removeItem('puntos');
-                            localStorage.removeItem('usadoPrimeraCompra');
-                            window.location.replace('../principal.html');
+                            window.location.replace('../principal.html'); 
                         }
                     },
                     {
                         text: 'Cancelar',
                         type: 'cancel',
-                        handler: () => {}
+                        handler: () => {} // Solo cerrar el modal
                     }
                 ]);
             });
 
-            // --- Lógica para el dropdown de notificaciones (modificada) ---
+            // --- Lógica para el dropdown de notificaciones ---
             clientNotifToggle.addEventListener('click', (event) => {
-                event.stopPropagation(); // Evita que el clic se propague al documento y cierre el dropdown
-                // Alternar la visibilidad del dropdown
-                if (clientNotifDropdown.style.display === 'block') {
-                    clientNotifDropdown.style.display = 'none';
-                } else {
-                    clientNotifDropdown.style.display = 'block';
-                    fetchNotifications(); // Cargar/refrescar notificaciones cuando se abre el dropdown
-                }
+                event.stopPropagation();
+                clientNotifDropdown.style.display = clientNotifDropdown.style.display === 'block' ? 'none' : 'block';
+                // Opcional: Ocultar el punto de notificación cuando se abre el dropdown
+                clientNotifDot.style.display = 'none';
             });
 
-            // Cierra el dropdown si se hace clic fuera de él o del botón de la campana
-            // Esta lógica ya está en window.onclick, pero la mantengo aquí para claridad.
-            // document.addEventListener('click', (event) => {
-            //     if (!clientNotifDropdown.contains(event.target) && !clientNotifToggle.contains(event.target)) {
-            //         clientNotifDropdown.style.display = 'none';
-            //     }
-            // });
+            document.addEventListener('click', (event) => {
+                if (!clientNotifDropdown.contains(event.target) && !clientNotifToggle.contains(event.target)) {
+                    clientNotifDropdown.style.display = 'none';
+                }
+            });
         });
     </script>
 </body>

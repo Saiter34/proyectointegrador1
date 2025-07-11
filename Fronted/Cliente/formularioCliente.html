@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teycketan - Formulario</title>
+    <link rel="stylesheet" href="cliente.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div class="fondo-overlay-extra"></div>
+    <div class="fondo-overlay"></div>
+
+    <main>
+        <header class="encabezado">
+            <div class="logo">
+                  <a href="cliente.html"></a>
+                <img src="../img/logo.png" alt="Logo de Teycketan">
+            </div>
+            <nav>
+                <div class="nav-box" id="organizerLinkContainer">
+                    <a href="../Proveedor/bienvenidoprov.html" id="organizerLink">¿Quieres ser organizador?</a>
+                </div>
+
+                <div class="nav-box dropdown">
+                    <button>Categorías</button>
+                    <div class="dropdown-content">
+                        <!-- Nombres de categorías ajustados según tu posible backend -->
+                        <a href="categorias.html?categoria=Conciertos">Conciertos</a>
+                        <a href="categorias.html?categoria=Teatro">Teatro</a>
+                        <a href="categorias.html?categoria=Deportiva">Deportes</a> <!-- Cambiado a 'Deportiva' -->
+                        <!-- Agrega más categorías aquí si existen en tu backend -->
+                    </div>
+                </div>
+
+                <div class="nav-box dropdown" id="miCuentaContainer">
+                    <button id="miCuentaButton">Mi Cuenta</button>
+                    <div class="dropdown-content" id="miCuentaDropdownContent">
+                        <a href="perfil.html" id="viewProfileLink">Ver Perfil</a>
+                        <a href="#" id="logoutLink">Cerrar Sesión</a>
+                    </div>
+                </div>
+
+                <div class="client-notif-wrapper">
+                    <button class="client-notif-btn" id="clientNotifToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="client-notif-dot"></span>
+                    </button>
+                    <div class="client-notif-dropdown" id="clientNotifDropdown">
+                        <p class="client-notif-title">Notificaciones</p>
+                        <ul>
+                            <li>Tu compra de "Concierto XYZ" fue exitosa!</li>
+                            <li>Recordatorio: "Evento ABC" es mañana.</li>
+                            <li>Nuevo evento "Festival de Verano" disponible.</li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        <section class="formulario-contacto">
+    <h2>Contáctanos</h2>
+    <p>¿Hay algun evento que desees que agreguemos? Llena el siguiente formulario y haremos todo lo posible por cumplir tu deseo:</p>
+
+
+    <form action="/ruta/del/servidor" method="POST" class="form-contacto">
+         <div class="form-group">
+            <label for="nombre">Tu Nombre:</label>
+            <input type="text" id="nombre" name="nombre" required>
+        </div>
+        <div class="form-group">
+            <label for="asunto">Asunto:</label>
+            <input type="text" id="asunto" name="asunto" required>
+        </div>
+
+        <div class="form-group">
+            <label for="descripcion">Descripción:</label>
+            <textarea id="descripcion" name="descripcion" rows="6" required></textarea>
+        </div>
+
+        <button href="cliente.html" type="submit" class="prov-btn-submit">Enviar</button>
+    </form>
+</section>
+</html>
