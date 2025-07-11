@@ -5,6 +5,7 @@ const pool = require('../db'); // Importa el pool de conexión a la base de dato
 const multer = require('multer'); // Importa multer para manejar la subida de archivos
 const path = require('path'); // Para manejar rutas de archivos
 const fs = require('fs'); // Para manejar operaciones de sistema de archivos
+const { authenticateToken, authorizeRole } = require('../middleware/authMiddleware'); 
 
 // Directorio donde se guardarán los archivos adjuntos de los mensajes de contacto
 const attachmentsDir = path.join(__dirname, '..', '..', 'Fronted', 'attachments', 'contacto');
@@ -40,15 +41,12 @@ const uploadMiddleware = multer({
  * @description Permite a un proveedor enviar un mensaje de contacto a la empresa.
  * @access Privado (Organizador - requiere autenticación)
  */
-router.post('/', uploadMiddleware, async (req, res) => {
-    // req.user.id viene del middleware de autenticación (asume que está configurado en index.js)
+router.post('/', authenticateToken, authorizeRole(['organizador']), uploadMiddleware, async (req, res) => {
     const Id_Usuario_Organizador = req.user.id; 
     const { problema, asunto } = req.body;
     const archivoPath = req.file ? `/attachments/contacto/${req.file.filename}` : null;
 
-    // Validaciones
     if (!problema || !asunto) {
-        // Si falta algún campo obligatorio, eliminar el archivo subido si existe
         if (req.file && fs.existsSync(req.file.path)) {
             fs.unlinkSync(req.file.path);
         }
@@ -58,9 +56,8 @@ router.post('/', uploadMiddleware, async (req, res) => {
     let client;
     try {
         client = await pool.connect();
-        await client.query('BEGIN'); // Iniciar transacción
+        await client.query('BEGIN');
 
-        // Obtener el Id_Organizador asociado al Id_Usuario autenticado
         const orgResult = await client.query('SELECT "Id_Organizador" FROM "Organizadores" WHERE "Id_Usuario" = $1', [Id_Usuario_Organizador]);
         if (orgResult.rows.length === 0) {
             await client.query('ROLLBACK');
@@ -69,7 +66,6 @@ router.post('/', uploadMiddleware, async (req, res) => {
         }
         const Id_Organizador = orgResult.rows[0].Id_Organizador;
 
-        // Insertar el mensaje de contacto en la base de datos (tabla "ContactoProveedor")
         const insertQuery = `
             INSERT INTO "ContactoProveedor" (
                 "Id_Organizador", 
@@ -89,13 +85,12 @@ router.post('/', uploadMiddleware, async (req, res) => {
             archivoPath
         ]);
 
-        await client.query('COMMIT'); // Confirmar transacción
+        await client.query('COMMIT');
         res.status(201).json({ message: 'Mensaje de contacto enviado exitosamente. Nos pondremos en contacto contigo pronto.', mensajeContacto: result.rows[0] });
 
     } catch (error) {
-        if (client) await client.query('ROLLBACK'); // Revertir transacción en caso de error
+        if (client) await client.query('ROLLBACK');
         console.error('Error al enviar mensaje de contacto:', error.message);
-        // Si hay un error, eliminar el archivo subido para evitar basura
         if (req.file && fs.existsSync(req.file.path)) {
             fs.unlink(req.file.path, (err) => {
                 if (err) console.error('Error al eliminar archivo subido tras un error:', err);
@@ -112,29 +107,24 @@ router.post('/', uploadMiddleware, async (req, res) => {
  * @description Obtiene todos los mensajes de contacto para el administrador.
  * @access Privado (Admin - requiere autenticación)
  */
-router.get('/', async (req, res) => {
-    // Asume que req.user.role se establece por el middleware de autenticación
-    if (req.user.role !== 'admin') {
-        return res.status(403).json({ message: 'Acceso denegado. Solo administradores pueden ver los mensajes de contacto.' });
-    }
-
+router.get('/', authenticateToken, authorizeRole(['admin']), async (req, res) => {
     let client;
     try {
         client = await pool.connect();
         const query = `
             SELECT 
-                r."Id_Contacto",
-                r."Tipo_Problema",
-                r."Descripcion",
-                r."URL_Archivo_Adjunto",
-                r."Fecha_Envio",
-                r."Estado",
+                cp."Id_Contacto",
+                cp."Tipo_Problema",
+                cp."Descripcion",
+                cp."URL_Archivo_Adjunto",
+                cp."Fecha_Envio",
+                cp."Estado",
                 o."Nom_Empresa" AS "Nombre_Empresa_Organizador",
-                u."Email" AS "Email_Organizador"
-            FROM "ContactoProveedor" r
-            JOIN "Organizadores" o ON r."Id_Organizador" = o."Id_Organizador"
-            JOIN "Usuarios" u ON o."Id_Usuario" = u."Id_Usuario"
-            ORDER BY r."Fecha_Envio" DESC;
+                u."Correo_Usuario" AS "Email_Organizador"  -- ¡CORRECCIÓN FINAL AQUÍ!
+            FROM "ContactoProveedor" cp
+            JOIN "Organizadores" o ON cp."Id_Organizador" = o."Id_Organizador"
+            JOIN "Usuarios" u ON o."Id_Usuario" = u.id  -- ¡ID DE USUARIOS ES 'id'!
+            ORDER BY cp."Fecha_Envio" DESC;
         `;
         const result = await client.query(query);
         res.status(200).json({ message: 'Mensajes de contacto obtenidos exitosamente.', mensajesContacto: result.rows });
@@ -151,13 +141,9 @@ router.get('/', async (req, res) => {
  * @description Actualiza el estado de un mensaje de contacto (ej. a 'leido' o 'resuelto').
  * @access Privado (Admin - requiere autenticación)
  */
-router.put('/:id/estado', async (req, res) => {
-    if (req.user.role !== 'admin') {
-        return res.status(403).json({ message: 'Acceso denegado. Solo administradores pueden actualizar el estado de los mensajes de contacto.' });
-    }
-
+router.put('/:id/estado', authenticateToken, authorizeRole(['admin']), async (req, res) => {
     const { id } = req.params;
-    const { estado } = req.body; // El nuevo estado (ej. 'leido', 'resuelto')
+    const { estado } = req.body;
 
     if (!estado || !['leido', 'resuelto'].includes(estado)) {
         return res.status(400).json({ message: 'Estado inválido proporcionado. Debe ser "leido" o "resuelto".' });
@@ -187,4 +173,4 @@ router.put('/:id/estado', async (req, res) => {
     }
 });
 
-module.exports = router; 
+module.exports = router;

@@ -15,7 +15,9 @@
     <main>
         <header class="encabezado">
             <div class="logo">
-                <img src="img/logo.png" alt="Logo de Teycketan">
+                <a href="principal.HTML">
+                    <img src="img/logo.png" alt="Logo de Teycketan">
+                </a>
             </div>
             <nav>
                 <div class="nav-box dropdown">
@@ -136,7 +138,7 @@
                 // Usuario logueado: Actualizar "Mi cuenta" y redirigir
                 miCuentaButton.textContent = `Hola, ${userName}`;
                 miCuentaDropdownContent.innerHTML = `
-                    <a href="Clientes/cliente.html" id="viewProfileLink">Ver Perfil</a>
+                    <a href="login.html" id="viewProfileLink">Ver Perfil</a>
                     <a href="#" id="logoutLink">Cerrar Sesión</a>
                 `;
 
@@ -156,7 +158,7 @@
                 // y no en otras subpáginas de Cliente que también usan este script.
                 if (window.location.pathname.endsWith('principal.html') || window.location.pathname.endsWith('/')) {
                     // Ruta corregida a la carpeta Clientes/
-                    window.location.replace('Clientes/cliente.html'); 
+                    window.location.replace('principal.html'); 
                 }
                 // No retornar aquí, ya que queremos que los eventos públicos se carguen si la redirección no ocurre inmediatamente
             } else {
@@ -218,7 +220,7 @@
                                 <p>${event.Descripcion || 'Especificación del evento'}</p>
                                 <p>${formattedDate}</p>
                                 <!-- Ruta corregida a detalles.html dentro de la carpeta Clientes/ -->
-                                <a href="Clientes/detalles.html?eventId=${event.Id_Evento}" class="btn-vermas">Ver más</a>
+                                <a href="detallesprincipal.html?eventId=${event.Id_Evento}" class="btn-vermas">Ver más</a>
                             </div>
                             <img src="${imageUrl}" alt="${event.Nom_Evento}">
                         </div>
@@ -373,7 +375,7 @@
 
                     eventsHtml += `
                         <!-- Ruta corregida a detalles.html dentro de la carpeta Clientes/ -->
-                        <a href="Clientes/detalles.html?eventId=${event.Id_Evento}" class="evento-link">
+                        <a href="detallesprincipal.html?eventId=${event.Id_Evento}" class="evento-link">
                             <div class="evento">
                                 <img src="${imageUrl}" alt="${event.Nom_Evento}">
                                 <div class="evento-info">

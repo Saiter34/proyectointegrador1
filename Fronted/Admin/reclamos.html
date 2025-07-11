@@ -9,99 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* Estilos específicos para reclamos.html */
-        .reclamos-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: #333; /* Fondo oscuro para la tabla */
-            color: #eee; /* Texto claro */
-            border-radius: 8px;
-            overflow: hidden; /* Para que los bordes redondeados se apliquen al contenido */
-        }
-
-        .reclamos-table th, .reclamos-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #555; /* Separador de filas */
-        }
-
-        .reclamos-table th {
-            background-color: #C10000; /* Fondo para encabezados */
-            font-weight: bold;
-            color: #fff;
-            text-transform: uppercase;
-            font-size: 0.9em;
-        }
-
-        .reclamos-table tbody tr:hover {
-            background-color: #555; /* Efecto hover en filas */
-        }
-
-        .reclamos-table .reclamo-estado-pendiente { color: #ffc107; } /* Amarillo */
-        .reclamos-table .reclamo-estado-leido { color: #17a2b8; } /* Azul claro */
-        .reclamos-table .reclamo-estado-resuelto { color: #28a745; } /* Verde */
-
-        .reclamos-actions button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.85em;
-            margin-right: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .reclamos-actions button:hover {
-            background-color: #0056b3;
-        }
-
-        .reclamos-actions button.view-attachment {
-            background-color: #6c757d;
-        }
-        .reclamos-actions button.view-attachment:hover {
-            background-color: #5a6268;
-        }
-        .reclamos-actions button.mark-read {
-            background-color: #17a2b8;
-        }
-        .reclamos-actions button.mark-read:hover {
-            background-color: #138496;
-        }
-        .reclamos-actions button.mark-resolved {
-            background-color: #28a745;
-        }
-        .reclamos-actions button.mark-resolved:hover {
-            background-color: #218838;
-        }
-
-        /* Estilos para el modal de visualización de adjuntos */
-        .attachment-modal-content {
-            background-color: #2c2c2c; /* Fondo oscuro para el modal */
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            max-width: 90%;
-            max-height: 90%;
-            overflow: auto; /* Para scroll si el contenido es grande */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .attachment-modal-content img, .attachment-modal-content iframe {
-            max-width: 100%;
-            max-height: 80vh; /* Limita la altura para que no desborde */
-            display: block;
-            margin-top: 20px;
-            border-radius: 5px;
-        }
-        .attachment-modal-content iframe {
-            min-height: 500px; /* Altura mínima para PDFs */
-        }
     </style>
+    <script src="../js/verificar-admin.js"></script>
+
 </head>
 <body>
 
@@ -215,6 +125,10 @@
             const token = localStorage.getItem('jwtToken');
             const userRole = localStorage.getItem('userRole');
             const userId = localStorage.getItem('userId');
+
+            console.log('reclamos.html: JWT Token:', token ? 'Exists' : 'Missing');
+            console.log('reclamos.html: User Role from localStorage:', userRole);
+            console.log('reclamos.html: User ID from localStorage:', userId);
 
             // Seguridad: Redirige si no hay token o el rol no es 'admin'
             if (!token || userRole !== 'admin') {
@@ -429,13 +343,23 @@
                 noReclamosMessage.style.display = 'none';
 
                 try {
-                    // CAMBIO CLAVE AQUÍ: Llama a la ruta /api/contactoProveedor
+                    // Llama a la ruta /api/contactoProveedor
                     const response = await fetch(`${API_URL}/api/contactoProveedor`, { 
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
                     });
+                    
+                    // Manejo específico del 403 para depuración
+                    if (response.status === 403) {
+                        console.error('reclamos.html: Error 403 (Forbidden). Token o rol no autorizado.');
+                        showAdminMessageModal('Acceso denegado para ver reclamos. Tu sesión puede haber expirado o no tienes los permisos necesarios.', 'error');
+                        // Opcional: Redirigir a login después de un tiempo
+                        // setTimeout(() => { window.location.replace('../login.html'); }, 2000);
+                        return;
+                    }
+
                     const data = await response.json();
 
                     if (response.ok && data.mensajesContacto) { // Data ahora viene como 'mensajesContacto'
@@ -451,7 +375,7 @@
                     }
                 } catch (error) {
                     console.error('Error al cargar reclamos:', error);
-                    showAdminMessageModal('Error de red al cargar reclamos.', 'error');
+                    showAdminMessageModal('Error de red al cargar reclamos. Por favor, verifica la conexión o el servidor.', 'error');
                     reclamosListBody.innerHTML = `<tr><td colspan="9" class="admin-no-data-message admin-error-text">Error de red.</td></tr>`;
                 }
             }
@@ -566,7 +490,6 @@
                 showAdminMessageModal(`Actualizando estado a '${newStatus}'...`, 'info');
 
                 try {
-                    // CAMBIO CLAVE AQUÍ: Llama a la ruta /api/contactoProveedor/:id/estado
                     const response = await fetch(`${API_URL}/api/contactoProveedor/${reclamoId}/estado`, {
                         method: 'PUT',
                         headers: {
@@ -591,6 +514,7 @@
 
             // Cargar reclamos al inicio
             fetchReclamos();
+            fetchNotifications(); // Cargar notificaciones al inicio
         });
     </script>
 </body>

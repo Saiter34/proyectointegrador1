@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="admin.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="../js/verificar-admin.js"></script>
 </head>
 <body>
 
@@ -26,7 +27,7 @@
             <li><a href="eventoDestacado.html" class="admin-nav-item"><i class="fas fa-star"></i><span>Eventos Destacados</span></a></li>
             <li><a href="solicitudDestacar.html" class="admin-nav-item active"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
             <li><a href="catalogoDeLugares.html" class="admin-nav-item"><i class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
-            <li><a href="reclamos.html" class="admin-nav-item"><i  class="fas fa-envelope"></i><span>Reclamos</span></a></li>
+            <li><a href="reclamos.html" class="admin-nav-item"><i class="fas fa-envelope"></i><span>Reclamos</span></a></li>
             <li><a href="comentariosClientes.html" class="admin-nav-item"><i class="fas fa-person"></i><span>Comentarios del cliente</span></a></li>
 
         </ul>
@@ -43,11 +44,10 @@
                     </button>
                     <div class="admin-notif-dropdown" id="adminNotifDropdown">
                         <p class="admin-notif-title">Notificaciones</p>
-                        <ul>
-                            <li>Evento “Damiano David” fue aprobado</li>
-                            <li>Nuevo mensaje del soporte</li>
-                            <li>Revisa los detalles del evento</li>
+                        <ul id="notifList">
+                            <!-- Las notificaciones se cargarán aquí dinámicamente -->
                         </ul>
+                        <button id="markAllReadBtn" style="width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">Marcar todas como leídas</button>
                     </div>
                 </div>
                 <button id="adminLogoutButton" class="admin-btn-logout">Cerrar Sesión</button>

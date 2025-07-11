@@ -9,11 +9,13 @@ const bcrypt = require('bcryptjs'); // Para hash de contraseñas.
 const jwt = require('jsonwebtoken'); // Para JSON Web Tokens.
 const path = require('path'); // Para manejar rutas de archivos.
 const fs = require('fs'); // Importa el módulo 'fs' para manejar sistemas de archivos
+const helmet = require('helmet');
 
 // --- Carga de variables de entorno ---
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
+app.disable('x-powered-by');
 const PORT = process.env.PORT || 3000;
 
 // --- JWT_SECRET ---
@@ -23,17 +25,35 @@ const JWT_SECRET = process.env.JWT_SECRET || 'tu_secreto_jwt_super_seguro_y_larg
 const { authenticateToken, authorizeRole } = require('./middleware/authMiddleware');
 
 // --- Importa tus módulos de rutas ---
-const eventosAdminRoutes = require('./routes/eventos'); // Ahora solo contendrá rutas de admin
+const eventosAdminRoutes = require('./routes/eventos'); 
 const eventosProveedorRoutes = require('./routes/eventosprov'); 
 const intermediarioRoutes = require('./routes/intermediario');
-const publicEventsRoutes = require('./routes/eventospublicos'); // Contendrá las rutas públicas de eventos
-const lugaresRoutes = require('./routes/lugares'); // Rutas para el catálogo de lugares
-const comprasRoutes = require('./routes/compras'); // Importa las rutas de compras
-const usuariosRoutes = require('./routes/usuarios'); // Importa las rutas de usuarios (para puntos, etc.)
-const notificacionesRoutes = require('./routes/notificaciones'); // <<-- NUEVA LÍNEA
-const contactoProveedorRoutes = require('./routes/contactoProveedor'); // Importa las rutas de contacto del proveedor
+const publicEventsRoutes = require('./routes/eventospublicos'); 
+const lugaresRoutes = require('./routes/lugares'); 
+const comprasRoutes = require('./routes/compras'); 
+const usuariosRoutes = require('./routes/usuarios'); 
+const notificacionesRoutes = require('./routes/notificaciones'); 
+const contactoProveedorRoutes = require('./routes/contactoProveedor'); 
+const solicitudClienteRoutes = require('./routes/solicitudCliente'); // ¡NUEVA LÍNEA!
+const adminCountsRoutes = require('./routes/adminCounts'); // Importa el nuevo archivo de rutas
+
+
+app.use(helmet());
+
+// Middleware para permitir solo ciertas IPs (puedes adaptarlo o comentar si estás en desarrollo)
+app.use((req, res, next) => {
+    const allowedIps = ['127.0.0.1', '::1', '192.168.1.33']; // Cambia por las IPs que tú autorizas
+    const ip = req.ip.replace('::ffff:', ''); // Formato común en Express
+
+    if (!allowedIps.includes(ip)) {
+        console.warn(`Intento de acceso bloqueado desde IP no autorizada: ${ip}`);
+        return res.status(403).json({ message: 'Acceso denegado desde esta IP.' });
+    }
+    next();
+});
 
 // --- Middlewares Globales de Express ---
+
 app.use(cors({
     origin: ['http://127.0.0.1:5502', 'http://localhost:3000', 'http://127.0.0.1:5500'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -44,14 +64,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 // --- Configuración de Multer: Directorios para imágenes ---
-// Directorio para imágenes de eventos (ya existente)
 const eventImagesDir = path.join(__dirname, '..', 'Fronted', 'img', 'event_images');
 if (!fs.existsSync(eventImagesDir)) {
     fs.mkdirSync(eventImagesDir, { recursive: true });
     console.log(`Carpeta de imágenes de eventos creada en: ${eventImagesDir}`);
 }
 
-// Directorio para imágenes de lugares
 const placeImagesDir = path.join(__dirname, '..', 'Fronted', 'img', 'place_images');
 if (!fs.existsSync(placeImagesDir)) {
     fs.mkdirSync(placeImagesDir, { recursive: true });
@@ -66,10 +84,8 @@ if (!fs.existsSync(placeImagesDir)) {
 // Servir archivos estáticos desde la carpeta 'Fronted'
 app.use(express.static(path.join(__dirname, '../Fronted')));
 
-// Esto permite que las imágenes de eventos se sirvan directamente desde /img/event_images/
 app.use('/img/event_images', express.static(eventImagesDir));
 
-// Esto permite que las imágenes de lugares se sirvan directamente desde /img/place_images/
 app.use('/img/place_images', express.static(placeImagesDir));
 
 
@@ -78,6 +94,65 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../Fronted/login.html'));
 });
 
+app.get('/Admin/:file', (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+        return res.redirect('/login.html');
+    }
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        if (decoded.rol !== 'admin') {
+            return res.redirect('/login.html');
+        }
+        next();
+    } catch (err) {
+        return res.redirect('/login.html');
+    }
+});
+
+(function () {
+    const token = localStorage.getItem('jwtToken');
+    const userRole = localStorage.getItem('userRole');
+
+    if (!token || userRole !== 'organizador') {
+        alert('Acceso denegado. Solo organizadores pueden ingresar.');
+        window.location.replace('../login.html');
+    }
+});
+app.get('/Organizador/:file', (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+        return res.redirect('/login.html');
+    }
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        if (decoded.rol !== 'organizador') {
+            return res.redirect('/login.html');
+        }
+        next();
+    } catch (err) {
+        return res.redirect('/login.html');
+    }
+});
+
+app.get('/Cliente/:file', (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+        return res.redirect('/login.html');
+    }
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        if (decoded.rol !== 'cliente') {
+            return res.redirect('/login.html');
+        }
+        next();
+    } catch (err) {
+        return res.redirect('/login.html');
+    }
+});
 // =========================================================
 // !!! FIN DE LÍNEAS IMPORTANTES PARA SERVIR EL FRONTEND !!!
 // =========================================================
@@ -149,7 +224,7 @@ app.post('/login', async (req, res) => {
                 rol: user.Rol_Usuario
             },
             JWT_SECRET,
-            { expiresIn: '8h' } // Ajustado a 8 horas como se discutió
+            { expiresIn: '8h' } 
         );
 
         res.status(200).json({
@@ -159,8 +234,8 @@ app.post('/login', async (req, res) => {
             isOrganizer: user.ES_Organizador,
             userRole: user.Rol_Usuario,
             token: token,
-            userPoints: user.Puntos_Teycketan, // Asegúrate de enviar los puntos
-            userUsedFirstPurchase: user.Usado_Primera_Compra // Asegúrate de enviar el estado de primera compra
+            userPoints: user.Puntos_Teycketan, 
+            userUsedFirstPurchase: user.Usado_Primera_Compra 
         });
 
     } catch (error) {
@@ -193,7 +268,7 @@ app.post('/organizer-request', authenticateToken, async (req, res) => {
 
         const insertResult = await client.query(
             `INSERT INTO "Organizadores" ("Id_Usuario", "Nom_Empresa", "Descripcion", "Estado_Solicitud", "fecha_solicitud")
-             VALUES ($1, $2, $3, 'pendiente', CURRENT_TIMESTAMP) RETURNING "Id_Organizador"`,
+            VALUES ($1, $2, $3, 'pendiente', CURRENT_TIMESTAMP) RETURNING "Id_Organizador"`,
             [userId, nom_empresa, descripcion]
         );
 
@@ -236,16 +311,13 @@ app.use('/api/admin/eventos', authenticateToken, authorizeRole(['admin']), event
 app.use('/api/proveedor', authenticateToken, authorizeRole(['organizador']), eventosProveedorRoutes); 
 
 // Monta las rutas para el intermediario (gestión de solicitudes de reclamos de organizadores).
-
-app.use('/api/contactoProveedor', authenticateToken, contactoProveedorRoutes); 
+app.use('/api/contactoProveedor', authenticateToken, authorizeRole(['admin', 'organizador', 'cliente']),contactoProveedorRoutes); 
 
 // Monta las rutas para la gestión de solicitudes de organizador (protegidas para admin).
 app.use('/api/admin/solicitudes', authenticateToken, authorizeRole(['admin']), intermediarioRoutes);
 
-// ¡¡¡ CAMBIO CLAVE AQUÍ !!!
 // Monta las rutas públicas de eventos (accesibles sin autenticación) en /api/eventos
-// para que coincida con las llamadas del frontend como /api/eventos/aprobados-para-cliente.
-app.use('/api/eventos', publicEventsRoutes); // <--- ¡ESTA ES LA LÍNEA CRÍTICA!
+app.use('/api/eventos', publicEventsRoutes); 
 
 // Monta las rutas de lugares, protegidas para administradores y organizadores.
 app.use('/api/lugares', authenticateToken, authorizeRole(['admin', 'organizador']), lugaresRoutes);
@@ -256,8 +328,14 @@ app.use('/api/compras', authenticateToken, comprasRoutes);
 // Monta las rutas de usuarios (protegidas para usuarios autenticados, para obtener puntos, etc.).
 app.use('/api/usuarios', authenticateToken, usuariosRoutes);
 
-// Monta las rutas de notificaciones (protegidas para usuarios autenticados). <<-- NUEVA LÍNEA
+// Monta las rutas de notificaciones (protegidas para usuarios autenticados).
 app.use('/api/notificaciones', authenticateToken, notificacionesRoutes);
+
+// Monta las rutas para las solicitudes de eventos de clientes (protegidas para clientes). ¡NUEVA LÍNEA!
+app.use('/api/solicitudCliente', authenticateToken, solicitudClienteRoutes);
+
+
+app.use('/api/adminCounts', authenticateToken, adminCountsRoutes); // Todas las rutas definidas en adminCounts.js comenzarán con /api
 
 
 // --- Rutas protegidas de ejemplo para diferentes roles ---
@@ -281,7 +359,6 @@ app.get('/protected-admin-route', authenticateToken, authorizeRole(['admin']), (
 
 
 // --- Manejo de Rutas no Encontradas (404) y Errores Globales ---
-// Coloca este middleware DESPUÉS de todas tus rutas de API y estáticas
 app.use((req, res, next) => {
     res.status(404).json({ message: 'Ruta no encontrada.' });
 });
@@ -294,22 +371,18 @@ app.use((err, req, res, next) => {
 // --- Manejo de errores de promesas no capturadas ---
 process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-    // Opcional: Terminar el proceso si es un error crítico
-    // process.exit(1); 
 });
 
 // --- Manejo de excepciones no capturadas ---
 process.on('uncaughtException', (err) => {
     console.error('Uncaught Exception:', err);
-    // Opcional: Terminar el proceso si es un error crítico
-    // process.exit(1);
 });
 
 
 // --- Iniciar el Servidor ---
-app.listen(PORT, () => {
-    console.log(`Servidor backend corriendo en http://localhost:${PORT}`);
-    console.log(`Frontend disponible en http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Servidor backend corriendo en http://0.0.0.0:${PORT}`);
+    console.log(`Frontend disponible en http://0.0.0.0:${PORT}`);
     pool.query('SELECT NOW()', (err, res) => {
         if (err) {
             console.error('Error de conexión a PostgreSQL:', err.message);

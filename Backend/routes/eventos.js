@@ -424,6 +424,81 @@ router.put('/:id/destacar', authenticateToken, authorizeRole(['admin']), async (
 });
 
 /**
+ * @route PUT /destacar/:id/aprobar
+ * @description Aprueba una solicitud de destacar para un evento, cambiando su SolicitudDestacar a 'aprobado'.
+ * Esta ruta es específica para las solicitudes pendientes de destacar.
+ * @access Privado (Admin)
+ */
+router.put('/destacar/:id/aprobar', authenticateToken, authorizeRole(['admin']), async (req, res) => {
+    const eventIdToApproveHighlight = req.params.id;
+    let client;
+    try {
+        client = await pool.connect();
+        await client.query('BEGIN');
+
+        const result = await client.query(
+            `UPDATE "Eventos" SET "SolicitudDestacar" = 'aprobado'
+             WHERE "Id_Evento" = $1 AND "SolicitudDestacar" = 'pendiente'
+             RETURNING *`,
+            [eventIdToApproveHighlight]
+        );
+
+        if (result.rowCount === 0) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ message: 'Solicitud de destacar pendiente no encontrada o ya ha sido procesada.' });
+        }
+
+        await client.query('COMMIT');
+        res.status(200).json({ message: `Solicitud para destacar el evento ID ${eventIdToApproveHighlight} ha sido aprobada correctamente.`, event: result.rows[0] });
+
+    } catch (error) {
+        if (client) await client.query('ROLLBACK');
+        console.error('Error al aprobar solicitud de destacar evento:', error.message);
+        res.status(500).json({ message: 'Error interno del servidor al aprobar la solicitud de destacar.' });
+    } finally {
+        if (client) client.release();
+    }
+});
+
+/**
+ * @route PUT /destacar/:id/rechazar
+ * @description Rechaza una solicitud de destacar para un evento, cambiando su SolicitudDestacar a 'rechazado'.
+ * Esta ruta es específica para las solicitudes pendientes de destacar.
+ * @access Privado (Admin)
+ */
+router.put('/destacar/:id/rechazar', authenticateToken, authorizeRole(['admin']), async (req, res) => {
+    const eventIdToRejectHighlight = req.params.id;
+    let client;
+    try {
+        client = await pool.connect();
+        await client.query('BEGIN');
+
+        const result = await client.query(
+            `UPDATE "Eventos" SET "SolicitudDestacar" = 'rechazado'
+             WHERE "Id_Evento" = $1 AND "SolicitudDestacar" = 'pendiente'
+             RETURNING *`,
+            [eventIdToRejectHighlight]
+        );
+
+        if (result.rowCount === 0) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ message: 'Solicitud de destacar pendiente no encontrada o ya ha sido procesada.' });
+        }
+
+        await client.query('COMMIT');
+        res.status(200).json({ message: `Solicitud para destacar el evento ID ${eventIdToRejectHighlight} ha sido rechazada.`, event: result.rows[0] });
+
+    } catch (error) {
+        if (client) await client.query('ROLLBACK');
+        console.error('Error al rechazar solicitud de destacar evento:', error.message);
+        res.status(500).json({ message: 'Error interno del servidor al rechazar la solicitud de destacar.' });
+    } finally {
+        if (client) client.release();
+    }
+});
+
+
+/**
  * @route GET /destacar/pendientes
  * @description Obtiene todas las solicitudes de eventos para destacar que están en estado 'pendiente'.
  * @access Privado (Admin)

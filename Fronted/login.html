@@ -1,29 +1,30 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Teycketan - Vende con Nosotros</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="login.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <meta charset="UTF-8" />
+    <title>Teycketan - Iniciar Sesión</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="login.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 <body>
-      <!-- Fondos -->
-  <div class="fondo-overlay-extra"></div>
-  <div class="fondo-overlay"></div>
-<header class="encabezado">
-        <div class="barra-logo">
-            <!-- Ruta al logo desde Fronted/ (correcta) -->
-            <img src="img/logo.png" alt="Logo Teycketan" class="logo" />
+    <!-- Fondos -->
+    <div class="fondo-overlay-extra"></div>
+    <div class="fondo-overlay"></div>
+
+    <header class="encabezado">
+        <div class="logo">
+            <a href="principal.HTML">
+                <img src="img/logo.png" alt="Logo de Teycketan">
+            </a>
         </div>
         <div class="barra-pasos">
-            <!-- Enlace a principal.html desde Fronted/ (correcta) -->
             <a href="principal.html" class="paso activo">
                 <span>INICIO</span>
             </a>
         </div>
-          </header>
+    </header>
 
     <div class="container-registro">
         <div class="form-box">
@@ -36,13 +37,13 @@
                 <label for="password">Contraseña</label>
                 <input type="password" id="password" name="password" placeholder="Ingresa tu contraseña" required />
 
-                <button type="submit">Iniciar Sesión</button>
-                <!-- Ruta correcta para la página de registro del cliente desde la raíz Fronted/ -->
+                <button type="submit" id="loginButton">Iniciar Sesión</button>
                 <p>¿No tienes cuenta? <a href="registro.html">Regístrate aquí</a></p>
             </form>
+            <!-- Mensaje de bloqueo para el usuario -->
+            <p id="lockoutMessage" class="lockout-message" style="display: none;"></p>
         </div>
         <footer>
-            <!-- La ruta del logo aquí es correcta si img/logo.png está en la raíz de Fronted/ -->
             <img src="img/logo.png" alt="Logo Footer" class="logo-footer"/>
         </footer>
     </div>
@@ -60,8 +61,19 @@
         // --- DEFINICIÓN DE VARIABLES Y FUNCIONES DEL MODAL AL PRINCIPIO ---
         const messageModal = document.getElementById('messageModal');
         const modalMessage = document.getElementById('modalMessage');
-        const closeButton = document.querySelector('#messageModal .close-button'); // Usar querySelector para ser específico
+        const closeButton = document.querySelector('#messageModal .close-button');
         const modalOkButton = document.getElementById('modalOkButton');
+
+        // Elementos del formulario de login
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const loginButton = document.getElementById('loginButton');
+        const lockoutMessageElement = document.getElementById('lockoutMessage');
+
+        // Constantes para el control de intentos
+        const MAX_ATTEMPTS = 3; // Número máximo de intentos fallidos
+        const LOCKOUT_DURATION_MS = 5 * 60 * 1000; // 5 minutos de bloqueo
 
         /**
          * Muestra un modal de mensaje personalizado.
@@ -101,10 +113,63 @@
         };
         // --- FIN DE DEFINICIONES DEL MODAL ---
 
-        const loginForm = document.getElementById('loginForm');
+        /**
+         * @brief Actualiza el estado del formulario de login basado en los intentos fallidos y el tiempo de bloqueo.
+         * @returns {boolean} True si el usuario está bloqueado, false en caso contrario.
+         */
+        function updateLoginState() {
+            let attempts = parseInt(localStorage.getItem('loginAttempts') || '0');
+            let lockoutTime = parseInt(localStorage.getItem('lockoutTime') || '0');
+            const currentTime = Date.now();
+
+            if (attempts >= MAX_ATTEMPTS && currentTime < lockoutTime + LOCKOUT_DURATION_MS) {
+                // Usuario bloqueado
+                const timeLeft = Math.ceil((lockoutTime + LOCKOUT_DURATION_MS - currentTime) / 1000); // Segundos restantes
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+
+                lockoutMessageElement.textContent = `Demasiados intentos fallidos. Inténtalo de nuevo en ${minutes}m ${seconds}s.`;
+                lockoutMessageElement.style.display = 'block';
+                emailInput.disabled = true;
+                passwordInput.disabled = true;
+                loginButton.disabled = true;
+                // No modificamos directamente el estilo aquí, lo dejamos al CSS
+                // loginButton.style.opacity = '0.5';
+                // loginButton.style.cursor = 'not-allowed';
+
+                // Actualizar el mensaje de bloqueo cada segundo
+                setTimeout(updateLoginState, 1000);
+                return true; // El usuario está bloqueado
+            } else {
+                // No bloqueado o bloqueo expirado
+                lockoutMessageElement.style.display = 'none';
+                emailInput.disabled = false;
+                passwordInput.disabled = false;
+                loginButton.disabled = false;
+                // No modificamos directamente el estilo aquí, lo dejamos al CSS
+                // loginButton.style.opacity = '1';
+                // loginButton.style.cursor = 'pointer';
+
+                // Si el bloqueo expiró, reinicia los contadores
+                if (attempts >= MAX_ATTEMPTS && currentTime >= lockoutTime + LOCKOUT_DURATION_MS) {
+                    localStorage.removeItem('loginAttempts');
+                    localStorage.removeItem('lockoutTime');
+                    showMessage('El período de bloqueo ha terminado. Puedes intentar iniciar sesión de nuevo.', true);
+                }
+                return false; // El usuario no está bloqueado
+            }
+        }
+
+        // Llama a updateLoginState al cargar la página para aplicar cualquier bloqueo existente
+        updateLoginState();
 
         loginForm.addEventListener('submit', async (event) => {
             event.preventDefault(); // Previene el envío del formulario por defecto
+
+            // Verifica el estado de bloqueo antes de intentar el login
+            if (updateLoginState()) {
+                return; // Si el usuario está bloqueado, no permite el intento
+            }
 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -122,38 +187,63 @@
 
                 if (response.ok) {
                     console.log('Inicio de sesión exitoso:', data);
+                    // Reinicia los contadores de intentos en caso de éxito
+                    localStorage.removeItem('loginAttempts');
+                    localStorage.removeItem('lockoutTime');
+
                     // Guarda todos los datos relevantes del usuario en localStorage
                     localStorage.setItem('jwtToken', data.token);
                     localStorage.setItem('userName', data.userName);
                     localStorage.setItem('userRole', data.userRole);
                     localStorage.setItem('isOrganizer', data.isOrganizer);
-                    localStorage.setItem('userId', data.userId); // *** ESTO ES LO CRÍTICO ***
+                    localStorage.setItem('userId', data.userId);
 
                     showMessage('Inicio de sesión exitoso!', true); // Muestra mensaje de éxito
 
                     // Lógica de redirección basada en el rol del usuario
-                    // El setTimeout permite que el usuario vea el mensaje de éxito antes de redirigir
                     setTimeout(() => {
                         if (data.userRole === 'admin') {
-                            // Ruta relativa a la raíz de Fronted/
                             window.location.href = 'Admin/admin.html'; 
                         } else if (data.userRole === 'organizador') {
-                            // Ruta relativa a la raíz de Fronted/
                             window.location.href = 'Proveedor/proveedorPanel.html'; 
                         } else {
-                            // Por defecto para rol 'cliente' o 'pendiente_organizador'
-                            window.location.href = 'Cliente/cliente.html'; 
+                            // Intenta redirigir a la página de origen si existe, de lo contrario a cliente.html
+                            const urlParams = new URLSearchParams(window.location.search);
+                            const redirectBack = urlParams.get('redirectBack');
+                            if (redirectBack) {
+                                window.location.href = decodeURIComponent(redirectBack);
+                            } else {
+                                window.location.href = 'Cliente/cliente.html'; 
+                            }
                         }
                     }, 1500); // Redirige después de 1.5 segundos
                 } else {
-                    // Si la respuesta no es OK (ej. 400, 401), muestra el mensaje de error del backend
-                    showMessage('Error al iniciar sesión: ' + (data.message || 'Error desconocido del servidor.'), false);
+                    // Si la respuesta no es OK (ej. 400, 401), incrementa el contador de intentos
+                    let attempts = parseInt(localStorage.getItem('loginAttempts') || '0');
+                    attempts++;
+                    localStorage.setItem('loginAttempts', attempts);
+
+                    if (attempts >= MAX_ATTEMPTS) {
+                        localStorage.setItem('lockoutTime', Date.now().toString());
+                        showMessage('Demasiados intentos fallidos. Tu cuenta ha sido bloqueada temporalmente.', false);
+                    } else {
+                        showMessage('Error al iniciar sesión: ' + (data.message || 'Credenciales inválidas.'), false);
+                    }
                     console.error('Error al iniciar sesión:', data.message);
+                    updateLoginState(); // Actualiza el estado del formulario inmediatamente
                 }
             } catch (error) {
                 // Captura errores de red o errores inesperados en la petición
                 console.error('Error de red o del servidor:', error);
                 showMessage('No se pudo conectar con el servidor. Por favor, asegúrate de que el backend esté funcionando.', false);
+                // También incrementa el contador de intentos en caso de error de red
+                let attempts = parseInt(localStorage.getItem('loginAttempts') || '0');
+                attempts++;
+                localStorage.setItem('loginAttempts', attempts);
+                if (attempts >= MAX_ATTEMPTS) {
+                    localStorage.setItem('lockoutTime', Date.now().toString());
+                }
+                updateLoginState(); // Actualiza el estado del formulario
             }
         });
     </script>

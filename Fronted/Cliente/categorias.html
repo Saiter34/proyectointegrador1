@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Teycketan - Vende con Nosotros</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="categorias.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <meta charset="UTF-8" />
+    <title>Teycketan - Eventos por Categorías</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="categorias.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="../js/verificar-cliente.js"></script>
 </head>
 <body>
     <!-- Fondos -->
-  <div class="fondo-overlay-extra"></div>
-  <div class="fondo-overlay"></div>
-<header class="encabezado">
-    <div class="logo">
-        <a href="cliente.html">
-            <img src="../img/logo.png" alt="Logo de Teycketan">
-        </a>
-    </div>
+    <div class="fondo-overlay-extra"></div>
+    <div class="fondo-overlay"></div>
+    <header class="encabezado">
+        <div class="logo">
+            <a href="cliente.html">
+                <img src="../img/logo.png" alt="Logo de Teycketan">
+            </a>
+        </div>
         <div class="barra-pasos">
-            <!-- Enlace a principal.html desde Fronted/ (correcta) -->
             <a href="cliente.html" class="paso activo">
                 <span>INICIO</span>
             </a>
@@ -30,9 +30,9 @@
                 <button>Categorías</button>
                 <div class="dropdown-content">
                     <!-- Enlaces a esta misma página con diferentes categorías (dentro de Fronted/) -->
-                    <a href="categoriasprincipal.html?categoria=Conciertos">Conciertos</a>
-                    <a href="categoriasprincipal.html?categoria=Teatro">Teatro</a>
-                    <a href="categoriasprincipal.html?categoria=Deportiva">Deportiva</a>
+                    <a href="categorias.html?categoria=Conciertos">Conciertos</a>
+                    <a href="categorias.html?categoria=Teatro">Teatro</a>
+                    <a href="categorias.html?categoria=Deportiva">Deportiva</a>
                 </div>
             </div>
             <!-- Dropdown de Mi Cuenta (comportamiento para usuario no logueado) -->
@@ -40,14 +40,13 @@
                 <button id="miCuentaButton">Mi Cuenta</button>
                 <div class="dropdown-content" id="miCuentaDropdownContent">
                     <!-- Rutas a login/registro desde Fronted/ (correctas) -->
-                    <a href="login.html" id="loginLink">Iniciar Sesión</a>
-                    <a href="registro.html" id="registerLink">Registrarse</a>
+                    <a href="../login.html" id="loginLink">Iniciar Sesión</a>
+                    <a href="../registro.html" id="registerLink">Registrarse</a>
                     <!-- Opciones para usuario logueado (añadidas por JS si aplica) -->
                 </div>
             </div>
         </nav>
     </header>
-
 
     <main>
         <!-- El título H2 se actualizará con JavaScript -->
@@ -131,7 +130,6 @@
                 }
             };
 
-
             // --- Lógica de Manejo de Sesión (para el menú "Mi Cuenta" si lo incluyes) ---
             const token = localStorage.getItem('jwtToken');
             const userName = localStorage.getItem('userName');
@@ -141,7 +139,7 @@
                 miCuentaContainer.style.display = 'block'; // Mostrar si hay sesión
                 miCuentaButton.textContent = `Hola, ${userName}`;
                 miCuentaDropdownContent.innerHTML = `
-                    <a href="cliente.html" id="viewProfileLink">Ver Perfil</a>
+                    <a href="perfil.html" id="viewProfileLink">Ver Perfil</a>
                     <a href="#" id="logoutLink">Cerrar Sesión</a>
                 `;
 
@@ -152,6 +150,7 @@
                     localStorage.removeItem('userName');
                     localStorage.removeItem('userEmail');
                     localStorage.removeItem('userRole');
+                    localStorage.removeItem('isOrganizer');
                     localStorage.removeItem('userId'); 
                     // Ruta corregida a principal.html (desde Clientes/ a Fronted/)
                     window.location.replace('../principal.html'); 
@@ -164,7 +163,6 @@
                     <a href="../registro.html" id="registerLink">Registrarse</a>
                 `;
             }
-
 
             // --- Lógica para Cargar y Filtrar Eventos por Categoría ---
             async function fetchAndFilterEvents() {
@@ -181,12 +179,28 @@
                 categoryTitleElement.textContent = category; // Actualizar el título de la página y el h2
 
                 try {
-                    // Llama a la nueva ruta pública para obtener eventos por categoría
-                    const response = await fetch(`${API_URL}/api/eventos/por-categoria/${encodeURIComponent(category)}`);
-                    const data = await response.json(); 
+                    // Llama a la ruta pública para obtener eventos por categoría.
+                    // No se envía el token si no existe, ya que la ruta es pública.
+                    const fetchOptions = {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    };
+
+                    // Opcional: Si quieres enviar el token solo si el usuario está logueado,
+                    // aunque la ruta sea pública, para que el backend pueda usarlo para otras cosas (ej. personalización).
+                    // Pero para el acceso básico, no es necesario si la ruta es pública.
+                    // const currentToken = localStorage.getItem('jwtToken');
+                    // if (currentToken) {
+                    //     fetchOptions.headers['Authorization'] = `Bearer ${currentToken}`;
+                    // }
+
+                    const response = await fetch(`${API_URL}/api/eventos/por-categoria/${encodeURIComponent(category)}`, fetchOptions);
+                    const data = await response.json(); // <-- CORRECCIÓN CLAVE: Parsear la respuesta aquí
 
                     if (response.ok) {
-                        const events = data.events; // El backend ahora devuelve { events: [...] }
+                        const events = data.events; 
                         if (events && events.length > 0) {
                             console.log('Categoría de la URL:', category);
                             console.log('Eventos filtrados recibidos:', events);
@@ -195,6 +209,7 @@
                             categoryEventsGrid.innerHTML = `<p class="no-events-found-message">No hay eventos disponibles en la categoría "${category}" por el momento. ¡Vuelve pronto!</p>`;
                         }
                     } else {
+                        // Si la respuesta no es OK, muestra el mensaje de error del backend
                         categoryEventsGrid.innerHTML = `<p class="error-message">Error al cargar eventos: ${data.message || 'Error desconocido'}</p>`;
                         console.error('Error fetching events by category:', data);
                     }

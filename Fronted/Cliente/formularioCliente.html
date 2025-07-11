@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teycketan - Formulario</title>
-    <link rel="stylesheet" href="cliente.css">
+    <title>Teycketan - Formulario de Solicitud de Evento</title>
+    <!-- Referencia a tu archivo CSS externo -->
+    <link rel="stylesheet" href="cliente.css"> 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="../js/verificar-cliente.js"></script>
+
 </head>
+
 <body>
     <div class="fondo-overlay-extra"></div>
     <div class="fondo-overlay"></div>
@@ -16,8 +20,9 @@
     <main>
         <header class="encabezado">
             <div class="logo">
-                  <a href="cliente.html"></a>
-                <img src="../img/logo.png" alt="Logo de Teycketan">
+                <a href="cliente.html">
+                    <img src="../img/logo.png" alt="Logo de Teycketan">
+                </a>
             </div>
             <nav>
                 <div class="nav-box" id="organizerLinkContainer">
@@ -27,11 +32,9 @@
                 <div class="nav-box dropdown">
                     <button>Categorías</button>
                     <div class="dropdown-content">
-                        <!-- Nombres de categorías ajustados según tu posible backend -->
                         <a href="categorias.html?categoria=Conciertos">Conciertos</a>
                         <a href="categorias.html?categoria=Teatro">Teatro</a>
-                        <a href="categorias.html?categoria=Deportiva">Deportes</a> <!-- Cambiado a 'Deportiva' -->
-                        <!-- Agrega más categorías aquí si existen en tu backend -->
+                        <a href="categorias.html?categoria=Deportiva">Deportes</a>
                     </div>
                 </div>
 
@@ -46,40 +49,359 @@
                 <div class="client-notif-wrapper">
                     <button class="client-notif-btn" id="clientNotifToggle">
                         <i class="fas fa-bell"></i>
-                        <span class="client-notif-dot"></span>
+                        <span class="client-notif-dot" id="notifDot" style="display:none;"></span>
                     </button>
                     <div class="client-notif-dropdown" id="clientNotifDropdown">
                         <p class="client-notif-title">Notificaciones</p>
-                        <ul>
-                            <li>Tu compra de "Concierto XYZ" fue exitosa!</li>
-                            <li>Recordatorio: "Evento ABC" es mañana.</li>
-                            <li>Nuevo evento "Festival de Verano" disponible.</li>
+                        <ul id="notifList">
+                            <!-- Las notificaciones se cargarán aquí dinámicamente -->
                         </ul>
+                        <button id="markAllReadBtn" style="width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">Marcar todas como leídas</button>
                     </div>
                 </div>
             </nav>
         </header>
+
         <section class="formulario-contacto">
-    <h2>Contáctanos</h2>
-    <p>¿Hay algun evento que desees que agreguemos? Llena el siguiente formulario y haremos todo lo posible por cumplir tu deseo:</p>
+            <h2>Contáctanos</h2>
+            <p>¿Hay algún evento que desees que agreguemos? Llena el siguiente formulario y haremos todo lo posible por cumplir tu deseo:</p>
 
+            <!-- Contenedor para mensajes (para modales) -->
+            <div id="clientMessageContainer" class="client-message-container"></div>
 
-    <form action="/ruta/del/servidor" method="POST" class="form-contacto">
-         <div class="form-group">
-            <label for="nombre">Tu Nombre:</label>
-            <input type="text" id="nombre" name="nombre" required>
+            <form class="form-contacto" id="solicitudClienteForm">
+                <div class="form-group">
+                    <label for="nombre">Tu Nombre:</label>
+                    <!-- El nombre del usuario se rellenará automáticamente y será de solo lectura -->
+                    <input type="text" id="nombre" name="nombre" required readonly>
+                </div>
+                <div class="form-group">
+                    <label for="asunto">Asunto:</label>
+                    <input type="text" id="asunto" name="asunto" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcion">Descripción:</label>
+                    <textarea id="descripcion" name="descripcion" rows="6" required></textarea>
+                    <small id="wordCount" style="color: #bbb; display: block; text-align: right; margin-top: 5px;">0/150 palabras</small>
+                </div>
+
+                <button type="submit" class="prov-btn-submit">Enviar</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- Modales -->
+    <div id="clientConfirmationModal" class="client-modal">
+        <div class="client-modal-content">
+            <span class="client-close-button">&times;</span>
+            <p id="clientModalMessage">¿Estás seguro de realizar esta acción?</p>
+            <button id="clientModalConfirmBtn" class="client-modal-btn client-modal-confirm">Confirmar</button>
+            <button id="clientModalCancelBtn" class="client-modal-btn client-modal-cancel">Cancelar</button>
         </div>
-        <div class="form-group">
-            <label for="asunto">Asunto:</label>
-            <input type="text" id="asunto" name="asunto" required>
-        </div>
+    </div>
 
-        <div class="form-group">
-            <label for="descripcion">Descripción:</label>
-            <textarea id="descripcion" name="descripcion" rows="6" required></textarea>
+    <div id="clientMessageModal" class="client-modal">
+        <div class="client-modal-content">
+            <span class="client-close-button">&times;</span>
+            <p id="clientMessageModalText"></p>
+            <button id="clientMessageModalCloseBtn" class="client-modal-btn client-modal-confirm">Aceptar</button>
         </div>
+    </div>
 
-        <button href="cliente.html" type="submit" class="prov-btn-submit">Enviar</button>
-    </form>
-</section>
+    <script>
+        const API_URL = 'http://localhost:3000'; 
+        const MAX_WORDS = 150;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // --- Lógica de Autenticación al cargar la página ---
+            const token = localStorage.getItem('jwtToken');
+            const userRole = localStorage.getItem('userRole');
+            const userId = localStorage.getItem('userId');
+            const userName = localStorage.getItem('userName'); // Obtener el nombre del usuario
+
+            console.log('formularioCliente.html: JWT Token:', token ? 'Exists' : 'Missing');
+            console.log('formularioCliente.html: User Role from localStorage:', userRole);
+            console.log('formularioCliente.html: User ID from localStorage:', userId);
+            console.log('formularioCliente.html: User Name from localStorage:', userName);
+
+            // Seguridad: Redirige si no hay token o el rol no es 'cliente'
+            if (!token || userRole !== 'cliente' || !userId) {
+                showClientMessageModal('Acceso denegado. Debes ser un cliente autenticado para ver esta página.', 'error');
+                setTimeout(() => {
+                    window.location.replace('../login.html');
+                }, 2000);
+                return;
+            }
+
+            // Elementos DOM principales
+            const logoutLink = document.getElementById('logoutLink');
+            const clientNotifToggle = document.getElementById('clientNotifToggle');
+            const clientNotifDropdown = document.getElementById('clientNotifDropdown');
+            const notifList = document.getElementById('notifList');
+            const notifDot = document.getElementById('notifDot');
+            const markAllReadBtn = document.getElementById('markAllReadBtn');
+            const solicitudClienteForm = document.getElementById('solicitudClienteForm');
+            const nombreInput = document.getElementById('nombre'); // Input para el nombre
+            const asuntoInput = document.getElementById('asunto');
+            const descripcionTextarea = document.getElementById('descripcion');
+            const wordCountDisplay = document.getElementById('wordCount'); // Elemento para mostrar el contador de palabras
+
+            // Referencias a los IDs de modales
+            const clientConfirmationModal = document.getElementById('clientConfirmationModal');
+            const clientModalMessage = document.getElementById('clientModalMessage');
+            const clientModalConfirmBtn = document.getElementById('clientModalConfirmBtn');
+            const clientModalCancelBtn = document.getElementById('clientModalCancelBtn');
+            const clientMessageModal = document.getElementById('clientMessageModal');
+            const clientMessageModalText = document.getElementById('clientMessageModalText');
+            const clientMessageModalCloseBtn = document.getElementById('clientMessageModalCloseBtn');
+            const clientMessageContainer = document.getElementById('clientMessageContainer');
+
+            // --- Autofill del nombre del usuario ---
+            if (userName) {
+                nombreInput.value = userName;
+            } else {
+                nombreInput.value = 'Nombre de Usuario Desconocido'; // Fallback
+            }
+
+            // --- Funciones para Modales (adaptadas para cliente) ---
+            function showClientConfirmationModal(message) {
+                return new Promise((resolve) => {
+                    clientModalMessage.textContent = message;
+                    clientConfirmationModal.style.display = 'flex';
+
+                    const confirmHandler = () => {
+                        clientConfirmationModal.style.display = 'none';
+                        clientModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        clientModalCancelBtn.removeEventListener('click', cancelHandler);
+                        clientConfirmationModal.querySelector('.client-close-button').removeEventListener('click', cancelHandler);
+                        resolve(true);
+                    };
+
+                    const cancelHandler = () => {
+                        clientConfirmationModal.style.display = 'none';
+                        clientModalConfirmBtn.removeEventListener('click', confirmHandler);
+                        clientModalCancelBtn.removeEventListener('click', cancelHandler);
+                        clientConfirmationModal.querySelector('.client-close-button').removeEventListener('click', cancelHandler);
+                        resolve(false);
+                    };
+
+                    clientModalConfirmBtn.addEventListener('click', confirmHandler);
+                    clientModalCancelBtn.addEventListener('click', cancelHandler);
+                    clientConfirmationModal.querySelector('.client-close-button').addEventListener('click', cancelHandler);
+                });
+            }
+
+            function showClientMessageModal(message, type = '') {
+                clientMessageModalText.textContent = message;
+                clientMessageModalText.className = `client-message-text ${type ? 'client-message-' + type : ''}`; 
+                clientMessageModal.style.display = 'flex';
+
+                clientMessageModalCloseBtn.onclick = () => {
+                    clientMessageModal.style.display = 'none';
+                };
+                clientMessageModal.querySelector('.client-close-button').onclick = () => {
+                    clientMessageModal.style.display = 'none';
+                };
+            }
+
+            // --- Event Listener para Cerrar Sesión ---
+            logoutLink.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const confirmLogout = await showClientConfirmationModal('¿Estás seguro de que quieres cerrar sesión?');
+                if (confirmLogout) {
+                    localStorage.removeItem('jwtToken');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('userId');
+                    showClientMessageModal('Sesión cerrada correctamente.', 'success');
+                    setTimeout(() => {
+                        window.location.replace('../login.html');
+                    }, 500);
+                }
+            });
+
+            // --- Lógica para Notificaciones (Dropdown) ---
+            clientNotifToggle.addEventListener('click', async (event) => {
+                event.stopPropagation();
+                if (clientNotifDropdown.style.display === 'block') {
+                    clientNotifDropdown.style.display = 'none';
+                } else {
+                    clientNotifDropdown.style.display = 'block';
+                    await fetchNotifications(); // Cargar notificaciones cada vez que se abre
+                }
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!clientNotifDropdown.contains(event.target) && !clientNotifToggle.contains(event.target)) {
+                    clientNotifDropdown.style.display = 'none';
+                }
+            });
+
+            async function fetchNotifications() {
+                try {
+                    const response = await fetch(`${API_URL}/api/notificaciones/usuario/${userId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await response.json();
+
+                    if (response.ok && data.notifications) {
+                        notifList.innerHTML = ''; // Limpiar lista actual
+                        let unreadCount = 0;
+                        if (data.notifications.length > 0) {
+                            data.notifications.forEach(notif => {
+                                const listItem = document.createElement('li');
+                                listItem.textContent = notif.Mensaje;
+                                if (!notif.Leida) {
+                                    listItem.classList.add('unread');
+                                    unreadCount++;
+                                }
+                                listItem.dataset.notificationId = notif.Id_Notificacion;
+                                listItem.addEventListener('click', () => markNotificationAsRead(notif.Id_Notificacion));
+                                notifList.appendChild(listItem);
+                            });
+                        } else {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = 'No tienes notificaciones nuevas.';
+                            notifList.appendChild(listItem);
+                        }
+
+                        if (unreadCount > 0) {
+                            notifDot.style.display = 'block';
+                        } else {
+                            notifDot.style.display = 'none';
+                        }
+                    } else {
+                        showClientMessageModal(`Error al cargar notificaciones: ${data.message || 'Desconocido'}`, 'error');
+                        notifDot.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Error al cargar notificaciones:', error);
+                    showClientMessageModal('Error de red al cargar notificaciones.', 'error');
+                    notifDot.style.display = 'none';
+                }
+            }
+
+            async function markNotificationAsRead(notificationId) {
+                try {
+                    const response = await fetch(`${API_URL}/api/notificaciones/${notificationId}/mark-as-read`, { 
+                        method: 'PUT',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (response.ok) {
+                        const listItem = notifList.querySelector(`li[data-notification-id="${notificationId}"]`);
+                        if (listItem) {
+                            listItem.classList.remove('unread');
+                            const unreadItems = notifList.querySelectorAll('li.unread');
+                            if (unreadItems.length === 0) {
+                                notifDot.style.display = 'none';
+                            }
+                        }
+                    } else {
+                        const errorData = await response.json();
+                        showClientMessageModal(`Error al marcar notificación: ${errorData.message || 'Desconocido'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error al marcar notificación como leída:', error);
+                    showClientMessageModal('Error de red al marcar notificación.', 'error');
+                }
+            }
+
+            markAllReadBtn.addEventListener('click', async () => {
+                const confirmRead = await showClientConfirmationModal('¿Estás seguro de que quieres marcar todas las notificaciones como leídas?');
+                if (confirmRead) {
+                    try {
+                        const response = await fetch(`${API_URL}/api/notificaciones/marcarTodasLeidas/${userId}`, {
+                            method: 'PUT',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        if (response.ok) {
+                            showClientMessageModal('Todas las notificaciones han sido marcadas como leídas.', 'success');
+                            fetchNotifications(); // Recargar para actualizar la UI
+                        } else {
+                            const errorData = await response.json();
+                            showClientMessageModal(`Error al marcar todas como leídas: ${errorData.message || 'Desconocido'}`, 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error al marcar todas las notificaciones como leídas:', error);
+                        showClientMessageModal('Error de red al marcar todas las notificaciones.', 'error');
+                    }
+                }
+            });
+
+            // --- Lógica para el contador de palabras y límite en la descripción ---
+            if (descripcionTextarea) {
+                const updateWordCount = () => {
+                    const text = descripcionTextarea.value.trim();
+                    const words = text === '' ? 0 : text.split(/\s+/).length; // Split by one or more spaces
+                    
+                    if (words > MAX_WORDS) {
+                        const trimmedText = text.split(/\s+/).slice(0, MAX_WORDS).join(' ');
+                        descripcionTextarea.value = trimmedText;
+                        wordCountDisplay.style.color = '#dc3545'; // Rojo si excede
+                        wordCountDisplay.textContent = `${MAX_WORDS}/${MAX_WORDS} palabras (límite excedido)`;
+                    } else {
+                        wordCountDisplay.style.color = '#bbb'; // Color normal
+                        wordCountDisplay.textContent = `${words}/${MAX_WORDS} palabras`;
+                    }
+                };
+
+                descripcionTextarea.addEventListener('input', updateWordCount);
+                updateWordCount(); // Initial count on load
+            }
+
+            // --- Manejo del formulario de solicitud de evento ---
+            solicitudClienteForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const asunto = asuntoInput.value;
+                const descripcion = descripcionTextarea.value;
+
+                if (!asunto.trim() || !descripcion.trim()) {
+                    showClientMessageModal('Por favor, completa todos los campos para enviar tu solicitud.', 'warning');
+                    return;
+                }
+
+                // Validar límite de palabras antes de enviar
+                const wordsInDescription = descripcion.trim() === '' ? 0 : descripcion.trim().split(/\s+/).length;
+                if (wordsInDescription > MAX_WORDS) {
+                    showClientMessageModal(`La descripción excede el límite de ${MAX_WORDS} palabras. Por favor, reduce el texto.`, 'warning');
+                    return;
+                }
+
+                showClientMessageModal('Enviando tu solicitud...', 'info');
+
+                try {
+                    const response = await fetch(`${API_URL}/api/solicitudCliente`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}` 
+                        },
+                        body: JSON.stringify({ asunto, descripcion })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showClientMessageModal(data.message, 'success');
+                        solicitudClienteForm.reset(); // Limpiar el formulario
+                        if (descripcionTextarea) {
+                            descripcionTextarea.style.height = 'auto'; // Resetear altura del textarea
+                            wordCountDisplay.textContent = `0/${MAX_WORDS} palabras`; // Resetear contador
+                            wordCountDisplay.style.color = '#bbb';
+                        }
+                    } else {
+                        showClientMessageModal(`Error al enviar solicitud: ${data.message || 'Error desconocido'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error de red al enviar solicitud:', error);
+                    showClientMessageModal('Error de conexión con el servidor al enviar la solicitud.', 'error');
+                }
+            });
+
+            fetchNotifications(); // Cargar notificaciones al inicio
+        });
+    </script>
+</body>
 </html>

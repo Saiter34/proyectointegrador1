@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="admin.css"> 
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="../js/verificar-admin.js"></script>
+
 </head>
 <body>
 
@@ -28,7 +30,6 @@
             <li><a href="solicitudDestacar.html" class="admin-nav-item"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
             <li><a href="catalogoDeLugares.html" class="admin-nav-item"><i  class="fas fa-map-marker-alt"></i><span>Catalogo de lugares</span></a></li>
             <li><a href="reclamos.html" class="admin-nav-item"><i  class="fas fa-envelope"></i><span>Reclamos</span></a></li>
-            <li><a href="comentariosClientes.html" class="admin-nav-item"><i class="fas fa-person"></i><span>Comentarios del cliente</span></a></li>
 
         </ul>
     </div>
@@ -36,7 +37,7 @@
     <!-- MAIN CONTENT -->
     <div class="admin-main-content">
         <header class="admin-topbar">
-            <h1 class="admin-titulo-seccion">Bienvenido al panel de administrador</h1>
+            <h1 class="admin-titulo-seccion">Panel del Administrador</h1>
             <div class="admin-acciones">
                 <div class="admin-notif-wrapper">
                     <button class="admin-notif-btn" id="adminNotifToggle">
@@ -45,11 +46,10 @@
                     </button>
                     <div class="admin-notif-dropdown" id="adminNotifDropdown">
                         <p class="admin-notif-title">Notificaciones</p>
-                        <ul>
-                            <li>Evento “Damiano David” fue aprobado</li>
-                            <li>Nuevo mensaje del soporte</li>
-                            <li>Revisa los detalles del evento</li>
+                        <ul id="notifList">
+                            <!-- Las notificaciones se cargarán aquí dinámicamente -->
                         </ul>
+                        <button id="markAllReadBtn" style="width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">Marcar todas como leídas</button>
                     </div>
                 </div>
                 <button id="adminLogoutButton" class="admin-btn-logout">Cerrar Sesión</button>
@@ -59,96 +59,6 @@
         <section class="admin-contenido">
             <div class="admin-bienvenida">Bienvenido al panel de administración. Aquí puedes gestionar proveedores y eventos.</div>
             <!-- Aquí irá el contenido específico de cada sección que cambie dinámicamente -->
-             <section class="prov-contenido">
-                <div class="prov-info-cards-grid">
-                    <div class="prov-info-card">
-                        <h4>Comentarios de clientes pendientes</h4>
-                        <p id="pendingEventsCount">0</p>
-                        <small>Comentarios esperando aprovacion.</small>
-                    </div>
-                    <div class="prov-info-card">
-                        <h4>Solicitudes de proveedores</h4>
-                        <p id="approvedEventsCount">0</p>
-                        <small>Clientes esperando respuesta para cambiar de rol.</small>
-                    </div>
-                    <div class="prov-info-card">
-                        <h4>Eventos pendientes</h4>
-                        <p id="rejectedEventsCount">0</p>
-                        <small>Eventos que necesitan ser aporvados o rechazados.</small>
-                    </div>
-                </div>
-
-                <!-- Botones para acceder a Editar Datos y Reporte de Ventas dentro de la sección de bienvenida -->
-                <div style="display: flex; justify-content: center; gap: 20px; margin-top: 30px;">
-                    <button class="prov-btn-submit" id="showEditProfileBtn" style="background-color: #007bff;"><i class="fas fa-user-edit"></i> Editar Datos</button>
-                    <button class="prov-btn-submit" id="showSalesReportBtn" style="background-color: #28a745;"><i class="fas fa-chart-line"></i> Reporte de Ventas</button>
-                </div>
-
-                <!-- Sección de Editar Datos (inicialmente oculta) -->
-                <div id="edit-profile-section" class="prov-section" style="display: none; margin-top: 30px;">
-                    <h3>Editar Datos de Perfil</h3>
-                    <form id="editProfileForm" class="prov-form">
-                        <div class="form-group">
-                            <label for="profileName">Nombre:</label>
-                            <input type="text" id="profileName" name="Nom_Usuario" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="profileApellido">Apellido:</label>
-                            <input type="text" id="profileApellido" name="Ape_Usuario" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="profileEmail">Email:</label>
-                            <input type="email" id="profileEmail" name="Correo_Usuario" required readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="profilePhone">Teléfono:</label>
-                            <input type="tel" id="profilePhone" name="Tlf_Usuario">
-                        </div>
-                        <div class="form-group">
-                            <label for="profileOldPassword">Contraseña Antigua (opcional):</label>
-                            <input type="password" id="profileOldPassword" name="oldPassword">
-                        </div>
-                        <div class="form-group">
-                            <label for="profileNewPassword">Nueva Contraseña (opcional):</label>
-                            <input type="password" id="profileNewPassword" name="newPassword">
-                        </div>
-                        <div class="form-group">
-                            <label for="profileConfirmNewPassword">Confirmar Nueva Contraseña:</label>
-                            <input type="password" id="profileConfirmNewPassword" name="confirmNewPassword">
-                        </div>
-                        <button type="submit" class="prov-btn-submit">Guardar Cambios</button>
-                        <button type="button" class="prov-btn-cancel" id="cancelEditProfile">Cancelar</button>
-                    </form>
-                </div>
-
-                <!-- Sección de Reporte de Ventas (inicialmente oculta) -->
-                <div id="sales-report-section" class="prov-section" style="display: none; margin-top: 30px;">
-                    <h3>Reporte de Ventas</h3>
-                    <div class="prov-info-cards-grid">
-                        <div class="prov-info-card">
-                            <h4>Total de Ventas Realizadas</h4>
-                            <p id="totalSalesAmount">S/ 0.00</p>
-                            <small>Monto total de tickets vendidos.</small>
-                        </div>
-                        <div class="prov-info-card">
-                            <h4>Tickets Vendidos</h4>
-                            <p id="totalTicketsSold">0</p>
-                            <small>Cantidad total de tickets vendidos.</small>
-                        </div>
-                        <div class="prov-info-card">
-                            <h4>Eventos con Ventas</h4>
-                            <p id="eventsWithSales">0</p>
-                            <small>Número de eventos con al menos una venta.</small>
-                        </div>
-                        <!-- Gráficos o tablas adicionales se pueden agregar aquí -->
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Contenedor para mensajes (para modales) -->
-            <div id="provMessageContainer" class="prov-message-container"></div>
-        </section>
         </section>
     </div>
 
@@ -171,7 +81,7 @@
     </div>
 
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', () => {
             const adminLogoutButton = document.getElementById('adminLogoutButton');
             const adminNotifToggle = document.getElementById('adminNotifToggle');
             const adminNotifDropdown = document.getElementById('adminNotifDropdown');
@@ -190,7 +100,7 @@
              * @param {string} message - El mensaje a mostrar en el modal.
              * @returns {Promise<boolean>} Una promesa que se resuelve a `true` si el usuario confirma, `false` si cancela.
              */
-           function showAdminConfirmationModal(message) {
+            function showAdminConfirmationModal(message) {
                 return new Promise((resolve) => {
                     adminModalMessage.textContent = message;
                     adminConfirmationModal.style.display = 'flex'; // Usar flex para centrar
@@ -231,7 +141,7 @@
                     adminMessageModal.style.display = 'none';
                 };
             }
-
+/*
             // --- Lógica de Autenticación al cargar la página ---
             const token = localStorage.getItem('jwtToken');
             const userRole = localStorage.getItem('userRole');
@@ -248,7 +158,7 @@
                     window.location.replace('../login.html'); 
                 }, 2000); // Dar 2 segundos para leer el mensaje
                 return; // Detiene la ejecución del script
-            }
+            }*/
             // --- Event Listener para Cerrar Sesión ---
             adminLogoutButton.addEventListener('click', async () => {
                 const confirmLogout = await showAdminConfirmationModal('¿Estás seguro de que quieres cerrar sesión?');

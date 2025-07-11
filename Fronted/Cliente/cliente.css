@@ -580,79 +580,57 @@ main {
     color: inherit;
 }
 
-/* --- ESTILOS DE NOTIFICACIONES DE CLIENTE --- */
+/* Client Notification Wrapper (Bell icon and dropdown) */
 .client-notif-wrapper {
     position: relative;
-    margin-left: 20px;
     display: inline-block;
 }
 
 .client-notif-btn {
-    background: transparent;
+    background: none;
     border: none;
-    color: #f5f5f5;
-    font-size: 22px;
+    color: #fff;
+    font-size: 1.5rem; /* Adjust size as needed */
     cursor: pointer;
     position: relative;
-    transition: color 0.3s ease, transform 0.2s ease;
-    outline: none;
-}
-
-.client-notif-btn:hover {
-    color: #a7d9ff; /* Azul claro en hover */
-    transform: scale(1.1);
+    padding: 5px;
 }
 
 .client-notif-dot {
     position: absolute;
-    top: 0px;
-    right: 0px;
+    top: 5px;
+    right: 5px;
     width: 10px;
     height: 10px;
-    background-color: #ff0000;
+    background-color: crimson;
     border-radius: 50%;
-    border: 1px solid #f5f5f5;
-    display: block; /* Muestra el punto; se puede cambiar a 'none' con JS */
+    display: none; /* Hidden by default, shown when unread notifications exist */
 }
 
 .client-notif-dropdown {
+    display: none; /* Hidden by default */
     position: absolute;
-    top: 100%; /* Posicionado debajo del botón */
+    top: 50px; /* Adjust as needed to be below the bell icon */
     right: 0;
-    max-width: 90vw; /* Máximo 90% del ancho del viewport */
-    min-width: 250px;
-    width: auto;
-
-    background-color: rgba(30, 30, 30, 0.98);
-    border: 1px solid #ff3333; /* Borde rojo */
-    box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.95);
+    border: 1px solid crimson;
     border-radius: 8px;
-
-    display: none; /* Controlado por JS (por defecto oculto) */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    min-width: 280px;
+    max-height: 300px; /* Max height for scrollability */
+    overflow-y: auto;
     z-index: 1000;
-    padding: 15px;
-    color: #f5f5f5;
-
-    opacity: 0; /* Para animación de aparición */
-    transform: translateY(-10px); /* Para animación de aparición */
-    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
-    pointer-events: none; /* No interactuable cuando está oculto */
+    padding: 10px;
 }
 
-/* Cuando el JS añada display: block, queremos que aparezca con la animación */
-.client-notif-dropdown[style*="display: block"] {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: all;
-}
-
-.client-notif-dropdown .client-notif-title {
+.client-notif-dropdown p.client-notif-title {
+    color: crimson;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
     font-weight: bold;
-    color: #a7d9ff; /* Azul claro para el título */
-    margin-bottom: 12px;
-    font-size: 18px;
-    border-bottom: 1px solid #444;
-    padding-bottom: 8px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 10px;
 }
 
 .client-notif-dropdown ul {
@@ -663,10 +641,11 @@ main {
 
 .client-notif-dropdown ul li {
     padding: 8px 0;
-    border-bottom: 1px solid #333;
-    color: #f5f5f5;
-    font-size: 14px;
-    line-height: 1.4;
+    color: #eee;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-family: 'Poppins', sans-serif; /* Ensure Poppins for notification text */
 }
 
 .client-notif-dropdown ul li:last-child {
@@ -674,9 +653,15 @@ main {
 }
 
 .client-notif-dropdown ul li:hover {
-    background-color: #444;
-    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.1);
 }
+
+.client-notif-dropdown ul li.unread {
+    font-weight: bold;
+    color: #fff;
+    background-color: rgba(255, 0, 0, 0.1); /* Slightly red background for unread in dropdown */
+}
+
 
 /* Mensajes de Carga/Sin Datos/Error para los grids dinámicos */
 .loading-carousel-message,

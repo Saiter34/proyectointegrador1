@@ -3,105 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bandeja de Reclamos - Panel de Administración</title>
-    <!-- Usar el nuevo archivo CSS del panel de administración -->
+    <title>Solicitudes de Clientes - Panel de Administración</title>
+    <!-- Usar el archivo CSS del panel de administración -->
     <link rel="stylesheet" href="admin.css"> 
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        /* Estilos específicos para reclamos.html */
-        .reclamos-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: #333; /* Fondo oscuro para la tabla */
-            color: #eee; /* Texto claro */
-            border-radius: 8px;
-            overflow: hidden; /* Para que los bordes redondeados se apliquen al contenido */
-        }
-
-        .reclamos-table th, .reclamos-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #555; /* Separador de filas */
-        }
-
-        .reclamos-table th {
-            background-color: #C10000; /* Fondo para encabezados */
-            font-weight: bold;
-            color: #fff;
-            text-transform: uppercase;
-            font-size: 0.9em;
-        }
-
-        .reclamos-table tbody tr:hover {
-            background-color: #555; /* Efecto hover en filas */
-        }
-
-        .reclamos-table .reclamo-estado-pendiente { color: #ffc107; } /* Amarillo */
-        .reclamos-table .reclamo-estado-leido { color: #17a2b8; } /* Azul claro */
-        .reclamos-table .reclamo-estado-resuelto { color: #28a745; } /* Verde */
-
-        .reclamos-actions button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.85em;
-            margin-right: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .reclamos-actions button:hover {
-            background-color: #0056b3;
-        }
-
-        .reclamos-actions button.view-attachment {
-            background-color: #6c757d;
-        }
-        .reclamos-actions button.view-attachment:hover {
-            background-color: #5a6268;
-        }
-        .reclamos-actions button.mark-read {
-            background-color: #17a2b8;
-        }
-        .reclamos-actions button.mark-read:hover {
-            background-color: #138496;
-        }
-        .reclamos-actions button.mark-resolved {
-            background-color: #28a745;
-        }
-        .reclamos-actions button.mark-resolved:hover {
-            background-color: #218838;
-        }
-
-        /* Estilos para el modal de visualización de adjuntos */
-        .attachment-modal-content {
-            background-color: #2c2c2c; /* Fondo oscuro para el modal */
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            max-width: 90%;
-            max-height: 90%;
-            overflow: auto; /* Para scroll si el contenido es grande */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .attachment-modal-content img, .attachment-modal-content iframe {
-            max-width: 100%;
-            max-height: 80vh; /* Limita la altura para que no desborde */
-            display: block;
-            margin-top: 20px;
-            border-radius: 5px;
-        }
-        .attachment-modal-content iframe {
-            min-height: 500px; /* Altura mínima para PDFs */
-        }
-    </style>
+    <script src="../js/verificar-admin.js"></script>
 </head>
 <body>
 
@@ -120,15 +27,15 @@
             <li><a href="eventoDestacado.html" class="admin-nav-item"><i class="fas fa-star"></i><span>Eventos Destacados</span></a></li>
             <li><a href="solicitudDestacar.html" class="admin-nav-item"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
             <li><a href="catalogoDeLugares.html" class="admin-nav-item"><i class="fas fa-map-marker-alt"></i><span>Catálogo de lugares</span></a></li>
-            <li><a href="reclamos.html" class="admin-nav-item"><i class="fas fa-envelope"></i><span>Reclamos</span></a></li>
-            <li><a href="comentariosClientes.html" class="admin-nav-item active"><i class="fas fa-person"></i><span>Comentarios del cliente</span></a></li>
+            <li><a href="reclamos.html" class="admin-nav-item"><i class="fas fa-envelope"></i><span>Reclamos de Proveedores</span></a></li> <!-- Actualizado para claridad -->
+            <li><a href="comentariosClientes.html" class="admin-nav-item active"><i class="fas fa-person"></i><span>Solicitudes de Clientes</span></a></li> <!-- Actualizado -->
         </ul>
     </div>
 
     <!-- MAIN CONTENT -->
     <div class="admin-main-content">
         <header class="admin-topbar">
-            <h1 class="admin-titulo-seccion">Bandeja de reclamos - Panel de administrador</h1>
+            <h1 class="admin-titulo-seccion">Solicitudes de Clientes - Panel de Administrador</h1>
             <div class="admin-acciones">
                 <div class="admin-notif-wrapper">
                     <button class="admin-notif-btn" id="adminNotifToggle">
@@ -148,17 +55,19 @@
         </header>
 
         <section class="admin-contenido">
-            <div class="admin-bienvenida">Aquí puedes gestionar los comentraios de los clientes.</div>
+            <div class="admin-bienvenida">Aquí puedes gestionar las solicitudes de eventos de los clientes.</div>
 
             <!-- Contenedor para mensajes (para modales) -->
             <div id="adminMessageContainer" class="admin-message-container"></div>
 
             <div class="admin-tabla-container">
-                <table class="reclamos-table">
+                <table class="solicitudes-table"> <!-- Cambiado a solicitudes-table -->
                     <thead>
                         <tr>
-                            <th>ID Cliente</th>
-                            <th>Email</th>
+                            <th>ID Solicitud</th>
+                            <th>Nombre Cliente</th>
+                            <th>Apellido Cliente</th>
+                            <th>Email Cliente</th>
                             <th>Asunto</th>
                             <th>Descripción</th>
                             <th>Fecha Envío</th>
@@ -166,12 +75,12 @@
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="reclamosListBody">
-                        <!-- Los reclamos se cargarán aquí dinámicamente -->
-                        <tr><td colspan="9" class="admin-loading-message">Cargando comentarios...</td></tr>
+                    <tbody id="solicitudesListBody"> <!-- Cambiado a solicitudesListBody -->
+                        <!-- Las solicitudes se cargarán aquí dinámicamente -->
+                        <tr><td colspan="9" class="admin-loading-message">Cargando solicitudes...</td></tr>
                     </tbody>
                 </table>
-                <p id="noComentarioMessage" class="admin-no-data-message" style="display: none;">No hay comentarios pendientes.</p>
+                <p id="noSolicitudesMessage" class="admin-no-data-message" style="display: none;">No hay solicitudes de clientes pendientes.</p> <!-- Cambiado -->
             </div>
         </section>
     </div>
@@ -219,8 +128,8 @@
             const notifList = document.getElementById('notifList');
             const notifDot = document.getElementById('notifDot');
             const markAllReadBtn = document.getElementById('markAllReadBtn');
-            const reclamosListBody = document.getElementById('reclamosListBody');
-            const noReclamosMessage = document.getElementById('noReclamosMessage');
+            const solicitudesListBody = document.getElementById('solicitudesListBody'); // Cambiado
+            const noSolicitudesMessage = document.getElementById('noSolicitudesMessage'); // Cambiado
 
             // Referencias a los IDs de modales
             const adminConfirmationModal = document.getElementById('adminConfirmationModal');
@@ -230,8 +139,7 @@
             const adminMessageModal = document.getElementById('adminMessageModal');
             const adminMessageModalText = document.getElementById('adminMessageModalText');
             const adminMessageModalCloseBtn = document.getElementById('adminMessageModalCloseBtn');
-            const attachmentViewerModal = document.getElementById('attachmentViewerModal');
-            const attachmentContent = document.getElementById('attachmentContent');
+            // Eliminado attachmentViewerModal y attachmentContent
 
             // --- Funciones para Modales ---
             function showAdminConfirmationModal(message) {
@@ -401,7 +309,7 @@
             const currentPath = window.location.pathname;
             document.querySelectorAll('.admin-nav-item').forEach(link => {
                 // Asegúrate de que el href coincida con el nombre del archivo
-                if (link.href.includes('reclamos.html')) { 
+                if (link.href.includes('comentariosClientes.html')) { // CAMBIADO para que sea esta página activa
                     link.classList.add('active');
                 } else {
                     link.classList.remove('active');
@@ -409,15 +317,14 @@
             });
 
             /**
-             * @brief Carga todos los reclamos/mensajes para el administrador.
+             * @brief Carga todas las solicitudes de clientes para el administrador.
              */
-            async function fetchReclamos() {
-                reclamosListBody.innerHTML = '<tr><td colspan="9" class="admin-loading-message">Cargando reclamos...</td></tr>';
-                noReclamosMessage.style.display = 'none';
+            async function fetchSolicitudesClientes() { // Renombrado
+                solicitudesListBody.innerHTML = '<tr><td colspan="9" class="admin-loading-message">Cargando solicitudes...</td></tr>'; // Cambiado
+                noSolicitudesMessage.style.display = 'none'; // Cambiado
 
                 try {
-                    // CAMBIO CLAVE AQUÍ: Llama a la ruta /api/contactoProveedor
-                    const response = await fetch(`${API_URL}/api/contactoProveedor`, { 
+                    const response = await fetch(`${API_URL}/api/solicitudCliente/admin`, { // CAMBIO CLAVE AQUÍ: Llama a la nueva ruta
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -425,126 +332,81 @@
                     });
                     const data = await response.json();
 
-                    if (response.ok && data.mensajesContacto) { // Data ahora viene como 'mensajesContacto'
-                        if (data.mensajesContacto.length === 0) {
-                            reclamosListBody.innerHTML = '';
-                            noReclamosMessage.style.display = 'block';
+                    if (response.ok && data.solicitudes) { // Data ahora viene como 'solicitudes'
+                        if (data.solicitudes.length === 0) {
+                            solicitudesListBody.innerHTML = '';
+                            noSolicitudesMessage.style.display = 'block';
                         } else {
-                            renderReclamosTable(data.mensajesContacto); // Pasa 'mensajesContacto' a la función de renderizado
+                            renderSolicitudesTable(data.solicitudes); // Pasa 'solicitudes' a la función de renderizado
                         }
                     } else {
-                        showAdminMessageModal(`Error al cargar reclamos: ${data.message || 'Desconocido'}`, 'error');
-                        reclamosListBody.innerHTML = `<tr><td colspan="9" class="admin-no-data-message admin-error-text">No se pudieron cargar los reclamos.</td></tr>`;
+                        showAdminMessageModal(`Error al cargar solicitudes: ${data.message || 'Desconocido'}`, 'error');
+                        solicitudesListBody.innerHTML = `<tr><td colspan="9" class="admin-no-data-message admin-error-text">No se pudieron cargar las solicitudes.</td></tr>`;
                     }
                 } catch (error) {
-                    console.error('Error al cargar reclamos:', error);
-                    showAdminMessageModal('Error de red al cargar reclamos.', 'error');
-                    reclamosListBody.innerHTML = `<tr><td colspan="9" class="admin-no-data-message admin-error-text">Error de red.</td></tr>`;
+                    console.error('Error al cargar solicitudes de clientes:', error);
+                    showAdminMessageModal('Error de red al cargar solicitudes.', 'error');
+                    solicitudesListBody.innerHTML = `<tr><td colspan="9" class="admin-no-data-message admin-error-text">Error de red.</td></tr>`;
                 }
             }
 
             /**
-             * @brief Renderiza la tabla de reclamos.
-             * @param {Array<Object>} mensajesContacto - Array de objetos de reclamo (ahora se llaman mensajesContacto).
+             * @brief Renderiza la tabla de solicitudes de clientes.
+             * @param {Array<Object>} solicitudes - Array de objetos de solicitud de cliente.
              */
-            function renderReclamosTable(mensajesContacto) { // Cambiado el parámetro a mensajesContacto
-                reclamosListBody.innerHTML = ''; // Limpiar tbody
-                noReclamosMessage.style.display = 'none';
+            function renderSolicitudesTable(solicitudes) { // Renombrado el parámetro
+                solicitudesListBody.innerHTML = ''; // Limpiar tbody
+                noSolicitudesMessage.style.display = 'none';
 
-                if (mensajesContacto.length === 0) {
-                    noReclamosMessage.style.display = 'block';
+                if (solicitudes.length === 0) {
+                    noSolicitudesMessage.style.display = 'block';
                     return;
                 }
 
-                mensajesContacto.forEach(mensaje => { // Iterar sobre 'mensaje'
+                solicitudes.forEach(solicitud => { // Iterar sobre 'solicitud'
                     const row = document.createElement('tr');
-                    const fechaEnvio = new Date(mensaje.Fecha_Envio).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+                    const fechaEnvio = new Date(solicitud.Fecha_Envio).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
                     
                     row.innerHTML = `
-                        <td>${mensaje.Id_Contacto}</td> <!-- Usar Id_Contacto -->
-                        <td>${mensaje.Nombre_Empresa_Organizador || 'N/A'}</td>
-                        <td>${mensaje.Email_Organizador || 'N/A'}</td>
-                        <td>${mensaje.Tipo_Problema || 'N/A'}</td>
-                        <td>${mensaje.Descripcion || 'N/A'}</td>
+                        <td>${solicitud.Id_Solicitud}</td>
+                        <td>${solicitud.Nom_Usuario || 'N/A'}</td>
+                        <td>${solicitud.Ape_Usuario || 'N/A'}</td>
+                        <td>${solicitud.Correo_Usuario || 'N/A'}</td>
+                        <td>${solicitud.Asunto_Solicitud || 'N/A'}</td>
+                        <td>${solicitud.Descripcion_Solicitud || 'N/A'}</td>
                         <td>${fechaEnvio}</td>
-                        <td>
-                            ${mensaje.URL_Archivo_Adjunto ? `<button class="admin-btn-details view-attachment" data-url="${API_URL}${mensaje.URL_Archivo_Adjunto}">Ver</button>` : 'Ninguno'}
-                        </td>
-                        <td><span class="reclamo-estado-${mensaje.Estado}">${mensaje.Estado}</span></td>
-                        <td class="reclamos-actions">
-                            ${mensaje.Estado === 'pendiente' ? `<button class="mark-read" data-id="${mensaje.Id_Contacto}">Marcar como Leído</button>` : ''}
-                            ${mensaje.Estado !== 'resuelto' ? `<button class="mark-resolved" data-id="${mensaje.Id_Contacto}">Marcar como Resuelto</button>` : ''}
+                        <td><span class="solicitud-estado-${solicitud.Estado_Solicitud}">${solicitud.Estado_Solicitud}</span></td> <!-- Cambiado a solicitud-estado -->
+                        <td class="solicitudes-actions">
+                            ${solicitud.Estado_Solicitud === 'pendiente' ? `<button class="mark-revisado" data-id="${solicitud.Id_Solicitud}">Marcar como Revisado</button>` : ''}
+                            ${solicitud.Estado_Solicitud !== 'rechazado' ? `<button class="mark-rechazado" data-id="${solicitud.Id_Solicitud}">Marcar como Rechazado</button>` : ''}
                         </td>
                     `;
-                    reclamosListBody.appendChild(row);
+                    solicitudesListBody.appendChild(row);
                 });
 
                 // Añadir event listeners a los botones de acción
-                reclamosListBody.querySelectorAll('.view-attachment').forEach(button => {
+                solicitudesListBody.querySelectorAll('.mark-revisado').forEach(button => {
                     button.addEventListener('click', (e) => {
-                        const fileUrl = e.target.dataset.url;
-                        viewAttachment(fileUrl);
+                        const solicitudId = e.target.dataset.id;
+                        updateSolicitudStatus(solicitudId, 'revisado', '¿Estás seguro de marcar esta solicitud como revisada?');
                     });
                 });
 
-                reclamosListBody.querySelectorAll('.mark-read').forEach(button => {
+                solicitudesListBody.querySelectorAll('.mark-rechazado').forEach(button => {
                     button.addEventListener('click', (e) => {
-                        const mensajeId = e.target.dataset.id; // Usar mensajeId
-                        updateReclamoStatus(mensajeId, 'leido', '¿Estás seguro de marcar este reclamo como leído?');
-                    });
-                });
-
-                reclamosListBody.querySelectorAll('.mark-resolved').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const mensajeId = e.target.dataset.id; // Usar mensajeId
-                        updateReclamoStatus(mensajeId, 'resuelto', '¿Estás seguro de marcar este reclamo como resuelto?');
+                        const solicitudId = e.target.dataset.id;
+                        updateSolicitudStatus(solicitudId, 'rechazado', '¿Estás seguro de marcar esta solicitud como rechazada?');
                     });
                 });
             }
 
             /**
-             * @brief Abre un modal para visualizar el archivo adjunto.
-             * @param {string} fileUrl - La URL completa del archivo adjunto.
-             */
-            function viewAttachment(fileUrl) {
-                attachmentContent.innerHTML = ''; // Limpiar contenido anterior
-                const fileExtension = fileUrl.split('.').pop().toLowerCase();
-
-                if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension)) {
-                    const img = document.createElement('img');
-                    img.src = fileUrl;
-                    img.alt = 'Archivo Adjunto';
-                    attachmentContent.appendChild(img);
-                } else if (fileExtension === 'pdf') {
-                    const iframe = document.createElement('iframe');
-                    iframe.src = fileUrl;
-                    iframe.style.width = '100%';
-                    iframe.style.height = '600px';
-                    iframe.style.border = 'none';
-                    attachmentContent.appendChild(iframe);
-                } else {
-                    attachmentContent.innerHTML = `<p>Tipo de archivo no soportado para previsualización. <a href="${fileUrl}" target="_blank" style="color: #007bff;">Descargar archivo</a></p>`;
-                }
-                attachmentViewerModal.style.display = 'flex';
-            }
-
-            // Cerrar modal de adjuntos
-            attachmentViewerModal.querySelector('.admin-close-button').onclick = () => {
-                attachmentViewerModal.style.display = 'none';
-            };
-            window.onclick = (event) => {
-                if (event.target === attachmentViewerModal) {
-                    attachmentViewerModal.style.display = 'none';
-                }
-            };
-
-            /**
-             * @brief Actualiza el estado de un reclamo en el backend.
-             * @param {number} reclamoId - El ID del reclamo a actualizar.
-             * @param {string} newStatus - El nuevo estado ('leido' o 'resuelto').
+             * @brief Actualiza el estado de una solicitud de cliente en el backend.
+             * @param {number} solicitudId - El ID de la solicitud a actualizar.
+             * @param {string} newStatus - El nuevo estado ('revisado' o 'rechazado').
              * @param {string} confirmationMessage - Mensaje para el modal de confirmación.
              */
-            async function updateReclamoStatus(reclamoId, newStatus, confirmationMessage) {
+            async function updateSolicitudStatus(solicitudId, newStatus, confirmationMessage) { // Renombrado
                 const confirmUpdate = await showAdminConfirmationModal(confirmationMessage);
                 if (!confirmUpdate) {
                     return;
@@ -553,8 +415,7 @@
                 showAdminMessageModal(`Actualizando estado a '${newStatus}'...`, 'info');
 
                 try {
-                    // CAMBIO CLAVE AQUÍ: Llama a la ruta /api/contactoProveedor/:id/estado
-                    const response = await fetch(`${API_URL}/api/contactoProveedor/${reclamoId}/estado`, {
+                    const response = await fetch(`${API_URL}/api/solicitudCliente/admin/${solicitudId}/estado`, { // CAMBIO CLAVE AQUÍ: Llama a la nueva ruta
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
@@ -566,18 +427,19 @@
 
                     if (response.ok) {
                         showAdminMessageModal(data.message, 'success');
-                        fetchReclamos(); // Recargar la tabla para ver los cambios
+                        fetchSolicitudesClientes(); // Recargar la tabla para ver los cambios
                     } else {
                         showAdminMessageModal(`Error al actualizar estado: ${data.message || 'Desconocido'}`, 'error');
                     }
                 } catch (error) {
-                    console.error('Error de red al actualizar estado del reclamo:', error);
+                    console.error('Error de red al actualizar estado de la solicitud:', error);
                     showAdminMessageModal('Error de conexión con el servidor al actualizar el estado.', 'error');
                 }
             }
 
-            // Cargar reclamos al inicio
-            fetchReclamos();
+            // Cargar solicitudes al inicio
+            fetchSolicitudesClientes(); // Renombrado
+            fetchNotifications(); // Cargar notificaciones al inicio
         });
     </script>
 </body>

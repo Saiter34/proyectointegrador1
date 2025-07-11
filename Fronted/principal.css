@@ -79,8 +79,9 @@ header.encabezado {
     transition: all 0.3s ease-in-out;
 }
 
+
 .logo img {
-    height: 48px; /* Altura del logo en el encabezado */
+  height: 48px; /* Altura del logo que tenías */
 }
 
 nav {

@@ -5,9 +5,8 @@
     <title>Teycketan - Detalles del Evento</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="detalles.css">
+    <link rel="stylesheet" href="detallesprincipal.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <script src="../js/verificar-cliente.js"></script>
 </head>
 <body>
     <!-- Capas de fondo para un diseño más rico y un efecto visual atractivo -->
@@ -16,10 +15,10 @@
 
     <header class="encabezado">
         <div class="logo">
-                <a href="cliente.html">
-                    <img src="../img/logo.png" alt="Logo de Teycketan">
-                </a>
-            </div>
+            <a href="principal.HTML">
+                <img src="../img/logo.png" alt="Logo de Teycketan">
+            </a>
+        </div>
     </header>
 
     <main class="main-content">
@@ -38,12 +37,13 @@
                         <div class="fila tabla-encabezado">
                             <div>Zona</div>
                             <div>Regular</div>
-                            <div>Preventa</div> <!-- Se muestra aquí el precio de preventa calculado -->
-                            <div>Disponible</div> <!-- Cambiado a "Stock Conadis" -->
+                            <div>Preventa</div>
+                            <div>Disponible</div>
                         </div>
                         <p class="loading-message">Cargando precios...</p>
                     </div>
-                    <a id="buyTicketsBtn" href="pago1.html" class="btn-comprar">COMPRAR ENTRADAS</a>
+                    <!-- CAMBIO: Ahora es un botón para manejar el evento click con JavaScript -->
+                    <button id="buyTicketsBtn" class="btn-comprar">COMPRAR ENTRADAS</button>
                     <p class="nota-conadis">* Descuento CONADIS válido con carné vigente. Cupos limitados.</p>
                 </div>
             </div>
@@ -168,6 +168,7 @@
         <img src="../img/logo.png" alt="Logo Teycketan" class="logo-footer"/>
     </footer>
     
+    <!-- Modal para mensajes al cliente -->
     <div id="clientModal" class="client-modal">
         <div class="client-modal-content">
             <span class="client-close-button">&times;</span>
@@ -190,15 +191,27 @@
             const eventCategoryLocation = document.getElementById('eventCategoryLocation');
             const eventDate = document.getElementById('eventDate');
             const pricingTable = document.getElementById('pricingTable');
+            // Referencia al botón de comprar entradas
             const buyTicketsBtn = document.getElementById('buyTicketsBtn'); 
             const eventDescription = document.getElementById('eventDescription');
             const eventRules = document.getElementById('eventRules'); // Mantener la referencia al elemento
 
+            // Referencias a los elementos del modal
             const clientModal = document.getElementById('clientModal');
             const clientModalMessage = document.getElementById('clientModalMessage');
             const clientModalActions = document.getElementById('clientModalActions');
             const clientCloseButton = document.querySelector('.client-modal-content .client-close-button');
 
+            /**
+             * @brief Muestra un modal con un mensaje y acciones opcionales.
+             * @param {string} message - El mensaje a mostrar en el modal.
+             * @param {string} [type='info'] - Tipo de mensaje ('info', 'error', 'success').
+             * @param {Array<Object>} [actions=[]] - Un array de objetos de acción para botones.
+             * Cada objeto de acción debe tener:
+             * - `text`: Texto del botón.
+             * - `type`: Tipo de botón (ej. 'confirm', 'cancel').
+             * - `handler`: Función a ejecutar al hacer clic en el botón.
+             */
             function showModal(message, type = 'info', actions = []) {
                 clientModalMessage.textContent = message;
                 clientModalMessage.className = `client-message-text client-message-${type}`;
@@ -227,6 +240,7 @@
                 clientModal.style.display = 'flex'; 
             }
 
+            // Event listeners para cerrar el modal
             clientCloseButton.onclick = () => {
                 clientModal.style.display = 'none';
             };
@@ -262,14 +276,12 @@
                         console.error('Error fetching event details:', eventData);
                         document.querySelector('.precios-box').innerHTML = '<p class="error-message">No se pudieron cargar los detalles del evento.</p>';
                         document.querySelector('.historia-box').innerHTML = '';
-                        // No modificar la sección de reglas aquí, ya que ahora es estática
                     }
                 } catch (error) {
                     showModal('Error de conexión con el servidor. No se pudieron cargar los detalles del evento.', 'error');
                     console.error('Network error fetching event details:', error);
                     document.querySelector('.precios-box').innerHTML = '<p class="error-message">Error de conexión con el servidor.</p>';
                     document.querySelector('.historia-box').innerHTML = '';
-                    // No modificar la sección de reglas aquí, ya que ahora es estática
                 }
             }
 
@@ -283,8 +295,6 @@
                 eventImage.src = eventImageUrl;
                 
                 let venueMapUrl;
-                // Asegúrate de que event.URL_Imagen_Asientos exista en tu respuesta del backend para el evento
-                // Esto viene de la tabla "Lugares" a través del JOIN en el backend.
                 if (event.URL_Imagen_Asientos) {
                     venueMapUrl = `${API_URL}${event.URL_Imagen_Asientos}`;
                 } else {
@@ -295,7 +305,6 @@
                 venueMap.src = venueMapUrl;
 
                 eventName.textContent = event.Nom_Evento || 'Unknown Event';
-                // CORRECCIÓN: Usar event.Ubicacion_Lugar en lugar de event.Ubicacion
                 eventCategoryLocation.textContent = `${event.Categoria || 'Unknown Category'} / ${event.Ubicacion_Lugar || 'Unknown Location'}`; 
                 eventDate.textContent = event.Fecha ? new Date(event.Fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Unknown Date';
 
@@ -308,14 +317,10 @@
                     </div>
                 `;
                 
-                // Ahora renderizamos usando el array CategoriasDeEntradas que viene del backend
-                // Asegúrate de que event.CategoriasDeEntradas esté presente y sea un array
                 if (event.CategoriasDeEntradas && Array.isArray(event.CategoriasDeEntradas) && event.CategoriasDeEntradas.length > 0) {
                     event.CategoriasDeEntradas.forEach(category => {
                         const precioRegular = parseFloat(category.precioRegular || 0);
-                        // Calcula el precio de preventa como 20% menos del precio regular
                         const precioPreventaCalculado = (precioRegular * 0.80).toFixed(2);
-                        // El stock disponible para CONADIS (o cualquier otra categoría)
                         const stockDisponibleConadis = parseInt(category.stockDisponible || 0); 
 
                         pricingHtml += `
@@ -323,7 +328,7 @@
                                 <div>${category.Nom_Categoria || 'N/A'}</div>
                                 <div>S/. ${precioRegular.toFixed(2)}</div>
                                 <div>S/. ${precioPreventaCalculado}</div>
-                                <div>${stockDisponibleConadis}</div> <!-- Muestra el stock sin "S/." -->
+                                <div>${stockDisponibleConadis}</div>
                             </div>
                         `;
                     });
@@ -333,15 +338,36 @@
                 pricingTable.innerHTML = pricingHtml;
 
                 eventDescription.textContent = event.Descripcion || 'No description available for this event.';
-
-                // La sección de reglas ahora es estática en el HTML, no se modifica aquí
-                // eventRules.innerHTML = rulesHtml; // Esta línea se elimina o comenta
-
-                // Update the buy tickets button link to include the eventId
-                buyTicketsBtn.href = `pago1.html?eventId=${event.Id_Evento}`; 
             }
 
+            // Llama a la función para cargar los detalles del evento al cargar la página
             fetchEventDetails();
+
+            // Event listener para el botón "COMPRAR ENTRADAS"
+            buyTicketsBtn.addEventListener('click', (e) => {
+                e.preventDefault(); // Previene la acción por defecto del botón (si fuera un enlace)
+                showModal(
+                    'Debes iniciar sesión para comprar entradas.', 
+                    'info', 
+                    [
+                        {
+                            text: 'Iniciar Sesión', 
+                            type: 'confirm', 
+                            handler: () => {
+                                // Redirige a login.html, pasando la URL actual para poder volver después de iniciar sesión
+                                window.location.href = `login.html?redirectBack=${encodeURIComponent(window.location.href)}`;
+                            }
+                        },
+                        {
+                            text: 'Cancelar',
+                            type: 'cancel',
+                            handler: () => {
+                                // No hace nada, simplemente cierra el modal
+                            }
+                        }
+                    ]
+                );
+            });
         });
     </script>
 </body>
