@@ -120,8 +120,8 @@
             <li><a href="eventoDestacado.html" class="admin-nav-item"><i class="fas fa-star"></i><span>Eventos Destacados</span></a></li>
             <li><a href="solicitudDestacar.html" class="admin-nav-item"><i class="fas fa-inbox"></i><span>Solicitudes para destacar</span></a></li>
             <li><a href="catalogoDeLugares.html" class="admin-nav-item"><i class="fas fa-map-marker-alt"></i><span>Catálogo de lugares</span></a></li>
-            <li><a href="reclamos.html" class="admin-nav-item active"><i class="fas fa-envelope"></i><span>Reclamos</span></a></li>
-            <li><a href="comentariosClientes.html" class="admin-nav-item"><i class="fas fa-person"></i><span>Comentarios del cliente</span></a></li>
+            <li><a href="reclamos.html" class="admin-nav-item"><i class="fas fa-envelope"></i><span>Reclamos</span></a></li>
+            <li><a href="comentariosClientes.html" class="admin-nav-item active"><i class="fas fa-person"></i><span>Comentarios del cliente</span></a></li>
         </ul>
     </div>
 
@@ -148,7 +148,7 @@
         </header>
 
         <section class="admin-contenido">
-            <div class="admin-bienvenida">Aquí puedes gestionar los reclamos enviados por los proveedores.</div>
+            <div class="admin-bienvenida">Aquí puedes gestionar los comentraios de los clientes.</div>
 
             <!-- Contenedor para mensajes (para modales) -->
             <div id="adminMessageContainer" class="admin-message-container"></div>
@@ -157,23 +157,21 @@
                 <table class="reclamos-table">
                     <thead>
                         <tr>
-                            <th>ID Reclamo</th>
-                            <th>Empresa</th>
+                            <th>ID Cliente</th>
                             <th>Email</th>
-                            <th>Tipo de Problema</th>
+                            <th>Asunto</th>
                             <th>Descripción</th>
                             <th>Fecha Envío</th>
-                            <th>Adjunto</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="reclamosListBody">
                         <!-- Los reclamos se cargarán aquí dinámicamente -->
-                        <tr><td colspan="9" class="admin-loading-message">Cargando reclamos...</td></tr>
+                        <tr><td colspan="9" class="admin-loading-message">Cargando comentarios...</td></tr>
                     </tbody>
                 </table>
-                <p id="noReclamosMessage" class="admin-no-data-message" style="display: none;">No hay reclamos pendientes.</p>
+                <p id="noComentarioMessage" class="admin-no-data-message" style="display: none;">No hay comentarios pendientes.</p>
             </div>
         </section>
     </div>
@@ -193,17 +191,6 @@
             <span class="admin-close-button">&times;</span>
             <p id="adminMessageModalText"></p>
             <button id="adminMessageModalCloseBtn" class="admin-modal-btn admin-modal-confirm">Aceptar</button>
-        </div>
-    </div>
-
-    <!-- Modal para visualizar archivos adjuntos -->
-    <div id="attachmentViewerModal" class="admin-modal">
-        <div class="attachment-modal-content">
-            <span class="admin-close-button">&times;</span>
-            <h3>Archivo Adjunto</h3>
-            <div id="attachmentContent">
-                <!-- El contenido del adjunto (imagen o iframe de PDF) se cargará aquí -->
-            </div>
         </div>
     </div>
 
